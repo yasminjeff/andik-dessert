@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comments – Andik's Staff</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<style>
+:root{--y:#F5C800;--yd:#D4A900;--bk:#011041;--sw:260px;}
+*{font-family:'Poppins',sans-serif;}body{background:#F4F5F7;margin:0;}
+.sidebar{width:var(--sw);min-height:100vh;background:var(--bk);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:200;}
+.sb-header{padding:1.2rem;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;}
+.sb-logo{width:42px;height:42px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:var(--bk);flex-shrink:0;}
+.sb-brand{color:var(--y);font-weight:700;font-size:.9rem;line-height:1.2;}
+.sb-role{color:rgba(255,255,255,.4);font-size:.68rem;}
+.sb-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.25);padding:.8rem 1.4rem .3rem;}
+.sb-link{display:flex;align-items:center;gap:10px;padding:.58rem 1.4rem;color:rgba(255,255,255,.65);text-decoration:none;font-size:.86rem;font-weight:500;transition:.2s;border-left:3px solid transparent;}
+.sb-link i{width:18px;text-align:center;}
+.sb-link:hover{color:#fff;background:rgba(255,255,255,.06);}
+.sb-link.active{color:var(--y);background:rgba(245,200,0,.08);border-left-color:var(--y);}
+.sb-footer{padding:1rem 1.4rem;border-top:1px solid rgba(255,255,255,.08);margin-top:auto;}
+.main{margin-left:var(--sw);display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:#fff;height:64px;display:flex;align-items:center;padding:0 1.5rem;border-bottom:1px solid #EBEBEB;position:sticky;top:0;z-index:100;}
+.topbar-title{font-weight:700;font-size:1.1rem;flex:1;}
+.avatar{width:36px;height:36px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:var(--bk);}
+.content{padding:1.8rem;}
+.panel{background:#fff;border-radius:14px;border:1px solid #EBEBEB;padding:1.4rem;margin-bottom:1.4rem;}
+.btn-y{background:var(--y);color:var(--bk);font-weight:700;border:none;border-radius:8px;}
+.btn-y:hover{background:var(--yd);color:var(--bk);}
+.form-control:focus{border-color:var(--y);box-shadow:0 0 0 3px rgba(245,200,0,.2);}
+.modal-header{background:var(--bk);}
+.modal-title{color:var(--y);font-weight:700;}
+.review-card{background:#fff;border:1px solid #EBEBEB;border-radius:14px;padding:1.4rem;margin-bottom:1rem;transition:.2s;}
+.review-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.07);transform:translateY(-1px);}
+.star-filled{color:var(--y);}
+.star-empty{color:#E0E0E0;}
+.reply-box{background:#FFFDE7;border-radius:10px;padding:1rem;margin-top:.8rem;border-left:4px solid var(--y);}
+.badge-new{background:#FFEBEE;color:#C62828;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px;}
+.badge-replied{background:#E8F5E9;color:#2E7D32;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px;}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">A</div>
+    <div><div class="sb-brand">Andik's Desserts</div><div class="sb-role" id="roleLabel">Staff Portal</div></div>
+  </div>
+  <nav style="padding:1rem 0;flex:1;overflow-y:auto">
+    <div class="sb-label">Main</div>
+    <a href="dashboard.html" class="sb-link"><i class="bi bi-speedometer2"></i>Dashboard</a>
+    <div class="sb-label">Menu</div>
+    <a href="menu.html" class="sb-link"><i class="bi bi-grid"></i>Menu Items</a>
+    <div class="sb-label">Engagement</div>
+    <a href="comments.html" class="sb-link active"><i class="bi bi-chat-left-text"></i>Comments</a>
+    <a href="staff-announcements.html" class="sb-link"><i class="bi bi-megaphone"></i>Announcements</a>
+    <div id="adminLinks"></div>
+  </nav>
+  <div class="sb-footer">
+    <button class="btn btn-sm w-100" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:none;border-radius:8px;padding:.5rem" onclick="DB.logout();location.href='http://localhost/project/group-24/customer/login.html'">
+      <i class="bi bi-box-arrow-right me-2"></i>Logout
+    </button>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Comments</div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="avatar" id="userAvatar">?</div>
+<div class="d-none d-md-block"><div style="font-weight:600;font-size:.85rem" id="userName"></div>
+<div style="font-size:.72rem;color:#999" id="userRole"></div></div>    </div>
+  </div>
+
+  <div class="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h5 class="mb-0" style="font-weight:700">Customer Comments</h5>
+        <p class="text-muted mb-0" style="font-size:.82rem">View and reply to anonymous customer reviews</p>
+      </div>
+      <div style="font-size:.85rem;color:#888">Total: <strong id="totalCount">0</strong> comments</div>
+    </div>
+
+    <div class="panel py-3 mb-3">
+      <div class="d-flex gap-2 align-items-center">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search comments..." style="max-width:300px;border-radius:10px" oninput="renderComments()">
+        <select id="filterStatus" class="form-select" style="max-width:160px;border-radius:10px" onchange="renderComments()">
+          <option value="all">All</option>
+          <option value="new">New</option>
+          <option value="replied">Replied</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="commentsList"></div>
+  </div>
+</div>
+
+<!-- REPLY MODAL -->
+<div class="modal fade" id="replyModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:16px;border:none">
+      <div class="modal-header" style="border-radius:16px 16px 0 0">
+        <h5 class="modal-title"><i class="bi bi-reply me-2"></i>Reply to Comment</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="replyId">
+        <div class="mb-3">
+          <label class="form-label" style="font-weight:600;font-size:.88rem">Customer Comment</label>
+          <p id="replyComment" class="text-muted mb-0" style="font-size:.88rem;background:#F8F9FA;padding:.8rem;border-radius:8px"></p>
+        </div>
+        <div>
+          <label class="form-label" style="font-weight:600;font-size:.88rem">Your Reply</label>
+          <textarea id="replyText" class="form-control" rows="3" placeholder="Write your reply here..." style="border-radius:10px;resize:none"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius:8px">Cancel</button>
+        <button type="button" class="btn btn-y" onclick="submitReply()"><i class="bi bi-send me-1"></i>Send Reply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../phpdata/data.js"></script>
+<script>
+const user = DB.currentUser();
+if (!user || (user.role !== 'staff' && user.role !== 'admin')) location.href = 'http://localhost/project/group-24/customer/login.html';
+document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+document.getElementById('userName').textContent = user.name;
+document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+document.getElementById('roleLabel').textContent = user.role === 'admin' ? 'Admin Portal' : 'Staff Portal';
+if (user.role === 'admin') document.getElementById('adminLinks').innerHTML = `<div class="sb-label">Admin</div><a href="http://localhost/project/admin/dashboard.html" class="sb-link"><i class="bi bi-people"></i>Manage Staff</a>`;
+
+const REVIEWS_API = "http://localhost/project/group-24/reviews";
+const MENU_API = "http://localhost/project/group-24/get_menu.php";
+
+let allReviews = [];
+let allMenu = [];
+
+async function loadComments() {
+  try {
+    const [menuRes, revRes] = await Promise.all([
+      fetch(MENU_API),
+      fetch(`${REVIEWS_API}/get_reviews.php`)
+    ]);
+    allMenu = await menuRes.json();
+    allReviews = await revRes.json();
+    renderComments();
+  } catch (err) {
+    console.error("loadComments error:", err);
+  }
+}
+
+function renderComments() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const filter = document.getElementById('filterStatus').value;
+
+  let reviews = allReviews.filter(r => {
+    const matchSearch = (r.comment || '').toLowerCase().includes(search);
+    const matchFilter = filter === 'all' ? true : filter === 'replied' ? r.reply : !r.reply;
+    return matchSearch && matchFilter;
+  });
+
+  document.getElementById('totalCount').textContent = reviews.length;
+  const list = document.getElementById('commentsList');
+
+  if (!reviews.length) {
+    list.innerHTML = `<div class="text-center text-muted py-5">
+      <i class="bi bi-chat-left-text" style="font-size:3rem;display:block;margin-bottom:12px;opacity:.3"></i>
+      <h6>No comments found</h6>
+      <p class="small">No customer reviews yet.</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = reviews.map(r => {
+    const item = allMenu.find(i => i.id == r.item_id);
+    const stars = Array.from({length:5}, (_,i) =>
+      `<i class="bi bi-star${i < r.rating ? '-fill star-filled' : ' star-empty'}"></i>`
+    ).join('');
+
+    return `
+    <div class="review-card">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div class="d-flex gap-3 align-items-start">
+          <div style="width:44px;height:44px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;color:var(--bk);flex-shrink:0">A</div>
+          <div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <span style="font-weight:700;font-size:.92rem">Anonymous</span>
+              ${r.reply ? `<span class="badge-replied">✓ Replied</span>` : `<span class="badge-new">● New</span>`}
+            </div>
+            <div style="font-size:.78rem;color:#888;margin:2px 0">
+              <i class="bi bi-tag me-1"></i>${item ? item.name : 'Unknown item'}
+              <span class="mx-1">•</span>
+              <i class="bi bi-clock me-1"></i>${r.created_at || ''}
+            </div>
+            <div style="margin-top:4px">${stars}</div>
+          </div>
+        </div>
+        <div class="d-flex gap-1">
+          <button class="btn btn-sm" style="background:#E3F2FD;color:#1565C0;border:none;border-radius:7px;font-size:.8rem" onclick="openReply(${r.id},'${(r.comment||'').replace(/'/g,"\\'").replace(/\n/g,' ')}','${(r.reply||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">
+            <i class="bi bi-reply me-1"></i>${r.reply ? 'Edit Reply' : 'Reply'}
+          </button>
+          <button class="btn btn-sm" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px" onclick="delComment(${r.id})">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <p style="font-size:.88rem;color:#444;margin:1rem 0 0;line-height:1.6">${r.comment || ''}</p>
+
+      ${r.reply ? `
+      <div class="reply-box">
+        <div style="font-size:.72rem;font-weight:700;color:var(--bk);margin-bottom:6px">
+          <i class="bi bi-reply-fill me-1" style="color:var(--y)"></i>Staff/Admin Reply
+        </div>
+        <p style="font-size:.85rem;color:#555;margin:0;line-height:1.6">${r.reply}</p>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function openReply(id, comment, existingReply) {
+  document.getElementById('replyId').value = id;
+  document.getElementById('replyComment').textContent = comment;
+  document.getElementById('replyText').value = existingReply || '';
+  new bootstrap.Modal(document.getElementById('replyModal')).show();
+}
+
+async function submitReply() {
+  const id = document.getElementById('replyId').value;
+  const reply = document.getElementById('replyText').value.trim();
+  if (!reply) { alert('Please write a reply.'); return; }
+
+  try {
+    await fetch(`${REVIEWS_API}/reply_review.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, reply })
+    });
+    bootstrap.Modal.getInstance(document.getElementById('replyModal')).hide();
+    loadComments();
+  } catch (err) {
+    alert('Server error. Please try again.');
+  }
+}
+
+async function delComment(id) {
+  if (!confirm('Delete this comment?')) return;
+  try {
+    await fetch(`${REVIEWS_API}/delete_review.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    loadComments();
+  } catch (err) {
+    alert('Server error. Please try again.');
+  }
+}
+
+loadComments();
+</script>
+</body>
+</html>

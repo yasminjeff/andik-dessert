@@ -1,0 +1,271 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Menu – Andik's Desserts</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<style>
+:root{--y:#F5C800;--yd:#D4A900;--bk:#011041;}
+*{font-family:'Poppins',sans-serif;}html,body{height:100%;}body{background:#fff;display:flex;flex-direction:column;margin:0;}
+.navbar{background:var(--bk);}
+.brand-logo{width:44px;height:44px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:var(--bk);}
+.brand-name{color:var(--y);font-weight:700;font-size:1rem;line-height:1.2;}
+.brand-sub{color:rgba(255,255,255,.5);font-size:.68rem;}
+.nav-link-c{color:rgba(255,255,255,.75)!important;font-weight:500;font-size:.88rem;padding:.4rem 1rem!important;border-radius:6px;transition:.2s;}
+.nav-link-c:hover,.nav-link-c.active{color:var(--y)!important;background:rgba(245,200,0,.08);}
+.btn-y{background:var(--y);color:var(--bk);font-weight:700;border:none;border-radius:8px;}
+.btn-y:hover{background:var(--yd);color:var(--bk);}
+.btn-yo{background:transparent;color:var(--y);font-weight:600;border:2px solid var(--y);border-radius:8px;transition:.2s;}
+.btn-yo:hover{background:var(--y);color:var(--bk);}
+.andik-card{border:1px solid #EBEBEB;border-radius:14px;overflow:hidden;transition:.25s;background:#fff;}
+.andik-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.1);transform:translateY(-3px);}
+.cat-btn{border:1.5px solid #E0E0E0;border-radius:20px;padding:.35rem 1rem;font-size:.82rem;font-weight:600;color:#666;background:#fff;cursor:pointer;transition:.2s;}
+.cat-btn:hover,.cat-btn.active{background:var(--y);border-color:var(--y);color:var(--bk);}
+.search-box{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;padding:.6rem 1rem .6rem 2.8rem;font-size:.9rem;width:100%;max-width:440px;}
+.search-box::placeholder{color:rgba(255,255,255,.4);}
+.search-box:focus{outline:none;border-color:var(--y);}
+main{flex:1;}
+footer{background:var(--bk);color:rgba(255,255,255,.6);font-size:.82rem;padding:2rem 0 1rem;margin-top:auto;}
+footer a{color:rgba(255,255,255,.5);text-decoration:none;}
+footer a:hover{color:var(--y);}
+</style>
+</head>
+<body>
+
+<nav class="navbar sticky-top shadow">
+  <div class="container d-flex align-items-center justify-content-between py-2">
+    <a href="index.html" class="d-flex align-items-center gap-2 text-decoration-none">
+      <img src="../assets/andikDessert.png" alt="Andik's Desserts Logo" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">
+      <div><div class="brand-name">Andik's Desserts</div><div class="brand-sub">Mini Cafe</div></div>
+    </a>
+    <ul class="nav d-none d-md-flex align-items-center">
+      <li><a href="index.html" class="nav-link-c nav-link"><i class="bi bi-house me-1"></i>Home</a></li>
+      <li><a href="menu.html" class="nav-link-c active nav-link"><i class="bi bi-grid me-1"></i>Menu</a></li>
+      <li><a href="announcements.html" class="nav-link-c nav-link"><i class="bi bi-megaphone me-1"></i>Announcements</a></li>
+    </ul>
+    <div class="d-flex gap-3 align-items-center">
+      <div style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
+      <div class="d-flex gap-2" id="authButtons"></div>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<!-- HERO HEADER -->
+<div style="background:var(--bk);padding:2.5rem 0 2rem">
+  <div class="container">
+    <h1 style="color:#fff;font-size:2rem;font-weight:800;margin-bottom:.3rem"><span style="color:var(--y)">Our</span> Menu</h1>
+    <p style="color:rgba(255,255,255,.5);font-size:.88rem;margin-bottom:1.2rem">Browse all desserts — filter by category and check live stock</p>
+    <div style="position:relative;max-width:440px">
+      <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.4)"></i>
+      <input type="text" id="searchInput" class="search-box" placeholder="Search desserts...">
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY + GRID -->
+<div class="container py-4">
+  <div class="d-flex flex-wrap gap-2 mb-4" id="catTabs"></div>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+  <p class="text-muted mb-0" style="font-size:.85rem" id="resultInfo"></p>
+  <div class="d-flex gap-2 align-items-center">
+    <select id="sortSelect" class="form-select form-select-sm" style="border-radius:8px;font-size:.82rem;max-width:200px;border:1.5px solid #E0E0E0" onchange="renderMenu()">
+      <option value="default">⭐ Sort By</option>
+      <option value="price_asc">💰 Price: Low → High</option>
+      <option value="price_desc">💸 Price: High → Low</option>
+      <option value="name_az">🔤 Name: A → Z</option>
+      <option value="rating_desc">⭐ Rating: Best First</option>
+      <option value="available">✅ Available First</option>
+    </select>
+    <button onclick="refreshMenu()" class="btn btn-sm btn-yo"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+  </div>
+</div>
+
+<div class="row g-4" id="menuGrid"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../phpdata/data.js"></script>
+<script>
+// auth
+const user = DB.currentUser();
+const authDiv = document.getElementById('authButtons');
+if (user) {
+  authDiv.innerHTML = `<span class="text-white opacity-75 small">Hi, ${user.name}</span>
+    <button class="btn btn-sm btn-yo" onclick="DB.logout();location.reload()">Logout</button>`;
+} else {
+  authDiv.innerHTML = `<a href="login.html" class="btn btn-sm btn-yo">Login</a><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
+}
+
+// date
+document.getElementById('navDate').textContent = DB.getDayName();
+
+let activeCat = 'All';
+let searchVal = '';
+let allItems = [];
+
+// categories
+const categories = ['All', 'Rice', 'Noodles', 'Dessert', 'Drinks'];
+const catTabs = document.getElementById('catTabs');
+
+categories.forEach(c => {
+  const btn = document.createElement('button');
+  btn.className = 'cat-btn' + (c === 'All' ? ' active' : '');
+  btn.textContent = c;
+  btn.onclick = () => {
+    activeCat = c;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderMenu();
+  };
+  catTabs.appendChild(btn);
+});
+
+// today button
+const todayBtn = document.createElement('button');
+todayBtn.className = 'cat-btn';
+todayBtn.textContent = "⭐ Today's Items";
+todayBtn.onclick = () => {
+  activeCat = 'Today';
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  todayBtn.classList.add('active');
+  renderMenu();
+};
+catTabs.appendChild(todayBtn);
+
+// search
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchVal = e.target.value.toLowerCase();
+  renderMenu();
+});
+
+// fetch dari PHP
+async function loadMenu() {
+  try {
+    const res = await fetch('http://localhost/project/group-24/get_menu.php');
+    if (!res.ok) throw new Error("Failed to load menu");
+    allItems = await res.json();
+    renderMenu();
+  } catch (err) {
+    console.error("loadMenu error:", err);
+    document.getElementById('menuGrid').innerHTML =
+      '<div class="col-12 text-center py-5 text-muted"><h5>Failed to load menu</h5><p class="small">Please check your connection.</p></div>';
+  }
+}
+
+// refresh button
+async function refreshMenu() {
+  try {
+    const res = await fetch('http://localhost/project/group-24/get_menu.php');
+    allItems = await res.json();
+    renderMenu();
+  } catch (err) {
+    console.error("refreshMenu error:", err);
+  }
+}
+
+// auto refresh every 30 seconds
+setInterval(refreshMenu, 30000);
+
+function renderMenu() {
+  let items = allItems;
+
+  if (activeCat === 'Today') {
+    items = items.filter(i => i.category === "⭐ Today's Items");
+  } else if (activeCat !== 'All') {
+    items = items.filter(i => i.category === activeCat);
+  }
+
+  if (searchVal) items = items.filter(i => i.name.toLowerCase().includes(searchVal));
+
+  const sort = document.getElementById('sortSelect').value;
+if (sort === 'price_asc') items.sort((a,b) => a.price - b.price);
+else if (sort === 'price_desc') items.sort((a,b) => b.price - a.price);
+else if (sort === 'name_az') items.sort((a,b) => a.name.localeCompare(b.name));
+else if (sort === 'rating_desc') items.sort((a,b) => (b.avg_rating||0) - (a.avg_rating||0));
+else if (sort === 'available') items.sort((a,b) => b.available - a.available);
+
+  document.getElementById('resultInfo').innerHTML =
+    `Showing ${items.length} item${items.length !== 1 ? 's' : ''}`;
+
+  const grid = document.getElementById('menuGrid');
+
+  if (!items.length) {
+    grid.innerHTML = '<div class="col-12 text-center py-5 text-muted"><div style="font-size:3rem">🍰</div><h5>No items found</h5><p class="small">Try a different category or search term.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = items.map(item => {
+    const isAvailable = item.available == 1;
+
+    const statusBadge = isAvailable
+      ? `<span class="badge" style="background:#E8F5E9;color:#2E7D32;font-size:.72rem">✓ Available</span>`
+      : `<span class="badge" style="background:#FFF3CD;color:#856404;font-size:.72rem">Unavailable</span>`;
+
+    return `
+    <div class="col-sm-6 col-lg-3">
+      <div class="andik-card h-100">
+        <div style="height:190px;overflow:hidden;background:#F0F0F0;position:relative">
+          <img src="${item.image}" alt="${item.name}" 
+               style="width:100%;height:100%;object-fit:cover;transition:.3s"
+               onmouseover="this.style.transform='scale(1.05)'"
+               onmouseout="this.style.transform='scale(1)'"
+               onerror="this.src='../assets/images/placeholder.png'">
+          ${!isAvailable ? `
+          <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center">
+            <span style="background:rgba(0,0,0,.8);color:#fff;padding:.5rem 1rem;border-radius:8px;font-weight:600">Out of Stock</span>
+          </div>` : ''}
+        </div>
+        <div class="p-3 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <h6 style="font-weight:700;margin:0">${item.name}</h6>
+            ${statusBadge}
+          </div>
+          <div class="text-muted mb-1" style="font-size:.78rem">${item.category}</div>
+          <div style="font-size:.75rem;color:#888;margin-bottom:4px">${item.description || ''}</div>
+          ${isAvailable
+            ? `<div style="font-size:.75rem;color:#888">Stock: ${item.stock}</div>`
+            : `<div style="font-size:.75rem;color:#999">Currently unavailable</div>`
+          }
+          <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
+            <span style="font-weight:700;font-size:1.05rem">RM ${parseFloat(item.price).toFixed(2)}</span>
+            <a href="item.html?id=${item.id}" class="btn btn-sm btn-y">Details</a>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+loadMenu();
+</script>
+</main>
+
+<!-- FOOTER -->
+<footer class="mt-5" style="margin-top:4rem">
+  <div class="container">
+    <div class="row g-4 mb-3">
+      <div class="col-md-4"><div style="color:var(--y);font-weight:700;margin-bottom:.4rem">Andik's Desserts</div><p class="mb-0">Your favourite dessert spot. Fresh, tasty, always available.</p></div>
+      <div class="col-md-4">
+        <div style="color:#fff;font-weight:600;margin-bottom:.5rem">Quick Links</div>
+        <ul class="list-unstyled mb-0" style="line-height:2">
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="announcements.html">Announcements</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <div style="color:#fff;font-weight:600;margin-bottom:.5rem">Contact</div>
+        <p class="mb-1"><i class="bi bi-geo-alt me-2"></i>Kolej 9, Universiti Teknologi Malaysia, Johor Bahru</p>
+        <p class="mb-0"><i class="bi bi-phone me-2"></i>019-726 7753</p>
+      </div>
+    </div>
+    <hr style="border-color:rgba(255,255,255,.1)">
+    <div class="text-center" style="font-size:.75rem">&copy; 2026 Andik's Desserts. All rights reserved.</div>
+  </div>
+</footer>
+
+</body>
+</html>
