@@ -109,7 +109,7 @@
             <label class="form-label fw-600" style="font-weight:600;font-size:.88rem">Category *</label>
             <select id="fCat" class="form-select" style="border-radius:10px">
               <option value="">Select...</option>
-              <option>Rice</option><option>Noodles</option><option>Dessert</option><option>Drinks</option>
+              <option>Rice</option><option>Noodles</option><option>Dessert</option><option>Drinks</option><option>⭐ Today's Items</option>
             </select>
           </div>
           <div class="col-md-6">
@@ -172,7 +172,7 @@ async function renderTable() {
       <td>${item.available == 1 ? '<span class="badge" style="background:#E8F5E9;color:#2E7D32;font-size:.72rem">Available</span>' : '<span class="badge" style="background:#FFEBEE;color:#C62828;font-size:.72rem">Out of Stock</span>'}</td>
       <td>
         <div class="d-flex gap-1">
-          <button class="btn btn-sm" style="background:#EDE7F6;color:#6A1B9A;border:none;border-radius:7px" onclick="openEdit(${item.id},'${item.name}','${item.category}',${item.price},${item.stock},'${item.description||''}',${item.available})"><i class="bi bi-pencil"></i></button>
+          <button class="btn btn-sm" style="background:#EDE7F6;color:#6A1B9A;border:none;border-radius:7px" onclick="openEdit(${item.id}, this)"><i class="bi bi-pencil"></i></button>
           <button class="btn btn-sm" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px" onclick="delItem(${item.id})"><i class="bi bi-trash"></i></button>
         </div>
       </td>
@@ -186,16 +186,21 @@ function openAdd() {
   document.getElementById('fAvail').checked = true;
 }
 
-function openEdit(id, name, cat, price, stock, desc, avail) {
-  document.getElementById('modalTitle').textContent = 'Edit Item';
-  document.getElementById('editId').value = id;
-  document.getElementById('fName').value = name;
-  document.getElementById('fCat').value = cat;
-  document.getElementById('fPrice').value = price;
-  document.getElementById('fStock').value = stock;
-  document.getElementById('fDesc').value = desc;
-  document.getElementById('fAvail').checked = avail == 1;
-  new bootstrap.Modal(document.getElementById('itemModal')).show();
+function openEdit(id, btn) {
+  fetch(`${MENU_API}/get_menu.php`)
+    .then(r => r.json())
+    .then(items => {
+      const item = items.find(i => i.id == id);
+      document.getElementById('modalTitle').textContent = 'Edit Item';
+      document.getElementById('editId').value = item.id;
+      document.getElementById('fName').value = item.name;
+      document.getElementById('fCat').value = item.category;
+      document.getElementById('fPrice').value = item.price;
+      document.getElementById('fStock').value = item.stock;
+      document.getElementById('fDesc').value = item.description || '';
+      document.getElementById('fAvail').checked = item.available == 1;
+      new bootstrap.Modal(document.getElementById('itemModal')).show();
+    });
 }
 
 async function saveItem() {
@@ -206,11 +211,15 @@ async function saveItem() {
   if (!name || !cat || isNaN(price) || isNaN(stock)) { alert('Please fill in all required fields.'); return; }
 
   const editId = document.getElementById('editId').value;
+  const currentImage = document.getElementById('editId').value 
+    ? (await (await fetch(`${MENU_API}/get_menu.php`)).json()).find(i => i.id == document.getElementById('editId').value)?.image || `https://placehold.co/400x300/F5C800/1A1A1A?text=${encodeURIComponent(name)}`
+    : `https://placehold.co/400x300/F5C800/1A1A1A?text=${encodeURIComponent(name)}`;
+
   const obj = {
     name, category: cat, price, stock,
     available: document.getElementById('fAvail').checked ? 1 : 0,
     description: document.getElementById('fDesc').value.trim(),
-    image: `https://placehold.co/400x300/F5C800/1A1A1A?text=${encodeURIComponent(name)}`
+    image: currentImage
   };
 
   if (editId) {
