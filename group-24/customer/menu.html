@@ -170,6 +170,15 @@ async function refreshMenu() {
 // auto refresh every 30 seconds
 setInterval(refreshMenu, 30000);
 
+function getImageSrc(image) {
+  if (!image) return '../assets/andikDessert.png';
+  const trimmed = String(image).trim();
+  if (/^(https?:)?\/\//.test(trimmed) || trimmed.startsWith('/')) return trimmed;
+  if (trimmed.startsWith('../assets/') || trimmed.startsWith('./assets/') || trimmed.includes('/assets/')) return trimmed.replace(/^\.\//, '');
+  if (trimmed.startsWith('assets/')) return `../${trimmed}`;
+  return `../assets/${trimmed}`;
+}
+
 function renderMenu() {
   let items = allItems;
 
