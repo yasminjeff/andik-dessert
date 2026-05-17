@@ -103,17 +103,28 @@ if (user) {
 // date
 document.getElementById('navDate').textContent = DB.getDayName();
 
-let activeCat = 'All';
+let activeCat = 'Today';
 let searchVal = '';
 let allItems = [];
 
 // categories
-const categories = ['All', 'Rice', 'Noodles', 'Dessert', 'Drinks'];
+const categories = ['Rice', 'Noodles', 'Dessert', 'Drinks', 'All'];
 const catTabs = document.getElementById('catTabs');
+
+const todayBtn = document.createElement('button');
+todayBtn.className = 'cat-btn active';
+todayBtn.textContent = "Today's item";
+todayBtn.onclick = () => {
+  activeCat = 'Today';
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  todayBtn.classList.add('active');
+  renderMenu();
+};
+catTabs.appendChild(todayBtn);
 
 categories.forEach(c => {
   const btn = document.createElement('button');
-  btn.className = 'cat-btn' + (c === 'All' ? ' active' : '');
+  btn.className = 'cat-btn' + (c === activeCat ? ' active' : '');
   btn.textContent = c;
   btn.onclick = () => {
     activeCat = c;
@@ -123,18 +134,6 @@ categories.forEach(c => {
   };
   catTabs.appendChild(btn);
 });
-
-// today button
-const todayBtn = document.createElement('button');
-todayBtn.className = 'cat-btn';
-todayBtn.textContent = "⭐ Today's Items";
-todayBtn.onclick = () => {
-  activeCat = 'Today';
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-  todayBtn.classList.add('active');
-  renderMenu();
-};
-catTabs.appendChild(todayBtn);
 
 // search
 document.getElementById('searchInput').addEventListener('input', e => {
