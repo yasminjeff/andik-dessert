@@ -10,9 +10,9 @@ try {
     $db = DB::connect();
 
     $sql = "INSERT INTO menu_items
-    (name, category, price, stock, available, image, description)
+    (name, category, price, stock, available, image, description, available_days)
     VALUES
-    (:name, :category, :price, :stock, :available, :image, :description)";
+    (:name, :category, :price, :stock, :available, :image, :description, :available_days)";
 
     $stmt = $db->prepare($sql);
 
@@ -23,7 +23,8 @@ try {
         ':stock' => $data->stock,
         ':available' => $data->available,
         ':image' => $data->image,
-        ':description' => $data->description
+        ':description' => $data->description,
+        ':available_days' => $data->available_days ?? null
     ]);
 
     echo json_encode(["status" => "success"]);

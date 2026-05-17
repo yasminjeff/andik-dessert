@@ -126,9 +126,19 @@
           </div>
           <div class="col-12">
             <label class="form-label fw-600" style="font-weight:600;font-size:.88rem">Availability</label>
-            <div class="form-check form-switch">
+            <div class="form-check form-switch mb-3">
               <input class="form-check-input" type="checkbox" id="fAvail" checked>
               <label class="form-check-label" for="fAvail" style="font-size:.88rem">Item is available</label>
+            </div>
+            <label class="form-label fw-600" style="font-weight:600;font-size:.88rem">Select days available (leave blank for all days)</label>
+            <div class="d-flex flex-wrap gap-2">
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="dayMon" value="Mon"><label class="form-check-label" for="dayMon" style="font-size:.85rem">Mon</label></div>
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="dayTue" value="Tue"><label class="form-check-label" for="dayTue" style="font-size:.85rem">Tue</label></div>
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="dayWed" value="Wed"><label class="form-check-label" for="dayWed" style="font-size:.85rem">Wed</label></div>
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="dayThu" value="Thu"><label class="form-check-label" for="dayThu" style="font-size:.85rem">Thu</label></div>
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="dayFri" value="Fri"><label class="form-check-label" for="dayFri" style="font-size:.85rem">Fri</label></div>
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="daySat" value="Sat"><label class="form-check-label" for="daySat" style="font-size:.85rem">Sat</label></div>
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="daySun" value="Sun"><label class="form-check-label" for="daySun" style="font-size:.85rem">Sun</label></div>
             </div>
           </div>
         </div>
@@ -184,6 +194,7 @@ function openAdd() {
   document.getElementById('editId').value = '';
   ['fName','fCat','fPrice','fStock','fDesc'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('fAvail').checked = true;
+  document.querySelectorAll('.dayCheck').forEach(cb => cb.checked = false);
 }
 
 function openEdit(id, btn) {
@@ -199,6 +210,17 @@ function openEdit(id, btn) {
       document.getElementById('fStock').value = item.stock;
       document.getElementById('fDesc').value = item.description || '';
       document.getElementById('fAvail').checked = item.available == 1;
+
+      // Parse and set available days
+      document.querySelectorAll('.dayCheck').forEach(cb => cb.checked = false);
+      if (item.available_days) {
+        const days = item.available_days.split(',').map(d => d.trim());
+        days.forEach(day => {
+          const dayEl = document.getElementById('day' + day);
+          if (dayEl) dayEl.checked = true;
+        });
+      }
+
       new bootstrap.Modal(document.getElementById('itemModal')).show();
     });
 }
@@ -211,15 +233,22 @@ async function saveItem() {
   if (!name || !cat || isNaN(price) || isNaN(stock)) { alert('Please fill in all required fields.'); return; }
 
   const editId = document.getElementById('editId').value;
-  const currentImage = document.getElementById('editId').value 
+  const currentImage = document.getElementById('editId').value
     ? (await (await fetch(`${MENU_API}/get_menu.php`)).json()).find(i => i.id == document.getElementById('editId').value)?.image || `https://placehold.co/400x300/F5C800/1A1A1A?text=${encodeURIComponent(name)}`
     : `https://placehold.co/400x300/F5C800/1A1A1A?text=${encodeURIComponent(name)}`;
+
+  // Collect selected days
+  const selectedDays = [];
+  document.querySelectorAll('.dayCheck:checked').forEach(cb => {
+    selectedDays.push(cb.value);
+  });
 
   const obj = {
     name, category: cat, price, stock,
     available: document.getElementById('fAvail').checked ? 1 : 0,
     description: document.getElementById('fDesc').value.trim(),
-    image: currentImage
+    image: currentImage,
+    available_days: selectedDays.length > 0 ? selectedDays.join(',') : null
   };
 
   if (editId) {

@@ -16,7 +16,8 @@ try {
     stock=:stock,
     available=:available,
     image=:image,
-    description=:description
+    description=:description,
+    available_days=:available_days
     WHERE id=:id";
 
     $stmt = $db->prepare($sql);
@@ -29,7 +30,8 @@ try {
         ':stock' => $data->stock,
         ':available' => $data->available,
         ':image' => $data->image,
-        ':description' => $data->description
+        ':description' => $data->description,
+        ':available_days' => $data->available_days ?? null
     ]);
 
     echo json_encode(["status" => "updated"]);
