@@ -130,6 +130,8 @@ categories.forEach(c => {
     activeCat = c;
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    document.getElementById('searchInput').value = '';
+    searchVal  = '';
     renderMenu();
   };
   catTabs.appendChild(btn);
