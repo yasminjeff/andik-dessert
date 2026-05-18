@@ -100,8 +100,11 @@ if (user) {
   authDiv.innerHTML = `<a href="login.html" class="btn btn-sm btn-yo">Login</a><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
 }
 
-// date
-document.getElementById('navDate').textContent = DB.getDayName();
+// date and day displayed
+const now = new Date();
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dateStr = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
+document.getElementById('navDate').textContent = dateStr;
 
 let activeCat = 'Today';
 let searchVal = '';
