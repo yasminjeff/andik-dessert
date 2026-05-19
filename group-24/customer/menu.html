@@ -73,12 +73,13 @@ footer a:hover{color:var(--y);}
   <p class="text-muted mb-0" style="font-size:.85rem" id="resultInfo"></p>
   <div class="d-flex gap-2 align-items-center">
     <select id="sortSelect" class="form-select form-select-sm" style="border-radius:8px;font-size:.82rem;max-width:200px;border:1.5px solid #E0E0E0" onchange="renderMenu()">
-      <option value="default">⭐ Sort By</option>
-      <option value="price_asc">💰 Price: Low → High</option>
-      <option value="price_desc">💸 Price: High → Low</option>
-      <option value="name_az">🔤 Name: A → Z</option>
-      <option value="rating_desc">⭐ Rating: Best First</option>
-      <option value="available">✅ Available First</option>
+      <option value="default">Sort By</option>
+      <option value="price_asc">Price: Low → High</option>
+      <option value="price_desc">Price: High → Low</option>
+      <option value="name_az">A → Z</option>
+      <option value="name_za">Z → A</option>
+      <option value="rating_desc">Rating: Best First</option>
+      <option value="available">Available First</option>
     </select>
     <button onclick="refreshMenu()" class="btn btn-sm btn-yo"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
   </div>
@@ -100,34 +101,23 @@ if (user) {
   authDiv.innerHTML = `<a href="login.html" class="btn btn-sm btn-yo">Login</a><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
 }
 
-// date
-document.getElementById('navDate').textContent = DB.getDayName();
+// date and day displayed
+const now = new Date();
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dateStr = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
+document.getElementById('navDate').textContent = dateStr;
 
-let activeCat = 'All';
+let activeCat = 'Today';
 let searchVal = '';
 let allItems = [];
 
 // categories
-const categories = ['All', 'Rice', 'Noodles', 'Dessert', 'Drinks'];
+const categories = ['Rice', 'Noodles', 'Dessert', 'Drinks', 'All'];
 const catTabs = document.getElementById('catTabs');
 
-categories.forEach(c => {
-  const btn = document.createElement('button');
-  btn.className = 'cat-btn' + (c === 'All' ? ' active' : '');
-  btn.textContent = c;
-  btn.onclick = () => {
-    activeCat = c;
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderMenu();
-  };
-  catTabs.appendChild(btn);
-});
-
-// today button
 const todayBtn = document.createElement('button');
-todayBtn.className = 'cat-btn';
-todayBtn.textContent = "⭐ Today's Items";
+todayBtn.className = 'cat-btn active';
+todayBtn.textContent = "Today's item";
 todayBtn.onclick = () => {
   activeCat = 'Today';
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -135,6 +125,21 @@ todayBtn.onclick = () => {
   renderMenu();
 };
 catTabs.appendChild(todayBtn);
+
+categories.forEach(c => {
+  const btn = document.createElement('button');
+  btn.className = 'cat-btn' + (c === activeCat ? ' active' : '');
+  btn.textContent = c;
+  btn.onclick = () => {
+    activeCat = c;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('searchInput').value = '';
+    searchVal  = '';
+    renderMenu();
+  };
+  catTabs.appendChild(btn);
+});
 
 // search
 document.getElementById('searchInput').addEventListener('input', e => {
@@ -170,11 +175,27 @@ async function refreshMenu() {
 // auto refresh every 30 seconds
 setInterval(refreshMenu, 30000);
 
+function getImageSrc(image) {
+  if (!image) return '../assets/andikDessert.png';
+  const trimmed = String(image).trim();
+  if (/^(https?:)?\/\//.test(trimmed) || trimmed.startsWith('/')) return trimmed;
+  if (trimmed.startsWith('../assets/') || trimmed.startsWith('./assets/') || trimmed.includes('/assets/')) return trimmed.replace(/^\.\//, '');
+  if (trimmed.startsWith('assets/')) return `../${trimmed}`;
+  return `../assets/${trimmed}`;
+}
+
 function renderMenu() {
   let items = allItems;
 
   if (activeCat === 'Today') {
-    items = items.filter(i => i.category === "⭐ Today's Items");
+    const todayAbbr = DB.getDayName().substring(0, 3);
+    items = items.filter(i => {
+      // Show if manually set as Today's Items
+      if (i.category === "⭐ Today's Items") return true;
+      // OR automatically show if today is one of its available days
+      if (i.available_days && i.available_days.includes(todayAbbr)) return true;
+      return false;
+    });
   } else if (activeCat !== 'All') {
     items = items.filter(i => i.category === activeCat);
   }
@@ -185,11 +206,13 @@ function renderMenu() {
 if (sort === 'price_asc') items.sort((a,b) => a.price - b.price);
 else if (sort === 'price_desc') items.sort((a,b) => b.price - a.price);
 else if (sort === 'name_az') items.sort((a,b) => a.name.localeCompare(b.name));
+else if (sort === 'name_za') items.sort((a,b) => b.name.localeCompare(a.name));
 else if (sort === 'rating_desc') items.sort((a,b) => (b.avg_rating||0) - (a.avg_rating||0));
 else if (sort === 'available') items.sort((a,b) => b.available - a.available);
 
-  document.getElementById('resultInfo').innerHTML =
-    `Showing ${items.length} item${items.length !== 1 ? 's' : ''}`;
+  document.getElementById('resultInfo').innerHTML = searchVal
+    ? `Result for "<strong>${searchVal}</strong>" — ${items.length} item${items.length !== 1 ? 's' : ''} found`
+    : `Showing ${items.length} item${items.length !== 1 ? 's' : ''}`;
 
   const grid = document.getElementById('menuGrid');
 
@@ -198,25 +221,56 @@ else if (sort === 'available') items.sort((a,b) => b.available - a.available);
     return;
   }
 
+  function getAvailableDaysText(availableDaysStr) {
+    if (!availableDaysStr) return null;
+    const days = availableDaysStr.split(',').map(d => d.trim());
+    return `Available on ${days.join('/')}`;
+  }
+
+  function isAvailableToday(availableDaysStr) {
+    if (!availableDaysStr) return true;
+    const today = DB.getDayName().substring(0, 3);
+    return availableDaysStr.includes(today);
+  }
+
   grid.innerHTML = items.map(item => {
     const isAvailable = item.available == 1;
+    const isAvailableOnDay = isAvailableToday(item.available_days);
+    const daysText = getAvailableDaysText(item.available_days);
 
-    const statusBadge = isAvailable
-      ? `<span class="badge" style="background:#E8F5E9;color:#2E7D32;font-size:.72rem">✓ Available</span>`
-      : `<span class="badge" style="background:#FFF3CD;color:#856404;font-size:.72rem">Unavailable</span>`;
-
+    let statusBadge;
+      if (isAvailable && isAvailableOnDay) {
+        // Fully available today
+        statusBadge = `<span class="badge" style="background:#E8F5E9;color:#2E7D32;font-size:.72rem">✓ Available</span>`;
+      } else if (!isAvailable && item.available_days) {
+        // Has specific days set — show them
+        statusBadge = `<span class="badge" style="background:#FFF3CD;color:#856404;font-size:.72rem">
+          <i class="bi bi-calendar-week me-1"></i>${daysText}
+        </span>`;
+      } else if (!isAvailable && !item.available_days) {
+        // No days set, just unavailable
+        statusBadge = `<span class="badge" style="background:#FFEBEE;color:#C62828;font-size:.72rem">Unavailable</span>`;
+      } else {
+        // Available but not today
+        statusBadge = `<span class="badge" style="background:#FFF3CD;color:#856404;font-size:.72rem">
+          <i class="bi bi-calendar-week me-1"></i>${daysText}
+        </span>`;
+      }
+      
     return `
     <div class="col-sm-6 col-lg-3">
       <div class="andik-card h-100">
         <div style="height:190px;overflow:hidden;background:#F0F0F0;position:relative">
-          <img src="${item.image}" alt="${item.name}" 
+          <img src="${item.image}" alt="${item.name}"
                style="width:100%;height:100%;object-fit:cover;transition:.3s"
                onmouseover="this.style.transform='scale(1.05)'"
                onmouseout="this.style.transform='scale(1)'"
                onerror="this.src='../assets/images/placeholder.png'">
-          ${!isAvailable ? `
+          ${(!isAvailable || !isAvailableOnDay) ? `
           <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center">
-            <span style="background:rgba(0,0,0,.8);color:#fff;padding:.5rem 1rem;border-radius:8px;font-weight:600">Out of Stock</span>
+          <span style="background:rgba(0,0,0,.8);color:#fff;padding:.5rem 1rem;border-radius:8px;font-weight:600;font-size:.85rem">
+            ${!isAvailable && item.available_days ? daysText : !isAvailable ? 'Out of Stock' : daysText || 'Unavailable'}
+          </span>
           </div>` : ''}
         </div>
         <div class="p-3 d-flex flex-column">
@@ -225,10 +279,16 @@ else if (sort === 'available') items.sort((a,b) => b.available - a.available);
             ${statusBadge}
           </div>
           <div class="text-muted mb-1" style="font-size:.78rem">${item.category}</div>
+          <div style="font-size:.82rem;margin-bottom:2px">
+            ${DB.stars(parseFloat(item.avg_rating) || 0)}
+            <span style="font-size:.72rem;color:#999;margin-left:3px">${parseFloat(item.avg_rating || 0).toFixed(1)} (${item.review_count || 0})</span>
+          </div>
           <div style="font-size:.75rem;color:#888;margin-bottom:4px">${item.description || ''}</div>
-          ${isAvailable
+          ${isAvailable && isAvailableOnDay
             ? `<div style="font-size:.75rem;color:#888">Stock: ${item.stock}</div>`
-            : `<div style="font-size:.75rem;color:#999">Currently unavailable</div>`
+            : `<div style="font-size:.75rem;color:#856404;font-weight:500">
+                ${item.available_days ? `<i class="bi bi-calendar-week me-1"></i>${daysText}` : 'Currently unavailable'}
+              </div>`
           }
           <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
             <span style="font-weight:700;font-size:1.05rem">RM ${parseFloat(item.price).toFixed(2)}</span>

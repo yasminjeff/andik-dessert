@@ -98,7 +98,10 @@ if (user) {
   authDiv.innerHTML = `<a href="login.html" class="btn btn-sm btn-yo">Login</a><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
 }
 
-document.getElementById('navDate').textContent = DB.getDayName();
+const now = new Date();
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dateStr = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
+document.getElementById('navDate').textContent = dateStr;
 
 const ITEM_API = "http://localhost/project/group-24";
 const REVIEWS_API = "http://localhost/project/group-24/reviews";
@@ -127,9 +130,25 @@ async function loadItem() {
     document.title = item.name + " – Andik's";
     document.getElementById('bcItem').textContent = item.name;
 
-    const stockBadge = item.available == 1
+    function getAvailableDaysText(availableDaysStr) {
+      if (!availableDaysStr) return null;
+      const days = availableDaysStr.split(',').map(d => d.trim());
+      return `Available on ${days.join('/')}`;
+    }
+
+    function isAvailableToday(availableDaysStr) {
+      if (!availableDaysStr) return true;
+      const today = DB.getDayName().substring(0, 3);
+      return availableDaysStr.includes(today);
+    }
+
+    const isAvailable = item.available == 1;
+    const isAvailableOnDay = isAvailableToday(item.available_days);
+    const daysText = getAvailableDaysText(item.available_days);
+
+    const stockBadge = isAvailable && isAvailableOnDay
       ? `<span class="badge" style="background:#E8F5E9;color:#2E7D32;font-size:.82rem">In Stock</span>`
-      : `<span class="badge" style="background:#FFEBEE;color:#C62828;font-size:.82rem">Out of Stock</span>`;
+      : `<span class="badge" style="background:#FFF3CD;color:#856404;font-size:.82rem">${daysText || 'Out of Stock'}</span>`;
 
     const avgRating = parseFloat(item.avg_rating) || 0;
     const reviewCount = parseInt(item.review_count) || 0;
@@ -151,7 +170,7 @@ async function loadItem() {
         </div>
         <div style="font-size:1.8rem;font-weight:800;margin-bottom:1rem">RM ${parseFloat(item.price).toFixed(2)}</div>
         <p style="color:#555;line-height:1.7;font-size:.95rem">${item.description || ''}</p>
-        ${item.available == 1 ? `<div style="font-size:.85rem;color:#555;margin-bottom:1rem"><i class="bi bi-box-seam" style="color:var(--y)"></i> Stock: <strong>${item.stock} units</strong></div>` : ''}
+        ${isAvailable && isAvailableOnDay ? `<div style="font-size:.85rem;color:#555;margin-bottom:1rem"><i class="bi bi-box-seam" style="color:var(--y)"></i> Stock: <strong>${item.stock} units</strong></div>` : (daysText ? `<div style="font-size:.85rem;color:#666;margin-bottom:1rem"><i class="bi bi-calendar" style="color:var(--y)"></i> ${daysText}</div>` : '')}
         <a href="menu.html" class="btn btn-yo"><i class="bi bi-arrow-left me-1"></i>Back to Menu</a>
       </div>`;
 
