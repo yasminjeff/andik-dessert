@@ -77,6 +77,7 @@ footer a:hover{color:var(--y);}
       <option value="price_asc">Price: Low → High</option>
       <option value="price_desc">Price: High → Low</option>
       <option value="name_az">A → Z</option>
+      <option value="name_za">Z → A</option>
       <option value="rating_desc">Rating: Best First</option>
       <option value="available">Available First</option>
     </select>
@@ -187,7 +188,14 @@ function renderMenu() {
   let items = allItems;
 
   if (activeCat === 'Today') {
-    items = items.filter(i => i.category === "⭐ Today's Items");
+    const todayAbbr = DB.getDayName().substring(0, 3);
+    items = items.filter(i => {
+      // Show if manually set as Today's Items
+      if (i.category === "⭐ Today's Items") return true;
+      // OR automatically show if today is one of its available days
+      if (i.available_days && i.available_days.includes(todayAbbr)) return true;
+      return false;
+    });
   } else if (activeCat !== 'All') {
     items = items.filter(i => i.category === activeCat);
   }
@@ -198,11 +206,13 @@ function renderMenu() {
 if (sort === 'price_asc') items.sort((a,b) => a.price - b.price);
 else if (sort === 'price_desc') items.sort((a,b) => b.price - a.price);
 else if (sort === 'name_az') items.sort((a,b) => a.name.localeCompare(b.name));
+else if (sort === 'name_za') items.sort((a,b) => b.name.localeCompare(a.name));
 else if (sort === 'rating_desc') items.sort((a,b) => (b.avg_rating||0) - (a.avg_rating||0));
 else if (sort === 'available') items.sort((a,b) => b.available - a.available);
 
-  document.getElementById('resultInfo').innerHTML =
-    `Showing ${items.length} item${items.length !== 1 ? 's' : ''}`;
+  document.getElementById('resultInfo').innerHTML = searchVal
+    ? `Result for "<strong>${searchVal}</strong>" — ${items.length} item${items.length !== 1 ? 's' : ''} found`
+    : `Showing ${items.length} item${items.length !== 1 ? 's' : ''}`;
 
   const grid = document.getElementById('menuGrid');
 
@@ -228,10 +238,25 @@ else if (sort === 'available') items.sort((a,b) => b.available - a.available);
     const isAvailableOnDay = isAvailableToday(item.available_days);
     const daysText = getAvailableDaysText(item.available_days);
 
-    const statusBadge = isAvailable && isAvailableOnDay
-      ? `<span class="badge" style="background:#E8F5E9;color:#2E7D32;font-size:.72rem">✓ Available</span>`
-      : `<span class="badge" style="background:#FFF3CD;color:#856404;font-size:.72rem">${daysText || 'Unavailable'}</span>`;
-
+    let statusBadge;
+      if (isAvailable && isAvailableOnDay) {
+        // Fully available today
+        statusBadge = `<span class="badge" style="background:#E8F5E9;color:#2E7D32;font-size:.72rem">✓ Available</span>`;
+      } else if (!isAvailable && item.available_days) {
+        // Has specific days set — show them
+        statusBadge = `<span class="badge" style="background:#FFF3CD;color:#856404;font-size:.72rem">
+          <i class="bi bi-calendar-week me-1"></i>${daysText}
+        </span>`;
+      } else if (!isAvailable && !item.available_days) {
+        // No days set, just unavailable
+        statusBadge = `<span class="badge" style="background:#FFEBEE;color:#C62828;font-size:.72rem">Unavailable</span>`;
+      } else {
+        // Available but not today
+        statusBadge = `<span class="badge" style="background:#FFF3CD;color:#856404;font-size:.72rem">
+          <i class="bi bi-calendar-week me-1"></i>${daysText}
+        </span>`;
+      }
+      
     return `
     <div class="col-sm-6 col-lg-3">
       <div class="andik-card h-100">
@@ -243,7 +268,9 @@ else if (sort === 'available') items.sort((a,b) => b.available - a.available);
                onerror="this.src='../assets/images/placeholder.png'">
           ${(!isAvailable || !isAvailableOnDay) ? `
           <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center">
-            <span style="background:rgba(0,0,0,.8);color:#fff;padding:.5rem 1rem;border-radius:8px;font-weight:600">${!isAvailable ? 'Out of Stock' : (daysText || 'Unavailable')}</span>
+          <span style="background:rgba(0,0,0,.8);color:#fff;padding:.5rem 1rem;border-radius:8px;font-weight:600;font-size:.85rem">
+            ${!isAvailable && item.available_days ? daysText : !isAvailable ? 'Out of Stock' : daysText || 'Unavailable'}
+          </span>
           </div>` : ''}
         </div>
         <div class="p-3 d-flex flex-column">
@@ -252,10 +279,16 @@ else if (sort === 'available') items.sort((a,b) => b.available - a.available);
             ${statusBadge}
           </div>
           <div class="text-muted mb-1" style="font-size:.78rem">${item.category}</div>
+          <div style="font-size:.82rem;margin-bottom:2px">
+            ${DB.stars(parseFloat(item.avg_rating) || 0)}
+            <span style="font-size:.72rem;color:#999;margin-left:3px">${parseFloat(item.avg_rating || 0).toFixed(1)} (${item.review_count || 0})</span>
+          </div>
           <div style="font-size:.75rem;color:#888;margin-bottom:4px">${item.description || ''}</div>
           ${isAvailable && isAvailableOnDay
             ? `<div style="font-size:.75rem;color:#888">Stock: ${item.stock}</div>`
-            : `<div style="font-size:.75rem;color:#999">${daysText ? `${daysText}` : 'Currently unavailable'}</div>`
+            : `<div style="font-size:.75rem;color:#856404;font-weight:500">
+                ${item.available_days ? `<i class="bi bi-calendar-week me-1"></i>${daysText}` : 'Currently unavailable'}
+              </div>`
           }
           <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
             <span style="font-weight:700;font-size:1.05rem">RM ${parseFloat(item.price).toFixed(2)}</span>
