@@ -48,16 +48,16 @@ try {
     $stmt = $db->prepare($sql);
 
     $stmt->execute([
-        ':id' => $data->id ?? $_POST['id'],
-        ':name' => $data->name ?? $_POST['name'],
-        ':category' => $data->category ?? $_POST['category'],
-        ':price' => $data->price ?? $_POST['price'],
-        ':stock' => $data->stock ?? $_POST['stock'],
-        ':available' => $data->available ?? ($_POST['available'] ?? 0),
-        ':image' => $imagePath,
-        ':description' => $data->description ?? $_POST['description'],
-        ':available_days' => $data->available_days ?? $_POST['available_days'] ?? null
-    ]);
+    ':id' => $_POST['id'] ?? null,
+    ':name' => $_POST['name'] ?? null,
+    ':category' => $_POST['category'] ?? null,
+    ':price' => $_POST['price'] ?? null,
+    ':stock' => $_POST['stock'] ?? null,
+    ':available' => $_POST['available'] ?? 0,
+    ':image' => $imagePath,
+    ':description' => $_POST['description'] ?? null,
+    ':available_days' => $_POST['available_days'] ?? null
+]);
 
     echo json_encode(["status" => "updated"]);
 

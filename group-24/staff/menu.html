@@ -124,13 +124,21 @@
             <label class="form-label fw-600" style="font-weight:600;font-size:.88rem">Description</label>
             <textarea id="fDesc" class="form-control" rows="2" placeholder="Brief description..." style="border-radius:10px;resize:none"></textarea>
           </div>
+          <div class="col-md-6">
+            <label class="form-label fw-600" style="font-weight:600;font-size:.88rem">Food Image</label>
+            <input type="file" id="fImage" class="form-control" accept="image/*" style="border-radius:10px">
+            <div class="form-text text-muted">Upload an image so customers can see the dish.</div>
+          </div>
+          <div class="col-md-6 d-flex align-items-end">
+            <img id="imagePreview" src="../assets/images/placeholder.png" alt="Preview" style="width:100%;border-radius:12px;object-fit:cover;max-height:140px;display:block">
+          </div>
           <div class="col-12">
             <label class="form-label fw-600" style="font-weight:600;font-size:.88rem">Availability</label>
             <div class="form-check form-switch mb-3">
               <input class="form-check-input" type="checkbox" id="fAvail" checked>
               <label class="form-check-label" for="fAvail" style="font-size:.88rem">Item is available</label>
             </div>
-            <label class="form-label fw-600" style="font-weight:600;font-size:.88rem">Select days available (leave blank for all days)</label>
+            <label class="form-label fw-600 mt-2" style="font-weight:600;font-size:.88rem">Select days available (leave blank for all days)</label>
             <div class="d-flex flex-wrap gap-2">
               <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="dayMon" value="Mon"><label class="form-check-label" for="dayMon" style="font-size:.85rem">Mon</label></div>
               <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="dayTue" value="Tue"><label class="form-check-label" for="dayTue" style="font-size:.85rem">Tue</label></div>
@@ -194,6 +202,8 @@ function openAdd() {
   document.getElementById('editId').value = '';
   ['fName','fCat','fPrice','fStock','fDesc'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('fAvail').checked = true;
+  document.getElementById('fImage').value = '';
+  document.getElementById('imagePreview').src = '../assets/images/placeholder.png';
   document.querySelectorAll('.dayCheck').forEach(cb => cb.checked = false);
 }
 
@@ -202,6 +212,7 @@ function openEdit(id, btn) {
     .then(r => r.json())
     .then(items => {
       const item = items.find(i => i.id == id);
+      if (!item) return;
       document.getElementById('modalTitle').textContent = 'Edit Item';
       document.getElementById('editId').value = item.id;
       document.getElementById('fName').value = item.name;
@@ -210,18 +221,23 @@ function openEdit(id, btn) {
       document.getElementById('fStock').value = item.stock;
       document.getElementById('fDesc').value = item.description || '';
       document.getElementById('fAvail').checked = item.available == 1;
+      document.getElementById('fImage').value = '';
+      document.getElementById('imagePreview').src = item.image || '../assets/images/placeholder.png';
 
-      // Parse and set available days
+      // Reset semua dulu
       document.querySelectorAll('.dayCheck').forEach(cb => cb.checked = false);
-      if (item.available_days) {
-        const days = item.available_days.split(',').map(d => d.trim());
-        days.forEach(day => {
-          const dayEl = document.getElementById('day' + day);
-          if (dayEl) dayEl.checked = true;
+
+      // Set days dari DB
+      if (item.available_days && item.available_days.toString().trim() !== '') {
+        item.available_days.toString().split(',').forEach(d => {
+          const trimmed = d.trim();
+          const el = document.getElementById('day' + trimmed);
+          if (el) el.checked = true;
         });
       }
 
-      new bootstrap.Modal(document.getElementById('itemModal')).show();
+      const modal = document.getElementById('itemModal');
+      bootstrap.Modal.getOrCreateInstance(modal).show();
     });
 }
 
@@ -233,42 +249,60 @@ async function saveItem() {
   if (!name || !cat || isNaN(price) || isNaN(stock)) { alert('Please fill in all required fields.'); return; }
 
   const editId = document.getElementById('editId').value;
-  const currentImage = document.getElementById('editId').value
-    ? (await (await fetch(`${MENU_API}/get_menu.php`)).json()).find(i => i.id == document.getElementById('editId').value)?.image || `https://placehold.co/400x300/F5C800/1A1A1A?text=${encodeURIComponent(name)}`
-    : `https://placehold.co/400x300/F5C800/1A1A1A?text=${encodeURIComponent(name)}`;
+  const imageFile = document.getElementById('fImage').files[0];
 
-  // Collect selected days
-  const selectedDays = [];
-  document.querySelectorAll('.dayCheck:checked').forEach(cb => {
-    selectedDays.push(cb.value);
-  });
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('category', cat);
+  formData.append('price', price);
+  formData.append('stock', stock);
+  formData.append('available', document.getElementById('fAvail').checked ? 1 : 0);
+  formData.append('description', document.getElementById('fDesc').value.trim());
 
-  const obj = {
-    name, category: cat, price, stock,
-    available: document.getElementById('fAvail').checked ? 1 : 0,
-    description: document.getElementById('fDesc').value.trim(),
-    image: currentImage,
-    available_days: selectedDays.length > 0 ? selectedDays.join(',') : null
-  };
+
+// Get selected available days
+const selectedDays = [];
+document.querySelectorAll('.dayCheck:checked').forEach(cb => {
+  selectedDays.push(cb.value);
+});
+
+formData.append('available_days', selectedDays.join(','));
+
+  if (imageFile) formData.append('image', imageFile);
 
   if (editId) {
-    obj.id = parseInt(editId);
+    formData.append('id', parseInt(editId));
+    if (!imageFile) {
+      const currentImage = (await (await fetch(`${MENU_API}/get_menu.php`)).json()).find(i => i.id == editId)?.image || '';
+      formData.append('image', currentImage);
+    }
     await fetch(`${MENU_API}/update_menu.php`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(obj)
+      body: formData
     });
   } else {
+    if (!imageFile) {
+      formData.append('image', `https://placehold.co/400x300/F5C800/1A1A1A?text=${encodeURIComponent(name)}`);
+    }
     await fetch(`${MENU_API}/add_menu.php`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(obj)
+      body: formData
     });
   }
 
   bootstrap.Modal.getInstance(document.getElementById('itemModal')).hide();
   renderTable();
 }
+
+const imageInput = document.getElementById('fImage');
+imageInput.addEventListener('change', () => {
+  const file = imageInput.files[0];
+  if (file) {
+    document.getElementById('imagePreview').src = URL.createObjectURL(file);
+  } else {
+    document.getElementById('imagePreview').src = '../assets/images/placeholder.png';
+  }
+});
 
 async function delItem(id) {
   if (!confirm('Delete this item?')) return;

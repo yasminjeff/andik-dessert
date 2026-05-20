@@ -134,9 +134,19 @@
           </div>
           <div class="col-12">
             <label class="form-label fw-600" style="font-weight:600;font-size:.88rem">Availability</label>
-            <div class="form-check form-switch">
+            <div class="form-check form-switch mb-3">
               <input class="form-check-input" type="checkbox" id="fAvail" checked>
               <label class="form-check-label" for="fAvail" style="font-size:.88rem">Item is available</label>
+            </div>
+            <label class="form-label fw-600 mt-2" style="font-weight:600;font-size:.88rem">Select days available (leave blank for all days)</label>
+            <div class="d-flex flex-wrap gap-2">
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="dayMon" value="Mon"><label class="form-check-label" for="dayMon" style="font-size:.85rem">Mon</label></div>
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="dayTue" value="Tue"><label class="form-check-label" for="dayTue" style="font-size:.85rem">Tue</label></div>
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="dayWed" value="Wed"><label class="form-check-label" for="dayWed" style="font-size:.85rem">Wed</label></div>
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="dayThu" value="Thu"><label class="form-check-label" for="dayThu" style="font-size:.85rem">Thu</label></div>
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="dayFri" value="Fri"><label class="form-check-label" for="dayFri" style="font-size:.85rem">Fri</label></div>
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="daySat" value="Sat"><label class="form-check-label" for="daySat" style="font-size:.85rem">Sat</label></div>
+              <div class="form-check"><input class="form-check-input dayCheck" type="checkbox" id="daySun" value="Sun"><label class="form-check-label" for="daySun" style="font-size:.85rem">Sun</label></div>
             </div>
           </div>
         </div>
@@ -194,6 +204,7 @@ function openAdd() {
   document.getElementById('fAvail').checked = true;
   document.getElementById('fImage').value = '';
   document.getElementById('imagePreview').src = '../assets/images/placeholder.png';
+  document.querySelectorAll('.dayCheck').forEach(cb => cb.checked = false);
 }
 
 function openEdit(id, btn) {
@@ -201,6 +212,7 @@ function openEdit(id, btn) {
     .then(r => r.json())
     .then(items => {
       const item = items.find(i => i.id == id);
+      if (!item) return;
       document.getElementById('modalTitle').textContent = 'Edit Item';
       document.getElementById('editId').value = item.id;
       document.getElementById('fName').value = item.name;
@@ -211,7 +223,21 @@ function openEdit(id, btn) {
       document.getElementById('fAvail').checked = item.available == 1;
       document.getElementById('fImage').value = '';
       document.getElementById('imagePreview').src = item.image || '../assets/images/placeholder.png';
-      new bootstrap.Modal(document.getElementById('itemModal')).show();
+
+      // Reset semua dulu
+      document.querySelectorAll('.dayCheck').forEach(cb => cb.checked = false);
+
+      // Set days dari DB
+      if (item.available_days && item.available_days.toString().trim() !== '') {
+        item.available_days.toString().split(',').forEach(d => {
+          const trimmed = d.trim();
+          const el = document.getElementById('day' + trimmed);
+          if (el) el.checked = true;
+        });
+      }
+
+      const modal = document.getElementById('itemModal');
+      bootstrap.Modal.getOrCreateInstance(modal).show();
     });
 }
 
@@ -232,6 +258,16 @@ async function saveItem() {
   formData.append('stock', stock);
   formData.append('available', document.getElementById('fAvail').checked ? 1 : 0);
   formData.append('description', document.getElementById('fDesc').value.trim());
+
+
+// Get selected available days
+const selectedDays = [];
+document.querySelectorAll('.dayCheck:checked').forEach(cb => {
+  selectedDays.push(cb.value);
+});
+
+formData.append('available_days', selectedDays.join(','));
+
   if (imageFile) formData.append('image', imageFile);
 
   if (editId) {
