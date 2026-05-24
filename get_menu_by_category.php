@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 require "db.php";
 header('Content-Type: application/json');
@@ -32,24 +31,4 @@ try {
         "message" => $e->getMessage()
     ]);
 }
-?> 
-=======
-<?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
-
-include "db.php";
-
-$category = $_GET['category'];
-
-$result = $db->query("SELECT * FROM menuyummy WHERE category='$category'");
-
-$data = [];
-
-while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-    $data[] = $row;
-}
-
-echo json_encode($data);
 ?>
->>>>>>> 89a64d5 (update index & connect fetch backend)

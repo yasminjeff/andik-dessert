@@ -127,7 +127,7 @@ const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 const dateStr = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
 document.getElementById('navDate').textContent = dateStr;
 
-const ANN_API = "http://localhost/project/group-24/get_announcements.php";
+const ANN_API = "https://andiksdesserts.infinityfreeapp.com/get_announcements.php";
 
 async function renderAnnouncements() {
   try {

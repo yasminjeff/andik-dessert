@@ -62,7 +62,7 @@ async function doLogin() {
   }
 
   try {
-    const res = await fetch('http://localhost/project/phpdata/login.php', {
+    const res = await fetch('https://andiksdesserts.infinityfreeapp.com/phpdata/login.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password: pass })
@@ -77,8 +77,8 @@ async function doLogin() {
 
     DB.setUser(data.user);
 
-    if (data.user.role === 'admin') location.href = '../../admin/dashboard.html';
-    else if (data.user.role === 'staff') location.href = '../staff/dashboard.html';
+    if (data.user.role === 'admin') location.href = 'https://andiksdesserts.infinityfreeapp.com/admin/dashboard.html';
+else if (data.user.role === 'staff') location.href = 'https://andiksdesserts.infinityfreeapp.com/group-24/staff/dashboard.html';
     else location.href = 'index.html';
 
   } catch (e) {
