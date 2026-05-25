@@ -1,7 +1,7 @@
 // =========================
 // REAL BACKEND ONLY (NO LOCALSTORAGE / NO FAKE DATA)
 // =========================
-const BASE_URL = "http://localhost/project/group-24";
+const BASE_URL = "https://andiksdesserts.infinityfreeapp.com";
 
 const DB = {
 

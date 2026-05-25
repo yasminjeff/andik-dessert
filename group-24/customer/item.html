@@ -106,7 +106,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../../phpdata/data.js"></script>
+<script src="https://andiksdesserts.infinityfreeapp.com/phpdata/data.js"></script>
 <script>
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
@@ -134,8 +134,8 @@ const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 const dateStr = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
 document.getElementById('navDate').textContent = dateStr;
 
-const ITEM_API = "http://localhost/project/group-24";
-const REVIEWS_API = "http://localhost/project/group-24/reviews";
+const ITEM_API = "https://andiksdesserts.infinityfreeapp.com";
+const REVIEWS_API = "https://andiksdesserts.infinityfreeapp.com/group-24/reviews";
 
 let selectedRating = 0;
 

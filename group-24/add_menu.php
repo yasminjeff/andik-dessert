@@ -2,7 +2,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
-require $_SERVER['DOCUMENT_ROOT'] . "/project/db.php";
+require $_SERVER['DOCUMENT_ROOT'] . "/db.php";
 
 function saveUploadedImage() {
     if (empty($_FILES['image']['tmp_name'])) return null;

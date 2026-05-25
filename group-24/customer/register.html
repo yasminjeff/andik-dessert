@@ -54,8 +54,7 @@ body{background:var(--bk);min-height:100vh;display:flex;align-items:center;justi
   <p class="text-center text-muted" style="font-size:.85rem">Already have an account? <a href="login.html" style="color:var(--y);font-weight:600">Login</a></p>
 </div>
 
-<script src="../phpdata/data.js"></script>
-<script>
+<script src="https://andiksdesserts.infinityfreeapp.com/phpdata/data.js"></script><script>
 document.getElementById('pageDate').textContent = DB.getDayName();
 
 async function doRegister() {
@@ -73,7 +72,7 @@ async function doRegister() {
   if (pass !== pass2) { err.textContent = 'Passwords do not match.'; err.style.display = ''; return; }
 
   try {
-    const res = await fetch('http://localhost/project/phpdata/register.php', {
+    const res = await fetch('https://andiksdesserts.infinityfreeapp.com/phpdata/register.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password: pass, role: 'staff' })

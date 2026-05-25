@@ -2,7 +2,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
  
-require $_SERVER['DOCUMENT_ROOT'] . "/project/db.php";
+require $_SERVER['DOCUMENT_ROOT'] . "/db.php";
  
 try {
     $db = DB::connect();

@@ -149,7 +149,7 @@ document.getElementById('searchInput').addEventListener('input', e => {
 // fetch dari PHP
 async function loadMenu() {
   try {
-    const res = await fetch('http://localhost/project/group-24/get_menu.php');
+    const res = await fetch('https://andiksdesserts.infinityfreeapp.com/get_menu.php');
     if (!res.ok) throw new Error("Failed to load menu");
     allItems = await res.json();
     renderMenu();
@@ -163,7 +163,7 @@ async function loadMenu() {
 // refresh button
 async function refreshMenu() {
   try {
-    const res = await fetch('http://localhost/project/group-24/get_menu.php');
+    const res = await fetch('https://andiksdesserts.infinityfreeapp.com/get_menu.php');
     allItems = await res.json();
     renderMenu();
   } catch (err) {
