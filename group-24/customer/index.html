@@ -29,6 +29,16 @@ body{background:#fff;}
 footer{background:var(--bk);color:rgba(255,255,255,.6);font-size:.82rem;padding:2rem 0 1rem;}
 footer a{color:rgba(255,255,255,.5);text-decoration:none;}
 footer a:hover{color:var(--y);}
+.hamburger{background:none;border:2px solid rgba(245,200,0,.4);border-radius:8px;padding:.35rem .5rem;cursor:pointer;display:flex;flex-direction:column;gap:5px;transition:.2s;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--y);border-radius:2px;transition:.3s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{display:none;background:var(--bk);border-top:1px solid rgba(245,200,0,.15);padding:1rem 1.25rem 1.25rem;}
+.mobile-menu.open{display:block;}
+.mobile-nav-link{display:flex;align-items:center;gap:.6rem;color:rgba(255,255,255,.8);font-weight:500;font-size:.95rem;padding:.7rem .5rem;border-radius:8px;text-decoration:none;transition:.2s;}
+.mobile-nav-link:hover,.mobile-nav-link.active{color:var(--y);background:rgba(245,200,0,.08);}
+.mobile-menu-divider{border-color:rgba(255,255,255,.1);margin:.6rem 0;}
 </style>
 </head>
 <body>
@@ -47,10 +57,21 @@ footer a:hover{color:var(--y);}
     </ul>
     <div class="d-flex gap-3 align-items-center">
       <div style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
-      <div class="d-flex gap-2" id="authButtons"></div>
+      <div class="d-flex gap-2 d-none d-md-flex" id="authButtons"></div>
+      <button class="hamburger d-md-none" id="hamburgerBtn" onclick="toggleMenu()" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </nav>
+<!-- MOBILE MENU DRAWER -->
+<div class="mobile-menu d-md-none" id="mobileMenu">
+  <a href="index.html" class="mobile-nav-link active"><i class="bi bi-house" style="font-size:1.1rem"></i>Home</a>
+  <a href="menu.html" class="mobile-nav-link"><i class="bi bi-grid" style="font-size:1.1rem"></i>Menu</a>
+  <a href="announcements.html" class="mobile-nav-link"><i class="bi bi-megaphone" style="font-size:1.1rem"></i>Announcements</a>
+  <hr class="mobile-menu-divider">
+  <div id="mobileAuthButtons" class="d-flex gap-2 mt-1"></div>
+</div>
 
 <!-- HERO -->
 <section style="background:linear-gradient(135deg,#011041 60%,#091746);padding:5rem 0 4rem;">
@@ -131,12 +152,23 @@ footer a:hover{color:var(--y);}
 <script>
 const user = DB.currentUser();
 const authDiv = document.getElementById('authButtons');
+const mobileAuth = document.getElementById('mobileAuthButtons');
 if (user) {
   authDiv.innerHTML = `<span class="text-white opacity-75 small d-none d-md-block">Hi, ${user.name}</span>
     <button class="btn btn-sm btn-yo" onclick="DB.logout();location.reload()">Logout</button>`;
+  mobileAuth.innerHTML = `<span class="text-white opacity-75 small">Hi, ${user.name}</span>
+    <button class="btn btn-sm btn-yo ms-auto" onclick="DB.logout();location.reload()">Logout</button>`;
   document.getElementById('heroBtn').style.display = 'none';
 } else {
   authDiv.innerHTML = `<a href="login.html" class="btn btn-sm btn-yo">Login</a><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
+  mobileAuth.innerHTML = `<a href="login.html" class="btn btn-sm btn-yo">Login</a><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
+}
+
+function toggleMenu() {
+  const btn = document.getElementById('hamburgerBtn');
+  const menu = document.getElementById('mobileMenu');
+  btn.classList.toggle('open');
+  menu.classList.toggle('open');
 }
 
 const now = new Date();

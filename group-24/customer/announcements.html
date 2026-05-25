@@ -37,6 +37,16 @@ main{flex:1;}
 footer{background:var(--bk);color:rgba(255,255,255,.6);font-size:.82rem;padding:2rem 0 1rem;margin-top:auto;}
 footer a{color:rgba(255,255,255,.5);text-decoration:none;}
 footer a:hover{color:var(--y);}
+.hamburger{background:none;border:2px solid rgba(245,200,0,.4);border-radius:8px;padding:.35rem .5rem;cursor:pointer;display:flex;flex-direction:column;gap:5px;transition:.2s;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--y);border-radius:2px;transition:.3s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{display:none;background:var(--bk);border-top:1px solid rgba(245,200,0,.15);padding:1rem 1.25rem 1.25rem;}
+.mobile-menu.open{display:block;}
+.mobile-nav-link{display:flex;align-items:center;gap:.6rem;color:rgba(255,255,255,.8);font-weight:500;font-size:.95rem;padding:.7rem .5rem;border-radius:8px;text-decoration:none;transition:.2s;}
+.mobile-nav-link:hover,.mobile-nav-link.active{color:var(--y);background:rgba(245,200,0,.08);}
+.mobile-menu-divider{border-color:rgba(255,255,255,.1);margin:.6rem 0;}
 </style>
 </head>
 <body>
@@ -59,6 +69,14 @@ footer a:hover{color:var(--y);}
     </div>
   </div>
 </nav>
+<!-- MOBILE MENU DRAWER -->
+<div class="mobile-menu d-md-none" id="mobileMenu">
+  <a href="index.html" class="mobile-nav-link"><i class="bi bi-house" style="font-size:1.1rem"></i>Home</a>
+  <a href="menu.html" class="mobile-nav-link"><i class="bi bi-grid" style="font-size:1.1rem"></i>Menu</a>
+  <a href="announcements.html" class="mobile-nav-link active"><i class="bi bi-megaphone" style="font-size:1.1rem"></i>Announcements</a>
+  <hr class="mobile-menu-divider">
+  <div id="mobileAuthButtons" class="d-flex gap-2 mt-1"></div>
+</div>
 
 <main>
 
