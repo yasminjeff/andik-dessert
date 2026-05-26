@@ -6,7 +6,7 @@ require $_SERVER['DOCUMENT_ROOT'] . "/db.php";
 
 function saveUploadedImage() {
     if (empty($_FILES['image']['tmp_name'])) return null;
-    $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/project/uploads';
+    $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads';
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
     $file = $_FILES['image'];
@@ -18,7 +18,7 @@ function saveUploadedImage() {
     $destination = $uploadDir . '/' . $filename;
     if (!move_uploaded_file($file['tmp_name'], $destination)) return null;
 
-    return '/project/uploads/' . $filename;
+    return 'https://andiksdesserts.infinityfreeapp.com/uploads/' . $filename;
 }
 
 try {
