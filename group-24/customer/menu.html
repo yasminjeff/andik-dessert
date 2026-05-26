@@ -30,24 +30,46 @@ main{flex:1;}
 footer{background:var(--bk);color:rgba(255,255,255,.6);font-size:.82rem;padding:2rem 0 1rem;margin-top:auto;}
 footer a{color:rgba(255,255,255,.5);text-decoration:none;}
 footer a:hover{color:var(--y);}
+
+/* ── MOBILE RESPONSIVE ── */
+@media (max-width:767px){
+  .search-box{max-width:100%;}
+  #navDate{font-size:.75rem;padding:.3rem .6rem!important;}
+  .btn-sm{font-size:.75rem;padding:.3rem .6rem;}
+  h1{font-size:1.5rem!important;}
+}
 </style>
 </head>
 <body>
 
-<nav class="navbar sticky-top shadow">
+<nav class="navbar shadow">
   <div class="container d-flex align-items-center justify-content-between py-2">
-    <a href="index.html" class="d-flex align-items-center gap-2 text-decoration-none">
+    <a href="index2.html" class="d-flex align-items-center gap-2 text-decoration-none">
       <img src="../assets/andikDessert.png" alt="Andik's Desserts Logo" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">
       <div><div class="brand-name">Andik's Desserts</div><div class="brand-sub">Mini Cafe</div></div>
     </a>
     <ul class="nav d-none d-md-flex align-items-center">
-      <li><a href="index.html" class="nav-link-c nav-link"><i class="bi bi-house me-1"></i>Home</a></li>
+      <li><a href="index2.html" class="nav-link-c nav-link"><i class="bi bi-house me-1"></i>Home</a></li>
       <li><a href="menu.html" class="nav-link-c active nav-link"><i class="bi bi-grid me-1"></i>Menu</a></li>
       <li><a href="announcements.html" class="nav-link-c nav-link"><i class="bi bi-megaphone me-1"></i>Announcements</a></li>
     </ul>
-    <div class="d-flex gap-3 align-items-center">
+    <div class="d-flex gap-2 align-items-center">
       <div style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
-      <div class="d-flex gap-2" id="authButtons"></div>
+      <div class="d-flex gap-2 d-none d-md-flex" id="authButtons"></div>
+      <!-- hamburger untuk mobile -->
+      <button class="btn d-md-none" style="color:var(--y);border:2px solid rgba(245,200,0,.3);border-radius:10px;font-size:1.3rem;padding:.3rem .6rem" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav">
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
+  </div>
+  <!-- mobile dropdown menu -->
+  <div class="collapse w-100 d-md-none" id="mobileNav">
+    <div style="background:var(--bk);padding:.5rem 1rem 1rem;border-top:1px solid rgba(255,255,255,.1)">
+      <a href="index2.html" class="nav-link-c nav-link d-block py-2"><i class="bi bi-house me-2"></i>Home</a>
+      <a href="menu.html" class="nav-link-c active nav-link d-block py-2"><i class="bi bi-grid me-2"></i>Menu</a>
+      <a href="announcements.html" class="nav-link-c nav-link d-block py-2"><i class="bi bi-megaphone me-2"></i>Announcements</a>
+      <hr style="border-color:rgba(255,255,255,.1);margin:.5rem 0">
+      <div id="authButtonsMobile"></div>
     </div>
   </div>
 </nav>
@@ -93,11 +115,16 @@ footer a:hover{color:var(--y);}
 // auth
 const user = DB.currentUser();
 const authDiv = document.getElementById('authButtons');
+const authMobile = document.getElementById('authButtonsMobile');
+
 if (user) {
-  authDiv.innerHTML = `<span class="text-white opacity-75 small">Hi, ${user.name}</span>
+  const html = `<span class="text-white opacity-75 small">Hi, ${user.name}</span>
     <button class="btn btn-sm btn-yo" onclick="DB.logout();location.reload()">Logout</button>`;
+  authDiv.innerHTML = html;
+  authMobile.innerHTML = html;
 } else {
   authDiv.innerHTML = `<a href="login.html" class="btn btn-sm btn-yo">Login</a><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
+  authMobile.innerHTML = `<a href="login.html" class="btn btn-sm btn-yo me-2">Login</a><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
 }
 
 // date and day displayed
@@ -300,6 +327,10 @@ else if (sort === 'available') items.sort((a,b) => b.available - a.available);
 }
 
 loadMenu();
+
+const navDateMobile = document.getElementById('navDateMobile');
+if (navDateMobile) navDateMobile.textContent = dateStr;
+
 </script>
 </main>
 
