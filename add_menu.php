@@ -2,7 +2,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
-require $_SERVER['DOCUMENT_ROOT'] . "/db.php";
+require __DIR__ . "/db.php";
 
 function saveUploadedImage() {
     if (empty($_FILES['image']['tmp_name'])) return null;
@@ -15,8 +15,8 @@ function saveUploadedImage() {
     $filename = uniqid('menu_', true) . '.' . $ext;
     $destination = $uploadDir . '/' . $filename;
     if (!move_uploaded_file($file['tmp_name'], $destination)) return null;
-    return 'https://andiksdesserts.infinityfreeapp.com/uploads/' . $filename;
-}
+$baseUrl = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+return $baseUrl . '/uploads/' . $filename;}
 
 try {
     $db = DB::connect();

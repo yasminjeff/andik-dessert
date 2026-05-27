@@ -1,7 +1,9 @@
 // =========================
 // REAL BACKEND ONLY (NO LOCALSTORAGE / NO FAKE DATA)
 // =========================
-const BASE_URL = "https://andiksdesserts.infinityfreeapp.com";
+const BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost/project'
+  : 'https://andiksdesserts.infinityfreeapp.com';
 
 const DB = {
 
@@ -50,21 +52,21 @@ const DB = {
     }
   },
 
-  currentUser() {
+ currentUser() {
     try {
-      return JSON.parse(sessionStorage.getItem("andiks_user")) || null;
+        return JSON.parse(localStorage.getItem("andiks_user")) || null;
     } catch {
-      return null;
+        return null;
     }
-  },
+},
 
-  setUser(user) {
-    sessionStorage.setItem("andiks_user", JSON.stringify(user));
-  },
+setUser(user) {
+    localStorage.setItem("andiks_user", JSON.stringify(user));
+},
 
-  logout() {
-    sessionStorage.removeItem("andiks_user");
-  },
+logout() {
+    localStorage.removeItem("andiks_user");
+},
 
   stars(rating, size = '') {
     let html = '';

@@ -3,7 +3,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
-require $_SERVER['DOCUMENT_ROOT'] . "/db.php";
+$dbPath = ($_SERVER['HTTP_HOST'] === 'localhost') ? $_SERVER['DOCUMENT_ROOT'] . "/project/db.php" : $_SERVER['DOCUMENT_ROOT'] . "/db.php"; require $dbPath;
 
 try {
    $db = DB::connect();

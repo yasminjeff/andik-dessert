@@ -233,7 +233,11 @@ if (user.role === 'admin') {
     </a>`;
 }
 
-const MENU_API = "https://andiksdesserts.infinityfreeapp.com";
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost/project'
+  : 'https://andiksdesserts.infinityfreeapp.com';
+
+const MENU_API = API_BASE;
 
 // ── Stock badge ───────────────────────────────────
 function getStockBadge(stock) {

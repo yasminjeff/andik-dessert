@@ -2,7 +2,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
-require $_SERVER['DOCUMENT_ROOT'] . "/db.php";
+require __DIR__ . "/../db.php";
 
 try {
     $input = json_decode(file_get_contents("php://input"), true);
@@ -44,7 +44,7 @@ try {
         exit;
     }
 
-    $hashed = password_hash($new_password, PASSWORD_DEFAULT);
+$hashed = password_hash($new_password, PASSWORD_BCRYPT, ['cost' => 4]);
     $stmt = $db->prepare("UPDATE users SET password = ? WHERE id = ?");
     $stmt->execute([$hashed, $user['id']]);
 

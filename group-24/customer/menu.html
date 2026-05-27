@@ -173,10 +173,16 @@ document.getElementById('searchInput').addEventListener('input', e => {
   renderMenu();
 });
 
+
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost/project/group-24'
+  : 'https://andiksdesserts.infinityfreeapp.com';
+
+
 // fetch dari PHP
 async function loadMenu() {
   try {
-    const res = await fetch('https://andiksdesserts.infinityfreeapp.com/get_menu.php');
+const res = await fetch(`${API_BASE}/get_menu.php`);
     if (!res.ok) throw new Error("Failed to load menu");
     allItems = await res.json();
     renderMenu();
@@ -190,8 +196,8 @@ async function loadMenu() {
 // refresh button
 async function refreshMenu() {
   try {
-    const res = await fetch('https://andiksdesserts.infinityfreeapp.com/get_menu.php');
-    allItems = await res.json();
+const res = await fetch(`${API_BASE}/get_menu.php`);
+allItems = await res.json();
     renderMenu();
   } catch (err) {
     console.error("refreshMenu error:", err);

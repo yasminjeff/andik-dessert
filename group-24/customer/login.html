@@ -41,12 +41,19 @@ body{background:var(--bk);min-height:100vh;display:flex;align-items:center;justi
     <input type="password" id="passInput" class="form-control" placeholder="Your password" style="border-radius:10px">
     <div class="text-end mt-2"><a href="../reset_password.html" style="color:var(--y);font-weight:600;font-size:.9rem;text-decoration:none">Forgot password?</a></div>
   </div>
-  <button class="btn btn-y mb-3" onclick="doLogin()">Login</button>
+  <button class="btn btn-y mb-3" id="loginBtn">Login</button>
   <p class="text-center text-muted" style="font-size:.85rem">Don't have an account? <a href="register.html" style="color:var(--y);font-weight:600">Register</a></p>
 </div>
 
-<script src="https://andiksdesserts.infinityfreeapp.com/phpdata/data.js"></script>
+<script src="../../phpdata/data.js"></script>
 <script>
+
+
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost/project'
+  : 'https://andiksdesserts.infinityfreeapp.com';
+
+
 document.getElementById('pageDate').textContent = DB.getDayName();
 
 async function doLogin() {
@@ -62,7 +69,7 @@ async function doLogin() {
   }
 
   try {
-    const res = await fetch('https://andiksdesserts.infinityfreeapp.com/phpdata/login.php', {
+    const res = await fetch(`${API_BASE}/phpdata/login.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password: pass })
@@ -77,9 +84,15 @@ async function doLogin() {
 
     DB.setUser(data.user);
 
-    if (data.user.role === 'admin') location.href = 'https://andiksdesserts.infinityfreeapp.com/admin/dashboard.html';
-else if (data.user.role === 'staff') location.href = 'https://andiksdesserts.infinityfreeapp.com/group-24/staff/dashboard.html';
-    else location.href = 'index2.html';
+    if (data.user.role === 'admin') {
+  location.href = '../../admin/dashboard.html';
+}
+else if (data.user.role === 'staff') {
+  location.href = '../staff/dashboard.html';
+}
+else {
+  location.href = 'index2.html';
+}
 
   } catch (e) {
     err.textContent = 'Server error. Please try again.';
@@ -88,6 +101,8 @@ else if (data.user.role === 'staff') location.href = 'https://andiksdesserts.inf
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+document.getElementById('loginBtn').addEventListener('click', doLogin);
 </script>
 </body>
 </html> 

@@ -193,8 +193,10 @@ const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 const dateStr = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
 document.getElementById('navDate').textContent = dateStr;
 
-const INDEX_API = "https://andiksdesserts.infinityfreeapp.com";
-
+const INDEX_API = window.location.hostname === 'localhost'
+  ? 'http://localhost/project/group-24'
+  : 'https://andiksdesserts.infinityfreeapp.com';
+  
 async function loadIndex() {
   try {
     // fetch announcements
