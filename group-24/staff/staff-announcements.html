@@ -128,6 +128,13 @@ document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperC
 document.getElementById('userName').textContent = user.name;
 document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
 document.getElementById('roleLabel').textContent = user.role === 'admin' ? 'Admin Portal' : 'Staff Portal';
+
+const menuUrl = user.role === 'admin' 
+  ? 'https://andiksdesserts.infinityfreeapp.com/staff/menu.html'
+  : 'https://andiksdesserts.infinityfreeapp.com/group-24/staff/menu.html';
+
+document.querySelector('a[href="menu.html"]').href = menuUrl;
+
 if (user.role === 'admin') document.getElementById('adminLinks').innerHTML = `<div class="sb-label">Admin</div><a href="https://andiksdesserts.infinityfreeapp.com/admin/dashboard.html" class="sb-link"><i class="bi bi-people"></i>Manage Staff</a>`;
 
 const ANN_API = "https://andiksdesserts.infinityfreeapp.com";
