@@ -154,11 +154,11 @@ const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 const dateStr = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
 document.getElementById('navDate').textContent = dateStr;
 
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost/project/group-24'
+const BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost/project'
   : 'https://andiksdesserts.infinityfreeapp.com';
 
-const ANN_API = `${API_BASE}/get_announcements.php`;
+const ANN_API = `${BASE}/group-24/get_announcements.php`;
 
 async function renderAnnouncements() {
   try {
