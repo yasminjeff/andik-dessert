@@ -130,7 +130,24 @@
     </div>
 
     <div class="panel py-3 mb-3">
-      <input type="text" id="searchInput" class="form-control" placeholder="Search items..." style="max-width:300px;border-radius:10px" oninput="renderTable()">
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search items..." style="max-width:300px;border-radius:10px" oninput="renderTable()">
+        <select id="categoryFilter" class="form-select" style="max-width:220px;border-radius:10px" onchange="renderTable()">
+          <option value="">All Categories</option>
+          <option>Rice</option>
+          <option>Noodles</option>
+          <option>Dessert</option>
+          <option>Drinks</option>
+          <option>Side Dishes</option>
+        </select>
+        <select id="stockFilter" class="form-select" style="max-width:220px;border-radius:10px" onchange="renderTable()">
+          <option value="">All Stocks</option>
+          <option value="out">Out of Stock</option>
+          <option value="critical">Critical (1–5)</option>
+          <option value="low">Low (6–10)</option>
+          <option value="good">Good (11+)</option>
+        </select>
+      </div>
     </div>
     <div class="panel p-0">
       <div class="table-responsive">
@@ -273,10 +290,23 @@ function checkLowStock(items) {
 
 async function renderTable() {
   const search = document.getElementById('searchInput').value.toLowerCase();
+  const category = document.getElementById('categoryFilter').value;
+  const stockFilter = document.getElementById('stockFilter').value;
   const res = await fetch(`${MENU_API}/get_menu.php`);
   const allItems = await res.json();
   checkLowStock(allItems);
-  const items = allItems.filter(i => i.name.toLowerCase().includes(search));
+  const items = allItems
+    .filter(i => i.name.toLowerCase().includes(search))
+    .filter(i => !category || i.category === category)
+    .filter(i => {
+      const stock = parseInt(i.stock);
+      if (!stockFilter) return true;
+      if (stockFilter === 'out') return stock === 0;
+      if (stockFilter === 'critical') return stock >= 1 && stock <= 5;
+      if (stockFilter === 'low') return stock >= 6 && stock <= 10;
+      if (stockFilter === 'good') return stock > 10;
+      return true;
+    });
   const tb = document.getElementById('menuTable');
   if (!items.length) { tb.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No items found.</td></tr>'; return; }
   tb.innerHTML = items.map((item, idx) => {
