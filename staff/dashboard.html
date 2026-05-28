@@ -49,7 +49,7 @@
     <a href="menu.html" class="sb-link"><i class="bi bi-grid"></i>Menu Items</a>
     <div class="sb-label">Engagement</div>
     <a href="comments.html" class="sb-link"><i class="bi bi-chat-left-text"></i>Comments</a>
-    <a href="staff-announcements.html" class="sb-link"><i class="bi bi-megaphone"></i>Announcements</a>
+    <a href="staff-announcements2.html" class="sb-link"><i class="bi bi-megaphone"></i>Announcements</a>
     <div id="adminLinks"></div>
   </nav>
   <div class="sb-footer">
@@ -102,8 +102,9 @@
           <div class="panel-title"><i class="bi bi-lightning-charge me-2" style="color:var(--y)"></i>Quick Actions</div>
           <div class="d-grid gap-2">
             <a href="menu.html" class="btn btn-y d-flex align-items-center gap-2"><i class="bi bi-plus-circle"></i>Add Menu Item</a>
-            <a href="staff-announcements.html" class="btn d-flex align-items-center gap-2" style="background:#F4F5F7;color:var(--bk);font-weight:600;border:none;border-radius:8px"><i class="bi bi-megaphone"></i>Post Announcement</a>
+            <a href="staff-announcements2.html" class="btn d-flex align-items-center gap-2" style="background:#F4F5F7;color:var(--bk);font-weight:600;border:none;border-radius:8px"><i class="bi bi-megaphone"></i>Post Announcement</a>
             <a href="comments.html" class="btn d-flex align-items-center gap-2" style="background:#F4F5F7;color:var(--bk);font-weight:600;border:none;border-radius:8px"><i class="bi bi-chat-left-text"></i>Manage Comments</a>
+            <div id="adminQuickAction"></div>
           </div>
         </div>
       </div>
@@ -125,10 +126,17 @@ document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCas
 document.getElementById('staffToday').textContent = DB.getDayName();
 document.getElementById('roleLabel').textContent = user.role === 'admin' ? 'Admin Portal' : 'Staff Portal';
 
-if (user.role === 'admin') document.getElementById('adminLinks').innerHTML = 
-  `<div class="sb-label">Admin</div>
-   <a href="../admin/dashboard.html" class="sb-link">
-     <i class="bi bi-people"></i>Manage Staff </a>`;
+if (user.role === 'admin') {
+  document.getElementById('adminLinks').innerHTML = 
+    `<div class="sb-label">Admin</div>
+     <a href="../admin/dashboard.html" class="sb-link">
+       <i class="bi bi-people"></i>Manage Staff
+     </a>`;
+  document.getElementById('adminQuickAction').innerHTML = 
+    `<a href="../admin/dashboard.html" class="btn d-flex align-items-center gap-2" style="background:#F4F5F7;color:var(--bk);font-weight:600;border:none;border-radius:8px">
+       <i class="bi bi-people"></i>Manage Staff
+     </a>`;
+}
 
 const BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost/project'
