@@ -56,6 +56,7 @@
     <a href="staff-announcements.html" class="sb-link active"><i class="bi bi-megaphone"></i>Announcements</a>
     <div id="adminLinks"></div>
   </nav>
+
   <div class="sb-footer">
     <button class="btn btn-sm w-100" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:none;border-radius:8px;padding:.5rem"
       onclick="DB.logout();location.href='../group-24/customer/login.html'">
@@ -135,6 +136,8 @@ if (user.role === 'admin') document.getElementById('adminLinks').innerHTML =
    <a href="../admin/dashboard.html" class="sb-link">
      <i class="bi bi-people"></i>Manage Staff
    </a>`;
+
+
 
 const BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost/project'
