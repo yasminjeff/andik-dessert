@@ -34,9 +34,36 @@
 .panel-title{font-weight:700;font-size:.95rem;margin-bottom:1rem;}
 .btn-y{background:var(--y);color:var(--bk);font-weight:700;border:none;border-radius:8px;}
 .btn-y:hover{background:var(--yd);color:var(--bk);}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    position: fixed;
+    z-index: 300;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 250;
+  }
+  .overlay.show { display: block; }
+  .hamburger-btn { display: flex !important; }
+  .content { padding: 1rem; }
+  .panel { padding: .8rem; }
+}
+.hamburger-btn { display: none; }
+
 </style>
 </head>
 <body>
+
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 <aside class="sidebar">
   <div class="sb-header">
     <div class="sb-logo">A</div>
@@ -61,6 +88,9 @@
 
 <div class="main">
   <div class="topbar">
+    <button class="hamburger-btn btn" style="background:none;border:none;color:var(--bk);font-size:1.4rem;padding:0;margin-right:.5rem" onclick="toggleSidebar()">
+  <i class="bi bi-list"></i>
+</button>
     <div class="topbar-title">Dashboard</div>
     <div style="font-size:.85rem;color:#666"><i class="bi bi-calendar-event me-1"></i>Today is <strong id="staffToday"></strong></div>
     <div class="d-flex align-items-center gap-2">
@@ -73,16 +103,16 @@
   </div>
   <div class="content">
     <div class="row g-3 mb-4">
-      <div class="col-sm-6 col-xl-3">
+      <div class="col-6">
         <div class="stat-card"><div class="stat-icon" style="background:#FFF9E0"><i class="bi bi-grid" style="color:var(--y)"></i></div><div><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Total Items</div></div></div>
       </div>
-      <div class="col-sm-6 col-xl-3">
+      <div class="col-6">
         <div class="stat-card"><div class="stat-icon" style="background:#E8F5E9"><i class="bi bi-check-circle" style="color:#2E7D32"></i></div><div><div class="stat-val" style="color:#2E7D32" id="statAvail">0</div><div class="stat-lbl">Available</div></div></div>
       </div>
-      <div class="col-sm-6 col-xl-3">
+      <div class="col-6">
         <div class="stat-card"><div class="stat-icon" style="background:#FFEBEE"><i class="bi bi-x-circle" style="color:#C62828"></i></div><div><div class="stat-val" style="color:#C62828" id="statOut">0</div><div class="stat-lbl">Out of Stock</div></div></div>
       </div>
-      <div class="col-sm-6 col-xl-3">
+      <div class="col-6">
         <div class="stat-card"><div class="stat-icon" style="background:#EDE7F6"><i class="bi bi-chat-left-text" style="color:#6A1B9A"></i></div><div><div class="stat-val" style="color:#6A1B9A" id="statComments">0</div><div class="stat-lbl">Total Reviews</div></div></div>
       </div>
     </div>
@@ -187,6 +217,12 @@ async function loadDashboard() {
 }
 
 loadDashboard();
+
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+
 </script>
 </body>
 </html>

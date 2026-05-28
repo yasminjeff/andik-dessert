@@ -54,13 +54,20 @@ const DB = {
 
   currentUser() {
     try {
-        return JSON.parse(localStorage.getItem("andiks_user")) || null;
+        const user = JSON.parse(localStorage.getItem("andiks_user")) || null;
+        if (!user) return null;
+        if (user._domain && user._domain !== window.location.hostname) {
+            localStorage.removeItem("andiks_user");
+            return null;
+        }
+        return user;
     } catch {
         return null;
     }
 },
 
 setUser(user) {
+    user._domain = window.location.hostname;
     localStorage.setItem("andiks_user", JSON.stringify(user));
 },
 

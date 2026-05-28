@@ -39,9 +39,45 @@
 /* Low stock row highlight */
 .row-critical { background: #FFF3E0 !important; }
 .row-out      { background: #FFEBEE !important; }
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    position: fixed;
+    z-index: 300;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .main {
+    margin-left: 0;
+  }
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 250;
+  }
+  .overlay.show { display: block; }
+  .hamburger-btn {
+    display: flex !important;
+  }
+  .content { padding: 1rem; }
+  .panel { padding: .8rem; }
+  .table th, .table td { font-size: .75rem; padding: .4rem; }
+}
+.hamburger-btn { display: none; }
+
+
+
 </style>
 </head>
 <body>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
 <aside class="sidebar">
   <div class="sb-header">
@@ -60,14 +96,18 @@
   </nav>
   <div class="sb-footer">
     <button class="btn btn-sm w-100" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:none;border-radius:8px;padding:.5rem"
-            onclick="DB.logout();location.href='https://andiksdesserts.infinityfreeapp.com/group-24/customer/login.html'">
-      <i class="bi bi-box-arrow-right me-2"></i>Logout
+onclick="DB.logout();location.href='../customer/login.html'">
+   <i class="bi bi-box-arrow-right me-2"></i>Logout
     </button>
   </div>
 </aside>
 
 <div class="main">
   <div class="topbar">
+    <button class="hamburger-btn btn" style="background:none;border:none;color:var(--bk);font-size:1.4rem;padding:0;margin-right:.5rem" onclick="toggleSidebar()">
+  <i class="bi bi-list"></i>
+</button>
+
     <div class="topbar-title">Menu Items</div>
     <div class="d-flex align-items-center gap-2">
       <div class="avatar" id="userAvatar">?</div>
@@ -218,9 +258,10 @@
 <script>
 // ── Auth ──────────────────────────────────────────
 const user = DB.currentUser();
-if (!user || (user.role !== 'staff' && user.role !== 'admin')) {
-  location.href = 'https://andiksdesserts.infinityfreeapp.com/group-24/customer/login.html';
+ if (!user || (user.role !== 'staff' && user.role !== 'admin')) {
+  location.href = '../customer/login.html';
 }
+
 document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
 document.getElementById('userName').textContent = user.name;
 document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
@@ -228,7 +269,7 @@ document.getElementById('roleLabel').textContent = user.role === 'admin' ? 'Admi
 if (user.role === 'admin') {
   document.getElementById('adminLinks').innerHTML = `
     <div class="sb-label">Admin</div>
-    <a href="https://andiksdesserts.infinityfreeapp.com/admin/dashboard.html" class="sb-link">
+    <a href="../../admin/dashboard.html" class="sb-link">
       <i class="bi bi-people"></i>Manage Staff
     </a>`;
 }
@@ -434,6 +475,12 @@ async function delItem(id) {
 }
 
 renderTable();
+
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+
 </script>
 </body>
 </html>
