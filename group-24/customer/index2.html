@@ -45,6 +45,18 @@ footer a:hover{color:var(--y);}
     max-width: 50% !important;
   }
 }
+
+@media (max-width: 768px) {
+  .navbar .container {
+    flex-wrap: nowrap !important;
+    gap: .5rem;
+  }
+  #navDate {
+    font-size: .72rem !important;
+    padding: .25rem .5rem !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -62,12 +74,11 @@ footer a:hover{color:var(--y);}
       <li><a href="announcements.html" class="nav-link-c nav-link"><i class="bi bi-megaphone me-1"></i>Announcements</a></li>
     </ul>
     <div class="d-flex gap-2 align-items-center">
-      <div style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
-      <div class="d-flex gap-2 d-none d-md-flex" id="authButtons"></div>
-      <!-- hamburger untuk mobile -->
       <button class="btn d-md-none" style="color:var(--y);border:2px solid rgba(245,200,0,.3);border-radius:10px;font-size:1.3rem;padding:.3rem .6rem" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav">
         <i class="bi bi-list"></i>
       </button>
+      <div style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
+      <div class="d-flex gap-2 d-none d-md-flex" id="authButtons"></div>
     </div>
   </div>
   <!-- mobile dropdown menu -->

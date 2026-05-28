@@ -54,7 +54,9 @@ const API_BASE = window.location.hostname === 'localhost' || window.location.hos
   : 'https://andiksdesserts.infinityfreeapp.com';
 
 
-document.getElementById('pageDate').textContent = DB.getDayName();
+const now = new Date();
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+document.getElementById('pageDate').textContent = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
 
 async function doLogin() {
   const email = document.getElementById('emailInput').value.trim();

@@ -18,12 +18,46 @@ body{background:var(--bk);min-height:100vh;display:flex;align-items:center;justi
 .btn-y:hover{background:var(--yd);color:var(--bk);}
 .form-control:focus{border-color:var(--y);box-shadow:0 0 0 3px rgba(245,200,0,.2);}
 .form-label{font-weight:600;font-size:.88rem;color:#444;}
+
+.go-back-card { display: none; }
+
+@media (max-width: 768px) {
+  .go-back-card { display: block; }
+  #goBackBtn { display: block; }
+}
+
+
+@media (max-width: 768px) {
+  body {
+    display: block !important;
+    padding: 4rem 1rem 2rem;
+    position: relative;
+  }
+  .auth-card {
+    margin: 0 auto;
+    padding: 1.5rem 1.2rem;
+  }
+  .date-badge {
+    top: 1rem;
+    right: 1rem;
+    font-size: .75rem;
+    padding: .3rem .7rem;
+    z-index: 10;
+  }
+  #goBackBtn {
+    top: 1rem !important;
+    left: 1rem !important;
+    z-index: 10 !important;
+  }
+}
+
+
 </style>
 </head>
 <body>
 <div class="date-badge"><i class="bi bi-calendar-event me-1"></i><span id="pageDate"></span></div>
-<div style="position:absolute;top:2rem;left:2rem">
-  <a href="index2.html" class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:8px;font-weight:600"><i class="bi bi-arrow-left me-1"></i>Go Back</a>
+<div id="goBackBtn" style="position:absolute;top:2rem;left:2rem">
+    <a href="index2.html" class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:8px;font-weight:600"><i class="bi bi-arrow-left me-1"></i>Go Back</a>
 </div>
 <div class="auth-card">
   <img src="../assets/andikDessert.png" alt="Andik's Desserts Logo" style="width:64px;height:64px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;display:block;">
@@ -61,7 +95,9 @@ const API_BASE = window.location.hostname === 'localhost' || window.location.hos
   ? 'http://localhost/project'
   : 'https://andiksdesserts.infinityfreeapp.com';
 
-document.getElementById('pageDate').textContent = DB.getDayName();
+const now = new Date();
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+document.getElementById('pageDate').textContent = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
 
 async function doRegister() {
   const name = document.getElementById('nameInput').value.trim();
