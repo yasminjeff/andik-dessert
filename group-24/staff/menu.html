@@ -338,12 +338,14 @@ async function renderTable() {
   // Check low stock on ALL items (not just filtered)
   checkLowStock(allItems);
 
-  const category = document.getElementById('categoryFilter').value;
-  const items = allItems.filter(i => {
+const category = document.getElementById('categoryFilter').value;
+const items = allItems.filter(i => {
   const matchSearch = i.name.toLowerCase().includes(search);
   const matchCategory = !category || i.category === category;
   return matchSearch && matchCategory;
-});  const tb = document.getElementById('menuTable');
+});
+
+const tb = document.getElementById('menuTable');
 
   if (!items.length) {
     tb.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No items found.</td></tr>';
