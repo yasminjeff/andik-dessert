@@ -57,6 +57,15 @@ footer a:hover{color:var(--y);}
   }
 }
 
+
+.ticker-wrap { overflow: hidden; flex: 1; }
+.ticker-text { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; }
+@keyframes ticker {
+  0% { transform: translateX(100vw); }
+  100% { transform: translateX(-100%); }
+}
+
+
 </style>
 </head>
 <body>
@@ -126,7 +135,6 @@ footer a:hover{color:var(--y);}
   <div class="container d-flex align-items-center gap-3">
     <span style="background:var(--bk);color:#fff;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap"><i class="bi bi-megaphone-fill me-1"></i>Latest</span>
     <span id="annStripText" style="font-size:.85rem;font-weight:500;color:var(--bk);overflow:hidden;white-space:nowrap;text-overflow:ellipsis"></span>
-    <a href="announcements.html" class="ms-auto btn btn-sm" style="background:var(--bk);color:var(--y);font-weight:600;border-radius:8px;white-space:nowrap">View All</a>
   </div>
 </div>
 
@@ -217,7 +225,9 @@ const annRes = await fetch(`${BASE}/group-24/get_announcements.php`);
     // announcement strip
     if (anns.length) {
       document.getElementById('annStrip').style.display = '';
-      document.getElementById('annStripText').textContent = anns[0].title + ' — ' + anns[0].body;
+      const allText = anns.map(a => `📢 ${a.title} — ${a.body}`).join('   ✦   ');
+document.getElementById('annStripText').innerHTML = `<span class="ticker-text">${allText}</span>`;
+document.getElementById('annStripText').className = 'ticker-wrap';
     }
 
     // announcements list
