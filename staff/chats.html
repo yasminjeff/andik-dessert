@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chats – Andik's</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--y:#F5C800;--yd:#D4A900;--bk:#011041;--sw:260px;}
+*{font-family:'Poppins',sans-serif;}body{background:#F4F5F7;margin:0;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sw);min-height:100vh;background:var(--bk);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:200;}
+.sb-header{padding:1.2rem;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;}
+.sb-logo{width:42px;height:42px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:var(--bk);flex-shrink:0;}
+.sb-brand{color:var(--y);font-weight:700;font-size:.9rem;line-height:1.2;}
+.sb-role{color:rgba(255,255,255,.4);font-size:.68rem;}
+.sb-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.25);padding:.8rem 1.4rem .3rem;}
+.sb-link{display:flex;align-items:center;gap:10px;padding:.58rem 1.4rem;color:rgba(255,255,255,.65);text-decoration:none;font-size:.86rem;font-weight:500;transition:.2s;border-left:3px solid transparent;}
+.sb-link i{width:18px;text-align:center;}
+.sb-link:hover{color:#fff;background:rgba(255,255,255,.06);}
+.sb-link.active{color:var(--y);background:rgba(245,200,0,.08);border-left-color:var(--y);}
+.sb-footer{padding:1rem 1.4rem;border-top:1px solid rgba(255,255,255,.08);margin-top:auto;}
+.sb-badge{background:var(--y);color:var(--bk);font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:auto;}
+
+/* MAIN */
+.main{margin-left:var(--sw);display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:#fff;height:64px;display:flex;align-items:center;padding:0 1.5rem;border-bottom:1px solid #EBEBEB;position:sticky;top:0;z-index:100;gap:1rem;}
+.topbar-title{font-weight:700;font-size:1.1rem;flex:1;}
+.avatar{width:36px;height:36px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:var(--bk);}
+
+/* CHAT LAYOUT */
+.chat-container{display:flex;height:calc(100vh - 64px);overflow:hidden;}
+
+/* CONTACTS */
+.contacts-panel{width:320px;background:#fff;border-right:1px solid #EBEBEB;display:flex;flex-direction:column;flex-shrink:0;}
+.contacts-header{padding:1rem 1.2rem;border-bottom:1px solid #EBEBEB;}
+.contacts-search{border:1.5px solid #E0E0E0;border-radius:10px;padding:.5rem 1rem;font-size:.85rem;width:100%;outline:none;}
+.contacts-search:focus{border-color:var(--y);}
+.contacts-list{flex:1;overflow-y:auto;}
+.contact-item{display:flex;align-items:center;gap:12px;padding:.9rem 1.2rem;cursor:pointer;border-bottom:1px solid #F5F5F5;transition:.2s;}
+.contact-item:hover{background:#F8F8F8;}
+.contact-item.active{background:#FFF9E0;border-left:3px solid var(--y);}
+.contact-av{width:44px;height:44px;border-radius:50%;background:var(--bk);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;color:var(--y);flex-shrink:0;}
+.contact-av.admin{background:var(--y);color:var(--bk);}
+.contact-info{flex:1;min-width:0;}
+.contact-name{font-weight:600;font-size:.88rem;color:#222;}
+.contact-preview{font-size:.75rem;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.contact-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+.contact-time{font-size:.68rem;color:#bbb;}
+.unread-badge{background:var(--y);color:var(--bk);font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:20px;}
+.role-tag{font-size:.68rem;font-weight:600;padding:1px 7px;border-radius:10px;}
+.role-tag.admin{background:#EDE7F6;color:#6A1B9A;}
+.role-tag.staff{background:#E8F5E9;color:#2E7D32;}
+
+/* CHAT WINDOW */
+.chat-panel{flex:1;display:flex;flex-direction:column;background:#F4F5F7;}
+.chat-empty{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#bbb;}
+.chat-header{background:#fff;padding:.9rem 1.4rem;border-bottom:1px solid #EBEBEB;display:flex;align-items:center;gap:12px;}
+.chat-messages{flex:1;overflow-y:auto;padding:1.2rem;display:flex;flex-direction:column;gap:.6rem;}
+.msg{max-width:65%;padding:.6rem 1rem;border-radius:14px;font-size:.87rem;line-height:1.5;word-break:break-word;}
+.msg.sent{background:var(--bk);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
+.msg.received{background:#fff;color:#333;border-bottom-left-radius:4px;align-self:flex-start;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.msg-time{font-size:.65rem;opacity:.6;margin-top:3px;text-align:right;}
+.msg.received .msg-time{text-align:left;}
+.chat-input-area{background:#fff;padding:.9rem 1.2rem;border-top:1px solid #EBEBEB;display:flex;gap:.6rem;align-items:center;}
+.chat-input{flex:1;border:1.5px solid #E0E0E0;border-radius:24px;padding:.55rem 1.2rem;font-size:.88rem;outline:none;font-family:'Poppins',sans-serif;resize:none;}
+.chat-input:focus{border-color:var(--y);}
+.send-btn{width:42px;height:42px;background:var(--y);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.2s;}
+.send-btn:hover{background:var(--yd);}
+.send-btn i{color:var(--bk);font-size:1rem;}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .sidebar{transform:translateX(-100%);transition:transform 0.3s ease;position:fixed;z-index:300;}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:250;}
+  .overlay.show{display:block;}
+  .hamburger-btn{display:flex!important;}
+  .contacts-panel{width:100%;}
+  .chat-panel{display:none;}
+  .chat-panel.mobile-show{display:flex;}
+  .contacts-panel.mobile-hide{display:none;}
+}
+.hamburger-btn{display:none;}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">A</div>
+    <div><div class="sb-brand">Andik's Desserts</div><div class="sb-role" id="roleLabel">Staff Portal</div></div>
+  </div>
+  <nav style="padding:1rem 0;flex:1;overflow-y:auto">
+    <div class="sb-label">Main</div>
+    <a href="dashboard.html" class="sb-link" id="dashboardLink"><i class="bi bi-speedometer2"></i>Dashboard</a>
+    <div class="sb-label">Menu</div>
+    <a href="menu.html" class="sb-link" id="menuLink"><i class="bi bi-grid"></i>Menu Items</a>
+    <div class="sb-label">Engagement</div>
+    <a href="comments.html" class="sb-link" id="commentsLink"><i class="bi bi-chat-left-text"></i>Comments</a>
+    <a href="staff-announcements2.html" class="sb-link" id="annLink"><i class="bi bi-megaphone"></i>Announcements</a>
+    <div class="sb-label">Messages</div>
+    <a href="chats.html" class="sb-link active"><i class="bi bi-chat-dots"></i>Chats <span class="sb-badge" id="sbUnreadBadge" style="display:none">0</span></a>
+    <div id="adminLinks"></div>
+  </nav>
+  <div class="sb-footer">
+    <button class="btn btn-sm w-100" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:none;border-radius:8px;padding:.5rem" onclick="doLogout()">
+      <i class="bi bi-box-arrow-right me-2"></i>Logout
+    </button>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <button class="hamburger-btn btn" style="background:none;border:none;color:var(--bk);font-size:1.4rem;padding:0;margin-right:.5rem" onclick="toggleSidebar()">
+      <i class="bi bi-list"></i>
+    </button>
+    <div class="topbar-title">Chats</div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="avatar" id="userAvatar">?</div>
+      <div class="d-none d-md-block">
+        <div style="font-weight:600;font-size:.85rem" id="userName"></div>
+        <div style="font-size:.72rem;color:#999" id="userRole"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-container">
+    <!-- CONTACTS -->
+    <div class="contacts-panel" id="contactsPanel">
+      <div class="contacts-header">
+        <h6 style="font-weight:700;margin-bottom:.6rem">Messages</h6>
+        <input type="text" class="contacts-search" placeholder="Search contacts..." id="contactSearch" oninput="filterContacts()">
+      </div>
+      <div class="contacts-list" id="contactsList">
+        <div class="text-center text-muted py-4" style="font-size:.85rem">Loading...</div>
+      </div>
+    </div>
+
+    <!-- CHAT WINDOW -->
+    <div class="chat-panel" id="chatPanel">
+      <div class="chat-empty" id="chatEmpty">
+        <i class="bi bi-chat-dots" style="font-size:3rem;margin-bottom:1rem;opacity:.3"></i>
+        <p style="font-size:.9rem">Select a contact to start chatting</p>
+      </div>
+      <div id="chatWindow" style="display:none;flex:1;flex-direction:column;display:none;">
+        <div class="chat-header" id="chatHeader"></div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-area">
+          <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1" onkeydown="handleKey(event)"></textarea>
+          <button class="send-btn" onclick="sendMessage()"><i class="bi bi-send-fill"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../phpdata/data.js"></script>
+<script>
+const BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost/project'
+  : 'https://andiksdesserts.infinityfreeapp.com';
+
+const CHAT_API = `${BASE}/phpdata`;
+
+const user = DB.currentUser();
+if (!user || (user.role !== 'staff' && user.role !== 'admin')) {
+  location.href = '../group-24/customer/login.html';
+}
+
+// Setup UI
+document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+document.getElementById('userName').textContent = user.name;
+document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+document.getElementById('roleLabel').textContent = user.role === 'admin' ? 'Admin Portal' : 'Staff Portal';
+
+// Fix sidebar links based on role
+if (user.role === 'admin') {
+  document.getElementById('dashboardLink').href = '../admin/dashboard.html';
+  document.getElementById('menuLink').href = '../staff/menu.html';
+  document.getElementById('commentsLink').href = '../staff/comments.html';
+  document.getElementById('annLink').href = '../staff/staff-announcements2.html';
+  document.getElementById('adminLinks').innerHTML = `
+    <div class="sb-label">Admin</div>
+    <a href="../admin/dashboard.html" class="sb-link"><i class="bi bi-people"></i>Manage Staff</a>`;
+} else {
+  document.getElementById('dashboardLink').href = '../group-24/staff/dashboard.html';
+  document.getElementById('menuLink').href = '../group-24/staff/menu.html';
+  document.getElementById('commentsLink').href = '../group-24/staff/comments.html';
+  document.getElementById('annLink').href = 'staff-announcements2.html';
+}
+
+let allContacts = [];
+let activeContact = null;
+let pollInterval = null;
+let unreadPollInterval = null;
+
+// Load contacts
+async function loadContacts() {
+  try {
+    const res = await fetch(`${CHAT_API}/get_chat_users.php?user_id=${user.id}&role=${user.role}`, {
+  headers: { 'X-Requested-With': 'XMLHttpRequest' }
+});
+    allContacts = await res.json();
+    renderContacts(allContacts);
+  } catch (err) {
+    console.error('loadContacts error:', err);
+  }
+}
+
+function renderContacts(contacts) {
+  const list = document.getElementById('contactsList');
+  if (!contacts.length) {
+    list.innerHTML = '<div class="text-center text-muted py-4" style="font-size:.85rem">No contacts yet</div>';
+    return;
+  }
+  list.innerHTML = contacts.map(c => `
+    <div class="contact-item ${activeContact?.id == c.id ? 'active' : ''}" onclick="openChat(${c.id}, '${c.name}', '${c.role}')">
+      <div class="contact-av ${c.role === 'admin' ? 'admin' : ''}">${c.name.charAt(0).toUpperCase()}</div>
+      <div class="contact-info">
+        <div class="d-flex align-items-center gap-1">
+          <span class="contact-name">${c.name}</span>
+          <span class="role-tag ${c.role}">${c.role}</span>
+        </div>
+        <div class="contact-preview">${c.last_message || 'No messages yet'}</div>
+      </div>
+      <div class="contact-meta">
+        <span class="contact-time">${c.last_message_time ? formatTime(c.last_message_time) : ''}</span>
+        ${c.unread_count > 0 ? `<span class="unread-badge">${c.unread_count}</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterContacts() {
+  const search = document.getElementById('contactSearch').value.toLowerCase();
+  const filtered = allContacts.filter(c => c.name.toLowerCase().includes(search));
+  renderContacts(filtered);
+}
+
+function formatTime(datetime) {
+  if (!datetime) return '';
+  const d = new Date(datetime);
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 86400000) return d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:false});
+  return d.toLocaleDateString('en-US', {day:'numeric', month:'short'});
+}
+
+// Open chat with contact
+async function openChat(contactId, contactName, contactRole) {
+  activeContact = { id: contactId, name: contactName, role: contactRole };
+
+  // Update active state
+  document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  // Show chat window
+  document.getElementById('chatEmpty').style.display = 'none';
+  const chatWindow = document.getElementById('chatWindow');
+  chatWindow.style.display = 'flex';
+  chatWindow.style.flexDirection = 'column';
+  chatWindow.style.flex = '1';
+
+  // Set header
+  document.getElementById('chatHeader').innerHTML = `
+    <div class="contact-av ${contactRole === 'admin' ? 'admin' : ''}" style="width:38px;height:38px;font-size:.9rem">${contactName.charAt(0).toUpperCase()}</div>
+    <div>
+      <div style="font-weight:700;font-size:.9rem">${contactName}</div>
+      <div class="role-tag ${contactRole}" style="display:inline-block">${contactRole}</div>
+    </div>
+  `;
+
+  // Mobile
+  document.getElementById('contactsPanel').classList.add('mobile-hide');
+  document.getElementById('chatPanel').classList.add('mobile-show');
+
+  // Load messages
+  await loadMessages();
+
+  // Start polling
+  if (pollInterval) clearInterval(pollInterval);
+  pollInterval = setInterval(loadMessages, 3000);
+}
+
+async function loadMessages() {
+  if (!activeContact) return;
+  try {
+    const res = await fetch(`${CHAT_API}/get_messages.php?user_id=${user.id}&other_id=${activeContact.id}`, {
+  headers: { 'X-Requested-With': 'XMLHttpRequest' }
+});
+    const messages = await res.json();
+    renderMessages(messages);
+    loadContacts(); // refresh contact list unread count
+  } catch (err) {
+    console.error('loadMessages error:', err);
+  }
+}
+
+function renderMessages(messages) {
+  const container = document.getElementById('chatMessages');
+  const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
+
+  container.innerHTML = messages.map(m => {
+    const isSent = m.sender_id == user.id;
+    return `
+      <div style="display:flex;flex-direction:column;align-items:${isSent ? 'flex-end' : 'flex-start'}">
+        ${!isSent ? `<div style="font-size:.68rem;color:#999;margin-bottom:2px;padding-left:4px">${m.sender_name}</div>` : ''}
+        <div class="msg ${isSent ? 'sent' : 'received'}">
+          ${m.message}
+          <div class="msg-time">${formatTime(m.created_at)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (wasAtBottom || messages.length < 5) {
+    container.scrollTop = container.scrollHeight;
+  }
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const message = input.value.trim();
+  if (!message || !activeContact) return;
+
+  input.value = '';
+
+  try {
+    await fetch(`${CHAT_API}/send_message.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      body: JSON.stringify({
+        sender_id: user.id,
+        receiver_id: activeContact.id,
+        message
+      })
+    });
+    await loadMessages();
+  } catch (err) {
+    console.error('sendMessage error:', err);
+  }
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+// Unread notification badge in sidebar
+async function checkUnread() {
+  try {
+    const res = await fetch(`${CHAT_API}/get_unread.php?user_id=${user.id}`, {
+  headers: { 'X-Requested-With': 'XMLHttpRequest' }
+});
+    const data = await res.json();
+    const badge = document.getElementById('sbUnreadBadge');
+    if (data.total > 0) {
+      badge.style.display = '';
+      badge.textContent = data.total;
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch (err) {}
+}
+
+function doLogout() {
+  DB.logout();
+  location.href = '../group-24/customer/login.html';
+}
+
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+
+// Init
+loadContacts();
+checkUnread();
+unreadPollInterval = setInterval(checkUnread, 5000);
+</script>
+</body>
+</html>
