@@ -1,7 +1,16 @@
 <?php
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type, X-Requested-With");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Content-Type: application/json");
-$dbPath = ($_SERVER['HTTP_HOST'] === 'localhost') ? $_SERVER['DOCUMENT_ROOT'] . "/project/db.php" : $_SERVER['DOCUMENT_ROOT'] . "/db.php"; require __DIR__ . "/../db.php";
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
+require __DIR__ . "/../db.php";
+
 try {
     $db = DB::connect();
     $status = $_GET['status'] ?? null;
