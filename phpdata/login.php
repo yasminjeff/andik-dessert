@@ -1,11 +1,14 @@
 <?php
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type, X-Requested-With");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: POST");
 
-$dbPath = ($_SERVER['HTTP_HOST'] === 'localhost') 
-    ? $_SERVER['DOCUMENT_ROOT'] . "/project/db.php" 
-    : $_SERVER['DOCUMENT_ROOT'] . "/db.php";
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
 require __DIR__ . "/../db.php";
 
 try {
@@ -30,7 +33,6 @@ try {
         exit;
     }
 
-    // check status pending
     if ($user['status'] === 'pending') {
         echo json_encode(["error" => true, "message" => "Your account is pending approval from admin. Please wait."]);
         exit;
