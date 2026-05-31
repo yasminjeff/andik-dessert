@@ -288,6 +288,13 @@ const menu = await menuRes.json();
 }
 
 loadIndex();
+
+
+// Keep server alive
+setInterval(() => {
+  fetch('/keep_alive.php').catch(() => {});
+}, 300000);
+
 </script>
 </body>
 </html>

@@ -286,7 +286,7 @@ async function openChat(contactId, contactName, contactRole) {
 
   // Start polling
   if (pollInterval) clearInterval(pollInterval);
-  pollInterval = setInterval(loadMessages, 3000);
+  pollInterval = setInterval(loadMessages, 5000);
 }
 
 async function loadMessages() {
