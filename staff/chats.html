@@ -152,9 +152,13 @@
         <div class="chat-header" id="chatHeader"></div>
         <div class="chat-messages" id="chatMessages"></div>
         <div class="chat-input-area">
-          <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1" onkeydown="handleKey(event)"></textarea>
-          <button class="send-btn" onclick="sendMessage()"><i class="bi bi-send-fill"></i></button>
-        </div>
+          <label for="imageUpload" style="cursor:pointer;width:38px;height:38px;background:#F0F0F0;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="bi bi-image" style="color:#666;font-size:1rem"></i>
+        </label>
+        <input type="file" id="imageUpload" accept="image/*" style="display:none" onchange="sendImage(this.files[0])">
+        <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1" onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" onclick="sendMessage()"><i class="bi bi-send-fill"></i></button>
+     </div>
       </div>
     </div>
   </div>
@@ -309,11 +313,14 @@ function renderMessages(messages) {
 
   container.innerHTML = messages.map(m => {
     const isSent = m.sender_id == user.id;
+    const isImage = m.message && m.message.startsWith('/uploads/chat/');
     return `
       <div style="display:flex;flex-direction:column;align-items:${isSent ? 'flex-end' : 'flex-start'}">
         ${!isSent ? `<div style="font-size:.68rem;color:#999;margin-bottom:2px;padding-left:4px">${m.sender_name}</div>` : ''}
-        <div class="msg ${isSent ? 'sent' : 'received'}">
-          ${m.message}
+        <div class="msg ${isSent ? 'sent' : 'received'}" onclick="showMsgOptions(${m.id}, ${isSent})">
+          ${isImage 
+            ? `<img src="${m.message}" style="max-width:200px;border-radius:8px;display:block" onerror="this.src='https://placehold.co/200x150?text=Image'">` 
+            : m.message}
           <div class="msg-time">${formatTime(m.created_at)}</div>
         </div>
       </div>
@@ -332,21 +339,63 @@ async function sendMessage() {
 
   input.value = '';
 
-  try {
-    await fetch(`${CHAT_API}/send_message.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-      body: JSON.stringify({
-        sender_id: user.id,
-        receiver_id: activeContact.id,
-        message
-      })
-    });
-    await loadMessages();
-  } catch (err) {
-    console.error('sendMessage error:', err);
+  // Show message instantly without waiting
+  fetch(`${CHAT_API}/send_message.php`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+    body: JSON.stringify({
+      sender_id: user.id,
+      receiver_id: activeContact.id,
+      message
+    })
+  }).then(() => loadMessages()).catch(err => console.error('sendMessage error:', err));
+}
+
+function showMsgOptions(msgId, isSent) {
+  if (!isSent) return; // only sender can delete
+  if (confirm('Delete this message?')) {
+    deleteMessage(msgId);
   }
 }
+
+async function deleteMessage(msgId) {
+  try {
+    await fetch(`${CHAT_API}/delete_message.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: msgId, user_id: user.id })
+    });
+    loadMessages();
+  } catch (err) {
+    console.error('deleteMessage error:', err);
+  }
+}
+
+async function sendImage(file) {
+  const formData = new FormData();
+  formData.append('image', file);
+  try {
+    const res = await fetch(`${CHAT_API}/upload_chat_image.php`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (data.success) {
+      fetch(`${CHAT_API}/send_message.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sender_id: user.id,
+          receiver_id: activeContact.id,
+          message: data.url
+        })
+      }).then(() => loadMessages());
+    }
+  } catch (err) {
+    console.error('sendImage error:', err);
+  }
+}
+
 
 function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
