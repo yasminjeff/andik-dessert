@@ -1,7 +1,14 @@
 <?php
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type, X-Requested-With");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: POST");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
 require __DIR__ . "/db.php";
 
 try {
@@ -10,10 +17,7 @@ try {
     $db = DB::connect();
 
     $stmt = $db->prepare("DELETE FROM menu_items WHERE id = :id");
-
-    $stmt->execute([
-        ':id' => $data->id
-    ]);
+    $stmt->execute([':id' => $data->id]);
 
     echo json_encode(["status" => "deleted"]);
 
