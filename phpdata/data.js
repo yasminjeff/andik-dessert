@@ -3,7 +3,7 @@
 // =========================
 const BASE_URL = window.location.hostname === 'localhost'
   ? 'http://localhost/project'
-  : 'https://andiksdesserts.infinityfreeapp.com';
+  : 'https://andik-dessert-production.up.railway.app';
 
 const DB = {
 
