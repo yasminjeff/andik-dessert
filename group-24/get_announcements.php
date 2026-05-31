@@ -4,8 +4,7 @@ header("Content-Type: application/json");
 $dbPath = ($_SERVER['HTTP_HOST'] === 'localhost') 
     ? $_SERVER['DOCUMENT_ROOT'] . "/project/db.php" 
     : $_SERVER['DOCUMENT_ROOT'] . "/db.php";
-require $dbPath;
-
+require __DIR__ . "/../db.php";
 try {
     $db = DB::connect();
     $stmt = $db->query("SELECT * FROM announcements ORDER BY created_at DESC");

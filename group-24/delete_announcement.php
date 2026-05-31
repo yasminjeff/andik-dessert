@@ -2,8 +2,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: POST");
-$dbPath = ($_SERVER['HTTP_HOST'] === 'localhost') ? $_SERVER['DOCUMENT_ROOT'] . "/project/db.php" : $_SERVER['DOCUMENT_ROOT'] . "/db.php"; require $dbPath;
-
+$dbPath = ($_SERVER['HTTP_HOST'] === 'localhost') ? $_SERVER['DOCUMENT_ROOT'] . "/project/db.php" : $_SERVER['DOCUMENT_ROOT'] . "/db.php"; require __DIR__ . "/../db.php";
 try {
     $input = json_decode(file_get_contents("php://input"), true);
     $id = $input['id'] ?? null;

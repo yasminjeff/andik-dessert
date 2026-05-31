@@ -6,7 +6,7 @@ header("Access-Control-Allow-Methods: POST");
 $dbPath = ($_SERVER['HTTP_HOST'] === 'localhost') 
     ? $_SERVER['DOCUMENT_ROOT'] . "/project/db.php" 
     : $_SERVER['DOCUMENT_ROOT'] . "/db.php";
-require $dbPath;
+require __DIR__ . "/../db.php";
 
 try {
     $input = json_decode(file_get_contents("php://input"), true);

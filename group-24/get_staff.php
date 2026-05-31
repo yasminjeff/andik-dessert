@@ -1,8 +1,7 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
-$dbPath = ($_SERVER['HTTP_HOST'] === 'localhost') ? $_SERVER['DOCUMENT_ROOT'] . "/project/db.php" : $_SERVER['DOCUMENT_ROOT'] . "/db.php"; require $dbPath;
-
+$dbPath = ($_SERVER['HTTP_HOST'] === 'localhost') ? $_SERVER['DOCUMENT_ROOT'] . "/project/db.php" : $_SERVER['DOCUMENT_ROOT'] . "/db.php"; require __DIR__ . "/../db.php";
 try {
     $db = DB::connect();
     $status = $_GET['status'] ?? null;
