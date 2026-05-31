@@ -372,16 +372,31 @@ async function deleteMessage(msgId) {
 }
 
 async function sendImage(file) {
+  if (!file || !activeContact) return;
+
+  // Show preview instantly
+  const localUrl = URL.createObjectURL(file);
+  const container = document.getElementById('chatMessages');
+  const previewId = 'preview_' + Date.now();
+  container.innerHTML += `
+    <div id="${previewId}" style="display:flex;flex-direction:column;align-items:flex-end">
+      <div class="msg sent" style="opacity:.6">
+        <img src="${localUrl}" style="max-width:200px;border-radius:8px;display:block">
+        <div class="msg-time">Sending...</div>
+      </div>
+    </div>`;
+  container.scrollTop = container.scrollHeight;
+
   const formData = new FormData();
   formData.append('image', file);
   try {
-    const res = await fetch(`${CHAT_API}/upload_chat_image.php`, {
+    const res = await fetch(`${BASE}/phpdata/upload_chat_image.php`, {
       method: 'POST',
       body: formData
     });
     const data = await res.json();
     if (data.success) {
-      fetch(`${CHAT_API}/send_message.php`, {
+      await fetch(`${CHAT_API}/send_message.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -389,11 +404,18 @@ async function sendImage(file) {
           receiver_id: activeContact.id,
           message: data.url
         })
-      }).then(() => loadMessages());
+      });
+      // Remove preview and reload
+      document.getElementById(previewId)?.remove();
+      loadMessages();
     }
   } catch (err) {
     console.error('sendImage error:', err);
+    document.getElementById(previewId)?.remove();
   }
+
+  // Reset file input
+  document.getElementById('imageUpload').value = '';
 }
 
 
