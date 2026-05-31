@@ -310,7 +310,7 @@ else if (sort === 'available') items.sort((a,b) => b.available - a.available);
                style="width:100%;height:100%;object-fit:cover;transition:.3s"
                onmouseover="this.style.transform='scale(1.05)'"
                onmouseout="this.style.transform='scale(1)'"
-               onerror="this.src='../assets/andikDessert.png'">
+               onerror="this.onerror=null;this.src='https://placehold.co/400x300/F5C800/011041?text=No+Image'">
           ${(!isAvailable || !isAvailableOnDay) ? `
           <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center">
           <span style="background:rgba(0,0,0,.8);color:#fff;padding:.5rem 1rem;border-radius:8px;font-weight:600;font-size:.85rem">
