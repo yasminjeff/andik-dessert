@@ -1,6 +1,14 @@
 <?php
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type, X-Requested-With");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Content-Type: application/json");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
 require __DIR__ . "/../db.php";
 
 try {
@@ -15,7 +23,7 @@ try {
     $db = DB::connect();
 
     if ($role === 'admin') {
-    $stmt = $db->prepare("SELECT id, name, email, role FROM users WHERE status = 'active' AND id != ?");
+        $stmt = $db->prepare("SELECT id, name, email, role FROM users WHERE status = 'active' AND id != ?");
         $stmt->execute([$user_id]);
     } else {
         $stmt = $db->prepare("SELECT id, name, email, role FROM users WHERE role = 'admin' AND id != ?");
@@ -24,7 +32,6 @@ try {
 
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Add last message and unread count for each user
     foreach ($users as &$u) {
         $stmt2 = $db->prepare("SELECT message, created_at FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY created_at DESC LIMIT 1");
         $stmt2->execute([$user_id, $u['id'], $u['id'], $user_id]);
