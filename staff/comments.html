@@ -84,7 +84,7 @@
     <a href="comments.html" class="sb-link active"><i class="bi bi-chat-left-text"></i>Comments</a>
     <a href="staff-announcements2.html" class="sb-link"><i class="bi bi-megaphone"></i>Announcements</a>
     <div class="sb-label">Messages</div>
-    <a href="https://andik-dessert-production.up.railway.app/staff/chats.html" class="sb-link"><i class="bi bi-chat-dots"></i>Chats <span class="sb-badge" id="sbUnreadBadge" style="display:none">0</span></a>
+    <a href="chats.html" class="sb-link" id="chatsLink"><i class="bi bi-chat-dots"></i>Chats<span class="sb-badge" id="sbUnreadBadge" style="display:none">0</span></a>
     <div id="adminLinks"></div>
   </nav>
   <div class="sb-footer">
@@ -172,7 +172,9 @@ document.getElementById('userName').textContent = user.name;
 document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
 document.getElementById('roleLabel').textContent = user.role === 'admin' ? 'Admin Portal' : 'Staff Portal';
 
-if (user.role === 'admin') document.getElementById('adminLinks').innerHTML = 
+if (user.role === 'admin') 
+  document.getElementById('chatsLink').href = 'chats.html';
+  document.getElementById('adminLinks').innerHTML = 
   `<div class="sb-label">Admin</div>
    <a href="../admin/dashboard.html" class="sb-link">
      <i class="bi bi-people"></i>Manage Staff
