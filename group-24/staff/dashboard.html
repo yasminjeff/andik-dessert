@@ -203,9 +203,10 @@ const menuUrl = user.role === 'admin'
 
 document.querySelector('a[href="menu.html"]').href = menuUrl;
 
+const userParam = encodeURIComponent(JSON.stringify(user));
 const CHAT_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost/project/staff/chats.html'
-  : 'https://andik-dessert-production.up.railway.app/staff/chats.html';
+  ? `http://localhost/project/staff/chats.html?u=${userParam}`
+  : `https://andik-dessert-production.up.railway.app/staff/chats.html?u=${userParam}`;
 
 document.getElementById('chatsLink').href = CHAT_URL;
 document.getElementById('chatsLinkSidebar').href = CHAT_URL;

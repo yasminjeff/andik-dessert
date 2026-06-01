@@ -177,6 +177,16 @@ const BASE = window.location.hostname === 'localhost' || window.location.hostnam
 
 const CHAT_API = `${BASE}/phpdata`;
 
+const urlParams = new URLSearchParams(window.location.search);
+const userFromUrl = urlParams.get('u');
+if (userFromUrl) {
+  try {
+    const userData = JSON.parse(decodeURIComponent(userFromUrl));
+    localStorage.setItem("andiks_user", JSON.stringify(userData));
+    window.history.replaceState({}, '', window.location.pathname);
+  } catch(e) {}
+}
+
 const user = DB.currentUser();
 if (!user || (user.role !== 'staff' && user.role !== 'admin')) {
   location.href = '../group-24/customer/login.html';
