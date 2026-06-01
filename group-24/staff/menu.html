@@ -278,8 +278,14 @@ document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperC
 document.getElementById('userName').textContent = user.name;
 document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
 document.getElementById('roleLabel').textContent = user.role === 'admin' ? 'Admin Portal' : 'Staff Portal';
+const CHAT_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost/project/staff/chats.html'
+  : 'https://andik-dessert-production.up.railway.app/staff/chats.html';
+
+document.getElementById('chatsLink').href = CHAT_URL;
+
 if (user.role === 'admin') {
-  document.getElementById('chatsLink').href = '../../staff/chats.html';
+  document.getElementById('chatsLink').href = CHAT_URL;
   document.getElementById('adminLinks').innerHTML = `
     <div class="sb-label">Admin</div>
     <a href="../../admin/dashboard.html" class="sb-link">

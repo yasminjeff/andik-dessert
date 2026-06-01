@@ -158,9 +158,15 @@
 <script src="../phpdata/data.js"></script>
 <script>
 const user = DB.currentUser();
+
 if (!user || user.role !== 'admin') location.href = '../group-24/customer/login.html';
 document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
 document.getElementById('userName').textContent = user.name;
+const CHAT_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost/project/staff/chats.html'
+  : 'https://andik-dessert-production.up.railway.app/staff/chats.html';
+
+document.getElementById('chatsLink').href = CHAT_URL;
 document.getElementById('adminToday').textContent = DB.getDayName();
 
 const ADMIN_API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
