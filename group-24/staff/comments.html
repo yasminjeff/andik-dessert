@@ -182,12 +182,6 @@ document.getElementById('userName').textContent = user.name;
 document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
 document.getElementById('roleLabel').textContent = user.role === 'admin' ? 'Admin Portal' : 'Staff Portal';
 
-const menuUrl = user.role === 'admin' 
-  ? `${API_BASE}/staff/menu.html`
-  : `${API_BASE}/group-24/staff/menu.html`;
-
-document.querySelector('a[href="menu.html"]').href = menuUrl;
-
 const userParam = encodeURIComponent(JSON.stringify(user));
 const CHAT_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? `http://localhost/project/staff/chats.html?u=${userParam}`
@@ -196,6 +190,8 @@ const CHAT_URL = window.location.hostname === 'localhost' || window.location.hos
 document.getElementById('chatsLink').href = CHAT_URL;
 
 if (user.role === 'admin') {
+  document.querySelector('a[href="menu.html"]').href = '../../staff/menu.html';
+  document.querySelector('a[href="dashboard.html"]').href = '../../staff/dashboard.html';
   document.getElementById('chatsLink').href = CHAT_URL;
   document.getElementById('adminLinks').innerHTML = 
   `<div class="sb-label">Admin</div>
