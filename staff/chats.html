@@ -59,7 +59,7 @@
 .chat-empty{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#bbb;}
 .chat-header{background:#fff;padding:.9rem 1.4rem;border-bottom:1px solid #EBEBEB;display:flex;align-items:center;gap:12px;}
 .chat-messages{flex:1;overflow-y:auto;padding:1.2rem;display:flex;flex-direction:column;gap:.6rem;}
-.msg{max-width:65%;padding:.6rem 1rem;border-radius:14px;font-size:.87rem;line-height:1.5;word-break:break-word;}
+.msg{max-width:65%;padding:.6rem 1rem;border-radius:14px;font-size:.87rem;line-height:1.5;word-break:break-word;cursor:pointer;user-select:none;}
 .msg.sent{background:var(--bk);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
 .msg.received{background:#fff;color:#333;border-bottom-left-radius:4px;align-self:flex-start;box-shadow:0 1px 4px rgba(0,0,0,.07);}
 .msg-time{font-size:.65rem;opacity:.6;margin-top:3px;text-align:right;}
@@ -70,6 +70,22 @@
 .send-btn{width:42px;height:42px;background:var(--y);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.2s;}
 .send-btn:hover{background:var(--yd);}
 .send-btn i{color:var(--bk);font-size:1rem;}
+
+/* CONTEXT MENU */
+.msg-context-menu{position:fixed;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:.4rem 0;z-index:9999;min-width:160px;}
+.msg-context-item{padding:.6rem 1.2rem;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:8px;color:#333;}
+.msg-context-item:hover{background:#F4F5F7;}
+.msg-context-item.delete{color:#C62828;}
+
+/* IMAGE PREVIEW */
+.img-preview-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center;}
+.img-preview-box{background:#fff;border-radius:20px 20px 0 0;padding:1.2rem;width:100%;max-width:500px;}
+.img-preview-box img{width:100%;max-height:300px;object-fit:contain;border-radius:12px;margin-bottom:1rem;}
+
+/* REPLY QUOTE */
+.reply-quote{background:rgba(255,255,255,.15);border-left:3px solid var(--y);padding:.3rem .6rem;border-radius:6px;font-size:.75rem;margin-bottom:4px;opacity:.85;}
+.msg.received .reply-quote{background:rgba(0,0,0,.06);}
+.reply-bar{background:#F4F5F7;border-left:3px solid var(--y);padding:.5rem 1rem;font-size:.82rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;}
 
 /* MOBILE */
 @media (max-width: 768px) {
@@ -90,6 +106,17 @@
 <body>
 
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<!-- IMAGE PREVIEW OVERLAY -->
+<div id="imgPreviewOverlay" class="img-preview-overlay" style="display:none">
+  <div class="img-preview-box">
+    <img id="imgPreviewImg" src="">
+    <div class="d-flex gap-2">
+      <button class="btn w-100" style="background:#F0F0F0;border:none;border-radius:10px;font-weight:600" onclick="cancelImagePreview()">Cancel</button>
+      <button class="btn w-100" style="background:var(--y);color:var(--bk);font-weight:700;border:none;border-radius:10px;" onclick="confirmSendImage()">Send</button>
+    </div>
+  </div>
+</div>
 
 <aside class="sidebar">
   <div class="sb-header">
@@ -148,21 +175,24 @@
         <i class="bi bi-chat-dots" style="font-size:3rem;margin-bottom:1rem;opacity:.3"></i>
         <p style="font-size:.9rem">Select a contact to start chatting</p>
       </div>
-      <div id="chatWindow" style="display:none;flex:1;flex-direction:column;display:none;">
-        <div class="chat-header" id="chatHeader">
-  <button class="btn d-md-none" style="background:none;border:none;color:var(--bk);font-size:1.2rem;padding:0;margin-right:.5rem" onclick="backToContacts()">
-    <i class="bi bi-arrow-left"></i>
-  </button>
-</div>
+      <div id="chatWindow" style="display:none;flex:1;flex-direction:column;">
+        <div class="chat-header" id="chatHeader"></div>
+        <div id="replyBar" style="display:none" class="reply-bar">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.7rem;font-weight:700;color:var(--bk)">Replying to</div>
+            <div id="replyBarText" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#555"></div>
+          </div>
+          <button onclick="cancelReply()" style="background:none;border:none;color:#999;font-size:1rem;padding:0"><i class="bi bi-x"></i></button>
+        </div>
         <div class="chat-messages" id="chatMessages"></div>
         <div class="chat-input-area">
           <label for="imageUpload" style="cursor:pointer;width:38px;height:38px;background:#F0F0F0;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="bi bi-image" style="color:#666;font-size:1rem"></i>
-        </label>
-        <input type="file" id="imageUpload" accept="image/*,video/*" capture="environment" style="display:none" onchange="console.log('file selected:', this.files[0]); sendImage(this.files[0])">
-        <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1" onkeydown="handleKey(event)"></textarea>
-        <button class="send-btn" onclick="sendMessage()"><i class="bi bi-send-fill"></i></button>
-     </div>
+            <i class="bi bi-image" style="color:#666;font-size:1rem"></i>
+          </label>
+          <input type="file" id="imageUpload" accept="image/*" style="display:none" onchange="previewImage(this.files[0])">
+          <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1" onkeydown="handleKey(event)"></textarea>
+          <button class="send-btn" onclick="sendMessage()"><i class="bi bi-send-fill"></i></button>
+        </div>
       </div>
     </div>
   </div>
@@ -192,13 +222,11 @@ if (!user || (user.role !== 'staff' && user.role !== 'admin')) {
   location.href = '../group-24/customer/login.html';
 }
 
-// Setup UI
 document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
 document.getElementById('userName').textContent = user.name;
 document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
 document.getElementById('roleLabel').textContent = user.role === 'admin' ? 'Admin Portal' : 'Staff Portal';
 
-// Fix sidebar links based on role
 if (user.role === 'admin') {
   document.getElementById('dashboardLink').href = '../admin/dashboard.html';
   document.getElementById('menuLink').href = '../staff/menu.html';
@@ -219,12 +247,137 @@ let activeContact = null;
 let pollInterval = null;
 let unreadPollInterval = null;
 
-// Load contacts
+// ── CONTEXT MENU ──────────────────────────────────
+let contextMsgId = null;
+let contextIsSent = false;
+let contextReplyText = null;
+let replyingTo = null;
+let longPressTimer = null;
+let pendingImageFile = null;
+
+function showMsgOptions(msgId, isSent, msgText, event) {
+  event.preventDefault();
+  contextMsgId = msgId;
+  contextIsSent = isSent;
+  contextReplyText = msgText;
+
+  const existing = document.getElementById('msgContextMenu');
+  if (existing) existing.remove();
+
+  const menu = document.createElement('div');
+  menu.id = 'msgContextMenu';
+  menu.className = 'msg-context-menu';
+
+  let items = `<div class="msg-context-item" onclick="replyToMsg()"><i class="bi bi-reply"></i>Reply</div>`;
+  if (isSent) {
+    items += `<div class="msg-context-item delete" onclick="deleteMessage(${msgId})"><i class="bi bi-trash"></i>Delete</div>`;
+  }
+  menu.innerHTML = items;
+
+  const x = Math.min(event.clientX, window.innerWidth - 170);
+  const y = Math.min(event.clientY, window.innerHeight - 100);
+  menu.style.left = x + 'px';
+  menu.style.top = y + 'px';
+
+  document.body.appendChild(menu);
+  setTimeout(() => {
+    document.addEventListener('click', closeContextMenu, { once: true });
+  }, 10);
+}
+
+function closeContextMenu() {
+  const menu = document.getElementById('msgContextMenu');
+  if (menu) menu.remove();
+}
+
+function replyToMsg() {
+  closeContextMenu();
+  replyingTo = { id: contextMsgId, text: contextReplyText };
+  document.getElementById('replyBarText').textContent = contextReplyText;
+  document.getElementById('replyBar').style.display = 'flex';
+  document.getElementById('chatInput').focus();
+}
+
+function cancelReply() {
+  replyingTo = null;
+  document.getElementById('replyBar').style.display = 'none';
+}
+
+function startLongPress(msgId, isSent, msgText, event) {
+  longPressTimer = setTimeout(() => {
+    const touch = event.touches[0];
+    showMsgOptions(msgId, isSent, msgText, { preventDefault: () => {}, clientX: touch.clientX, clientY: touch.clientY });
+  }, 600);
+}
+
+function cancelLongPress() {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+  }
+}
+
+// ── IMAGE PREVIEW ─────────────────────────────────
+function previewImage(file) {
+  if (!file) return;
+  pendingImageFile = file;
+  const url = URL.createObjectURL(file);
+  document.getElementById('imgPreviewImg').src = url;
+  document.getElementById('imgPreviewOverlay').style.display = 'flex';
+}
+
+function cancelImagePreview() {
+  pendingImageFile = null;
+  document.getElementById('imgPreviewOverlay').style.display = 'none';
+  document.getElementById('imageUpload').value = '';
+}
+
+async function confirmSendImage() {
+  if (!pendingImageFile || !activeContact) return;
+  document.getElementById('imgPreviewOverlay').style.display = 'none';
+
+  const container = document.getElementById('chatMessages');
+  const previewId = 'preview_' + Date.now();
+  const localUrl = URL.createObjectURL(pendingImageFile);
+  container.innerHTML += `
+    <div id="${previewId}" style="display:flex;flex-direction:column;align-items:flex-end">
+      <div class="msg sent" style="opacity:.6">
+        <img src="${localUrl}" style="max-width:200px;border-radius:8px;display:block">
+        <div class="msg-time">Sending...</div>
+      </div>
+    </div>`;
+  container.scrollTop = container.scrollHeight;
+
+  const formData = new FormData();
+  formData.append('image', pendingImageFile);
+
+  try {
+    const res = await fetch(`${BASE}/phpdata/upload_chat_image.php`, { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) {
+      await fetch(`${CHAT_API}/send_message.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sender_id: user.id, receiver_id: activeContact.id, message: data.url })
+      });
+      document.getElementById(previewId)?.remove();
+      loadMessages();
+    }
+  } catch (err) {
+    console.error('sendImage error:', err);
+    document.getElementById(previewId)?.remove();
+  }
+
+  pendingImageFile = null;
+  document.getElementById('imageUpload').value = '';
+}
+
+// ── CONTACTS ──────────────────────────────────────
 async function loadContacts() {
   try {
     const res = await fetch(`${CHAT_API}/get_chat_users.php?user_id=${user.id}&role=${user.role}`, {
-  headers: { 'X-Requested-With': 'XMLHttpRequest' }
-});
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
     allContacts = await res.json();
     renderContacts(allContacts);
   } catch (err) {
@@ -258,8 +411,7 @@ function renderContacts(contacts) {
 
 function filterContacts() {
   const search = document.getElementById('contactSearch').value.toLowerCase();
-  const filtered = allContacts.filter(c => c.name.toLowerCase().includes(search));
-  renderContacts(filtered);
+  renderContacts(allContacts.filter(c => c.name.toLowerCase().includes(search)));
 }
 
 function formatTime(datetime) {
@@ -271,23 +423,23 @@ function formatTime(datetime) {
   return d.toLocaleDateString('en-US', {day:'numeric', month:'short'});
 }
 
-// Open chat with contact
+// ── OPEN CHAT ─────────────────────────────────────
 async function openChat(contactId, contactName, contactRole) {
   activeContact = { id: contactId, name: contactName, role: contactRole };
 
-  // Update active state
   document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
   event.currentTarget.classList.add('active');
 
-  // Show chat window
   document.getElementById('chatEmpty').style.display = 'none';
   const chatWindow = document.getElementById('chatWindow');
   chatWindow.style.display = 'flex';
   chatWindow.style.flexDirection = 'column';
   chatWindow.style.flex = '1';
 
-  // Set header
   document.getElementById('chatHeader').innerHTML = `
+    <button class="btn d-md-none" style="background:none;border:none;color:var(--bk);font-size:1.2rem;padding:0;margin-right:.5rem" onclick="backToContacts()">
+      <i class="bi bi-arrow-left"></i>
+    </button>
     <div class="contact-av ${contactRole === 'admin' ? 'admin' : ''}" style="width:38px;height:38px;font-size:.9rem">${contactName.charAt(0).toUpperCase()}</div>
     <div>
       <div style="font-weight:700;font-size:.9rem">${contactName}</div>
@@ -295,27 +447,25 @@ async function openChat(contactId, contactName, contactRole) {
     </div>
   `;
 
-  // Mobile
   document.getElementById('contactsPanel').classList.add('mobile-hide');
   document.getElementById('chatPanel').classList.add('mobile-show');
 
-  // Load messages
   await loadMessages();
 
-  // Start polling
   if (pollInterval) clearInterval(pollInterval);
   pollInterval = setInterval(loadMessages, 5000);
 }
 
+// ── MESSAGES ──────────────────────────────────────
 async function loadMessages() {
   if (!activeContact) return;
   try {
     const res = await fetch(`${CHAT_API}/get_messages.php?user_id=${user.id}&other_id=${activeContact.id}`, {
-  headers: { 'X-Requested-With': 'XMLHttpRequest' }
-});
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
     const messages = await res.json();
     renderMessages(messages);
-    loadContacts(); // refresh contact list unread count
+    loadContacts();
   } catch (err) {
     console.error('loadMessages error:', err);
   }
@@ -328,13 +478,31 @@ function renderMessages(messages) {
   container.innerHTML = messages.map(m => {
     const isSent = m.sender_id == user.id;
     const isImage = m.message && m.message.startsWith('/uploads/chat/');
+    const msgText = isImage ? '[Image]' : (m.message || '').replace(/`/g, '').substring(0, 60);
+    const safeText = msgText.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+    // Check if message has reply quote (starts with "> ")
+    let displayMsg = '';
+    if (!isImage && m.message && m.message.startsWith('> ')) {
+      const lines = m.message.split('\n');
+      const quoteLine = lines[0].replace('> ', '');
+      const restLines = lines.slice(1).join('\n');
+      displayMsg = `<div class="reply-quote">${quoteLine}</div>${restLines}`;
+    } else if (isImage) {
+      displayMsg = `<img src="${m.message}" style="max-width:200px;border-radius:8px;display:block" onerror="this.src='https://placehold.co/200x150?text=Image'">`;
+    } else {
+      displayMsg = m.message;
+    }
+
     return `
       <div style="display:flex;flex-direction:column;align-items:${isSent ? 'flex-end' : 'flex-start'}">
         ${!isSent ? `<div style="font-size:.68rem;color:#999;margin-bottom:2px;padding-left:4px">${m.sender_name}</div>` : ''}
-        <div class="msg ${isSent ? 'sent' : 'received'}" onclick="showMsgOptions(${m.id}, ${isSent})">
-          ${isImage 
-            ? `<img src="${m.message}" style="max-width:200px;border-radius:8px;display:block" onerror="this.src='https://placehold.co/200x150?text=Image'">` 
-            : m.message}
+        <div class="msg ${isSent ? 'sent' : 'received'}"
+          oncontextmenu="showMsgOptions(${m.id}, ${isSent}, '${safeText}', event)"
+          ontouchstart="startLongPress(${m.id}, ${isSent}, '${safeText}', event)"
+          ontouchend="cancelLongPress()"
+          ontouchmove="cancelLongPress()">
+          ${displayMsg}
           <div class="msg-time">${formatTime(m.created_at)}</div>
         </div>
       </div>
@@ -346,33 +514,29 @@ function renderMessages(messages) {
   }
 }
 
+// ── SEND MESSAGE ──────────────────────────────────
 async function sendMessage() {
   const input = document.getElementById('chatInput');
-  const message = input.value.trim();
+  let message = input.value.trim();
   if (!message || !activeContact) return;
+
+  // Add reply quote if replying
+  if (replyingTo) {
+    message = `> ${replyingTo.text}\n${message}`;
+    cancelReply();
+  }
 
   input.value = '';
 
-  // Show message instantly without waiting
   fetch(`${CHAT_API}/send_message.php`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-    body: JSON.stringify({
-      sender_id: user.id,
-      receiver_id: activeContact.id,
-      message
-    })
+    body: JSON.stringify({ sender_id: user.id, receiver_id: activeContact.id, message })
   }).then(() => loadMessages()).catch(err => console.error('sendMessage error:', err));
 }
 
-function showMsgOptions(msgId, isSent) {
-  if (!isSent) return; // only sender can delete
-  if (confirm('Delete this message?')) {
-    deleteMessage(msgId);
-  }
-}
-
 async function deleteMessage(msgId) {
+  closeContextMenu();
   try {
     await fetch(`${CHAT_API}/delete_message.php`, {
       method: 'POST',
@@ -385,54 +549,6 @@ async function deleteMessage(msgId) {
   }
 }
 
-async function sendImage(file) {
-  if (!file || !activeContact) return;
-
-  // Show preview instantly
-  const localUrl = URL.createObjectURL(file);
-  const container = document.getElementById('chatMessages');
-  const previewId = 'preview_' + Date.now();
-  container.innerHTML += `
-    <div id="${previewId}" style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="msg sent" style="opacity:.6">
-        <img src="${localUrl}" style="max-width:200px;border-radius:8px;display:block">
-        <div class="msg-time">Sending...</div>
-      </div>
-    </div>`;
-  container.scrollTop = container.scrollHeight;
-
-  const formData = new FormData();
-  formData.append('image', file);
-  try {
-    const res = await fetch(`${BASE}/phpdata/upload_chat_image.php`, {
-      method: 'POST',
-      body: formData
-    });
-    const data = await res.json();
-    if (data.success) {
-      await fetch(`${CHAT_API}/send_message.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sender_id: user.id,
-          receiver_id: activeContact.id,
-          message: data.url
-        })
-      });
-      // Remove preview and reload
-      document.getElementById(previewId)?.remove();
-      loadMessages();
-    }
-  } catch (err) {
-    console.error('sendImage error:', err);
-    document.getElementById(previewId)?.remove();
-  }
-
-  // Reset file input
-  document.getElementById('imageUpload').value = '';
-}
-
-
 function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -440,12 +556,12 @@ function handleKey(e) {
   }
 }
 
-// Unread notification badge in sidebar
+// ── UNREAD BADGE ──────────────────────────────────
 async function checkUnread() {
   try {
     const res = await fetch(`${CHAT_API}/get_unread.php?user_id=${user.id}`, {
-  headers: { 'X-Requested-With': 'XMLHttpRequest' }
-});
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
     const data = await res.json();
     const badge = document.getElementById('sbUnreadBadge');
     if (data.total > 0) {
@@ -467,19 +583,18 @@ function toggleSidebar() {
   document.getElementById('overlay').classList.toggle('show');
 }
 
-// Init
-loadContacts();
-checkUnread();
-unreadPollInterval = setInterval(checkUnread, 5000);
-
-
 function backToContacts() {
   document.getElementById('contactsPanel').classList.remove('mobile-hide');
   document.getElementById('chatPanel').classList.remove('mobile-show');
   if (pollInterval) clearInterval(pollInterval);
   activeContact = null;
+  cancelReply();
 }
 
+// Init
+loadContacts();
+checkUnread();
+unreadPollInterval = setInterval(checkUnread, 5000);
 </script>
 </body>
 </html>
