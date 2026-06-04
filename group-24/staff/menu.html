@@ -40,6 +40,22 @@
 .row-critical { background: #FFF3E0 !important; }
 .row-out      { background: #FFEBEE !important; }
 
+/* Info icon styling */
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background-color: #DC3545;
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 6px;
+  cursor: help;
+}
+
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
@@ -92,8 +108,6 @@
     <div class="sb-label">Engagement</div>
     <a href="comments.html" class="sb-link"><i class="bi bi-chat-left-text"></i>Comments</a>
     <a href="../../staff/staff-announcements2.html" class="sb-link"><i class="bi bi-megaphone"></i>Announcements</a>
-    <div class="sb-label">Messages</div>
-    <a href="../../staff/chats.html" class="sb-link" id="chatsLink"><i class="bi bi-chat-dots"></i>Chats<span class="sb-badge" id="sbUnreadBadge" style="display:none">0</span></a>  
     <div id="adminLinks"></div>
   </nav>
   <div class="sb-footer">
@@ -153,19 +167,26 @@ onclick="DB.logout();location.href='../customer/login.html'">
     </div>
 
     <div class="panel py-3 mb-3">
-  <div class="d-flex flex-wrap gap-2 align-items-center">
-    <input type="text" id="searchInput" class="form-control" placeholder="Search items..."
-           style="max-width:300px;border-radius:10px" oninput="renderTable()">
-    <select id="categoryFilter" class="form-select" style="max-width:180px;border-radius:10px" onchange="renderTable()">
-      <option value="">All Categories</option>
-      <option>Side Dishes</option>
-      <option>Dessert</option>
-      <option>Drinks</option>
-      <option>Rice</option>
-      <option>Noodles</option>
-    </select>
-  </div>
-</div>
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search items..."
+               style="max-width:300px;border-radius:10px" oninput="renderTable()">
+        <select id="categoryFilter" class="form-select" style="max-width:220px;border-radius:10px" onchange="renderTable()">
+          <option value="">All Categories</option>
+          <option>Rice</option>
+          <option>Noodles</option>
+          <option>Dessert</option>
+          <option>Drinks</option>
+          <option>Side Dishes</option>
+        </select>
+        <select id="stockFilter" class="form-select" style="max-width:220px;border-radius:10px" onchange="renderTable()">
+          <option value="">All Stocks</option>
+          <option value="out">Out of Stock</option>
+          <option value="critical">Critical (1–5)</option>
+          <option value="low">Low (6–10)</option>
+          <option value="good">Good (11+)</option>
+        </select>
+      </div>
+    </div>
 
     <div class="panel p-0">
       <div class="table-responsive">
@@ -216,7 +237,7 @@ onclick="DB.logout();location.href='../customer/login.html'">
             <input type="number" id="fPrice" class="form-control" placeholder="0.00" step="0.01" style="border-radius:10px">
           </div>
           <div class="col-md-6">
-            <label class="form-label fw-600" style="font-weight:600;font-size:.88rem">Stock Quantity *</label>
+            <label class="form-label fw-600" style="font-weight:600;font-size:.88rem">Stock Quantity * <span class="info-icon" title="Only whole numbers are allowed">i</span></label>
             <input type="number" id="fStock" class="form-control" placeholder="0" min="0" style="border-radius:10px">
           </div>
           <div class="col-12">
@@ -278,15 +299,7 @@ document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperC
 document.getElementById('userName').textContent = user.name;
 document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
 document.getElementById('roleLabel').textContent = user.role === 'admin' ? 'Admin Portal' : 'Staff Portal';
-const userParam = encodeURIComponent(JSON.stringify(user));
-const CHAT_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? `http://localhost/project/staff/chats.html?u=${userParam}`
-  : `https://andik-dessert-production.up.railway.app/staff/chats.html?u=${userParam}`;
-
-document.getElementById('chatsLink').href = CHAT_URL;
-
 if (user.role === 'admin') {
-  document.getElementById('chatsLink').href = CHAT_URL;
   document.getElementById('adminLinks').innerHTML = `
     <div class="sb-label">Admin</div>
     <a href="../../admin/dashboard.html" class="sb-link">
@@ -296,7 +309,7 @@ if (user.role === 'admin') {
 
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost/project'
-  : 'https://andik-dessert-production.up.railway.app';
+  : 'https://andiksdesserts.infinityfreeapp.com';
 
 const MENU_API = API_BASE;
 
@@ -342,20 +355,27 @@ function checkLowStock(items) {
 // ── Render table ──────────────────────────────────
 async function renderTable() {
   const search = document.getElementById('searchInput').value.toLowerCase();
+  const category = document.getElementById('categoryFilter').value;
+  const stockFilter = document.getElementById('stockFilter').value;
   const res = await fetch(`${MENU_API}/get_menu.php`);
   const allItems = await res.json();
 
   // Check low stock on ALL items (not just filtered)
   checkLowStock(allItems);
 
-const category = document.getElementById('categoryFilter').value;
-const items = allItems.filter(i => {
-  const matchSearch = i.name.toLowerCase().includes(search);
-  const matchCategory = !category || i.category === category;
-  return matchSearch && matchCategory;
-});
-
-const tb = document.getElementById('menuTable');
+  const items = allItems
+    .filter(i => i.name.toLowerCase().includes(search))
+    .filter(i => !category || i.category === category)
+    .filter(i => {
+      const stock = parseInt(i.stock);
+      if (!stockFilter) return true;
+      if (stockFilter === 'out') return stock === 0;
+      if (stockFilter === 'critical') return stock >= 1 && stock <= 5;
+      if (stockFilter === 'low') return stock >= 6 && stock <= 10;
+      if (stockFilter === 'good') return stock > 10;
+      return true;
+    });
+  const tb = document.getElementById('menuTable');
 
   if (!items.length) {
     tb.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No items found.</td></tr>';
