@@ -87,13 +87,13 @@ async function doLogin() {
     DB.setUser(data.user);
 
     if (data.user.role === 'admin') {
-  location.href = '/admin/dashboard.html';
+  location.href = '../../admin/dashboard.html';
 }
 else if (data.user.role === 'staff') {
-  location.href = '/group-24/staff/dashboard.html';
+  location.href = '../staff/dashboard.html';
 }
 else {
-  location.href = '/group-24/customer/index2.html';
+  location.href = 'index2.html';
 }
 
   } catch (e) {
