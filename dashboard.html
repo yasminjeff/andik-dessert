@@ -51,6 +51,8 @@
     <div class="sb-label">Engagement</div>
     <a href="../group-24/staff/comments.html" class="sb-link"><i class="bi bi-chat-left-text"></i>Comments</a>
     <a href="../group-24/staff/staff-announcements2.html" class="sb-link"><i class="bi bi-megaphone"></i>Announcements</a>
+    <div class="sb-label">Messages</div>
+    <a href="#" class="sb-link" id="chatsLink"><i class="bi bi-chat-dots"></i>Chats <span class="sb-badge" id="sbUnreadBadge" style="display:none">0</span></a>
     <div class="sb-label">Admin</div>
     <a href="dashboard.html" class="sb-link active"><i class="bi bi-people"></i>Manage Staff</a>
 </nav>
@@ -130,6 +132,13 @@ if (!user || user.role !== 'admin') location.href = '../group-24/customer/login.
 document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
 document.getElementById('userName').textContent = user.name;
 document.getElementById('adminToday').textContent = DB.getDayName();
+
+const userParam = encodeURIComponent(JSON.stringify(user));
+const CHAT_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? `http://localhost/project/staff/chats.html?u=${userParam}`
+  : `https://andik-dessert-production.up.railway.app/staff/chats.html?u=${userParam}`;
+
+document.getElementById('chatsLink').href = CHAT_URL;
 
 const ADMIN_API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost/project/phpdata'
