@@ -223,7 +223,7 @@ const BASE = window.location.hostname === 'localhost' || window.location.hostnam
   : 'https://andik-dessert-production.up.railway.app';
   
 
-let lastMenuSnapshot = null;
+let lastMenuSnapshot = localStorage.getItem('menuSnapshot') || null;
 
 async function checkStockUpdate() {
   try {
@@ -233,13 +233,15 @@ async function checkStockUpdate() {
 
     if (lastMenuSnapshot === null) {
       lastMenuSnapshot = snapshot;
+      localStorage.setItem('menuSnapshot', snapshot);
       return;
     }
 
     if (snapshot !== lastMenuSnapshot) {
       lastMenuSnapshot = snapshot;
+      localStorage.setItem('menuSnapshot', snapshot);
       showStockToast();
-      loadIndex(); // auto refresh featured items
+      loadIndex();
     }
   } catch (err) {}
 }
