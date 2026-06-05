@@ -311,6 +311,7 @@ function checkLowStock(items) {
 async function renderTable() {
   const search = document.getElementById('searchInput').value.toLowerCase();
   const category = document.getElementById('categoryFilter').value;
+  const stockFilter = document.getElementById('stockFilter').value;
   const res = await fetch(`${MENU_API}/get_menu.php`);
   const allItems = await res.json();
 
