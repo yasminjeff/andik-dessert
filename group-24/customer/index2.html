@@ -66,6 +66,12 @@ footer a:hover{color:var(--y);}
 }
 
 
+.stock-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bk);color:#fff;padding:.8rem 1.4rem;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;display:flex;align-items:center;gap:10px;font-size:.88rem;font-weight:500;transition:opacity .4s;min-width:280px;}
+.stock-toast .toast-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:1rem;padding:0;margin-left:auto;cursor:pointer;}
+
+
+
+
 </style>
 </head>
 <body>
@@ -216,7 +222,56 @@ const BASE = window.location.hostname === 'localhost' || window.location.hostnam
   ? 'http://localhost/project'
   : 'https://andik-dessert-production.up.railway.app';
   
-async function loadIndex() {
+
+let lastMenuSnapshot = null;
+
+async function checkStockUpdate() {
+  try {
+    const res = await fetch(`${BASE}/get_menu.php`);
+    const menu = await res.json();
+    const snapshot = JSON.stringify(menu.map(i => ({ id: i.id, stock: i.stock, available: i.available })));
+
+    if (lastMenuSnapshot === null) {
+      lastMenuSnapshot = snapshot;
+      return;
+    }
+
+    if (snapshot !== lastMenuSnapshot) {
+      lastMenuSnapshot = snapshot;
+      showStockToast();
+      loadIndex(); // auto refresh featured items
+    }
+  } catch (err) {}
+}
+
+function showStockToast() {
+  const existing = document.getElementById('stockToast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'stockToast';
+  toast.className = 'stock-toast';
+  toast.innerHTML = `
+    <i class="bi bi-arrow-clockwise" style="color:var(--y);font-size:1.1rem"></i>
+    <span>Menu updated! Showing latest items.</span>
+    <button class="toast-close" onclick="document.getElementById('stockToast').remove()"><i class="bi bi-x"></i></button>
+  `;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    if (document.getElementById('stockToast')) {
+      document.getElementById('stockToast').style.opacity = '0';
+      setTimeout(() => document.getElementById('stockToast')?.remove(), 400);
+    }
+  }, 5000);
+}
+
+setInterval(checkStockUpdate, 30000);
+checkStockUpdate();
+
+
+
+  async function loadIndex() {
   try {
     // fetch announcements
 const annRes = await fetch(`${BASE}/group-24/get_announcements.php`);
