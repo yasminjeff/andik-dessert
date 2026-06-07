@@ -50,6 +50,8 @@ footer a:hover{color:var(--y);}
   }
 }
 
+.ann-card.latest{border:2px solid var(--y);box-shadow:0 4px 20px rgba(245,200,0,.2);}
+.badge-latest{background:var(--y);color:var(--bk);font-size:.68rem;font-weight:700;padding:2px 10px;border-radius:20px;}
 
 </style>
 </head>
@@ -226,25 +228,28 @@ async function renderAnnouncements() {
     return;
   }
 
-  list.innerHTML = filtered.map(a => `
-    <div class="col-md-6 col-lg-4">
-      <div class="ann-card h-100">
-        <div class="ann-top">
-          <div class="ann-icon">
-            <i class="bi bi-megaphone-fill" style="color:var(--y)"></i>
+    list.innerHTML = anns.map(a => `
+      <div class="col-md-6 col-lg-4">
+        <div class="ann-card h-100">
+          <div class="ann-top">
+            <div class="ann-icon">
+              <i class="bi bi-megaphone-fill" style="color:var(--y)"></i>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:.95rem;color:var(--bk)">${a.title}</div>
+              <div style="font-size:.72rem;color:rgba(0,0,0,.5)">${a.created_at}</div>
+            </div>
           </div>
-          <div>
-            <div style="font-weight:700;font-size:.95rem;color:var(--bk)">${a.title}</div>
-            <div style="font-size:.72rem;color:rgba(0,0,0,.5)">${a.created_at}</div>
+          <div class="ann-body">
+            <p style="font-size:.88rem;color:#444;line-height:1.7;margin:0">${a.body}</p>
           </div>
         </div>
-        <div class="ann-body">
-          <p style="font-size:.88rem;color:#444;line-height:1.7;margin:0">${a.body}</p>
-        </div>
-      </div>
-    </div>`).join('');
+      </div>`).join('');
 
-  enableHorizontalScroll(list);
+    enableHorizontalScroll(list);
+  } catch (err) {
+    console.error("renderAnnouncements error:", err);
+  }
 }
 
 function enableHorizontalScroll(container) {

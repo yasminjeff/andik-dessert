@@ -66,6 +66,12 @@ footer a:hover{color:var(--y);}
 }
 
 
+.stock-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bk);color:#fff;padding:.8rem 1.4rem;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;display:flex;align-items:center;gap:10px;font-size:.88rem;font-weight:500;transition:opacity .4s;min-width:280px;}
+.stock-toast .toast-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:1rem;padding:0;margin-left:auto;cursor:pointer;}
+
+
+
+
 </style>
 </head>
 <body>
@@ -216,7 +222,58 @@ const BASE = window.location.hostname === 'localhost' || window.location.hostnam
   ? 'http://localhost/project'
   : 'https://andik-dessert-production.up.railway.app';
   
-async function loadIndex() {
+
+let lastMenuSnapshot = localStorage.getItem('menuSnapshot') || null;
+
+async function checkStockUpdate() {
+  try {
+    const res = await fetch(`${BASE}/get_menu.php`);
+    const menu = await res.json();
+    const snapshot = JSON.stringify(menu.map(i => ({ id: i.id, stock: i.stock, available: i.available })));
+
+    if (lastMenuSnapshot === null) {
+      lastMenuSnapshot = snapshot;
+      localStorage.setItem('menuSnapshot', snapshot);
+      return;
+    }
+
+    if (snapshot !== lastMenuSnapshot) {
+      lastMenuSnapshot = snapshot;
+      localStorage.setItem('menuSnapshot', snapshot);
+      showStockToast();
+      loadIndex();
+    }
+  } catch (err) {}
+}
+
+function showStockToast() {
+  const existing = document.getElementById('stockToast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'stockToast';
+  toast.className = 'stock-toast';
+  toast.innerHTML = `
+    <i class="bi bi-arrow-clockwise" style="color:var(--y);font-size:1.1rem"></i>
+    <span>Menu updated! Showing latest items.</span>
+    <button class="toast-close" onclick="document.getElementById('stockToast').remove()"><i class="bi bi-x"></i></button>
+  `;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    if (document.getElementById('stockToast')) {
+      document.getElementById('stockToast').style.opacity = '0';
+      setTimeout(() => document.getElementById('stockToast')?.remove(), 400);
+    }
+  }, 5000);
+}
+
+setInterval(checkStockUpdate, 10000);
+checkStockUpdate();
+
+
+
+  async function loadIndex() {
   try {
     // fetch announcements
 const annRes = await fetch(`${BASE}/group-24/get_announcements.php`);
@@ -235,19 +292,29 @@ document.getElementById('annStripText').className = 'ticker-wrap';
     if (!anns.length) {
       annList.innerHTML = '<div class="col-12 text-muted text-center py-3">No announcements yet.</div>';
     } else {
-      annList.innerHTML = anns.slice(0, 4).map(a => `
+      anns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+const oneDayAgo = new Date(new Date() - 24 * 60 * 60 * 1000);
+
+annList.innerHTML = anns.slice(0, 4).map((a, idx) => {
+  const isLatest = new Date(a.created_at) >= oneDayAgo || idx === 0;
+  return `
   <div style="width:50%;float:left;padding:8px">
-    <div class="ann-card d-flex gap-3 align-items-start">
+    <div class="ann-card d-flex gap-3 align-items-start" style="${isLatest ? 'border:2px solid var(--y);' : ''}">
       <div style="width:40px;height:40px;background:var(--y);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
         <i class="bi bi-megaphone-fill" style="color:var(--bk)"></i>
       </div>
       <div>
-        <div style="font-weight:600;font-size:.9rem">${a.title}</div>
+        <div class="d-flex align-items-center gap-2">
+          <div style="font-weight:600;font-size:.9rem">${a.title}</div>
+          ${isLatest ? `<span style="background:var(--y);color:var(--bk);font-size:.65rem;font-weight:700;padding:1px 8px;border-radius:20px">New</span>` : ''}
+        </div>
         <div style="font-size:.8rem;color:#666;margin:2px 0">${a.body}</div>
         <div style="font-size:.72rem;color:#999">${a.created_at}</div>
       </div>
     </div>
-  </div>`).join('');
+  </div>`;
+}).join('');
+      
     }
 
     // fetch menu

@@ -23,8 +23,18 @@ try {
 
     $db = DB::connect();
 
-    $stmt = $db->prepare("INSERT INTO reviews (item_id, rating, comment) VALUES (?, ?, ?)");
-    $stmt->execute([$item_id, $rating, $comment]);
+    // Check duplicate — same item_id dan same comment
+    $checkStmt = $db->prepare("SELECT COUNT(*) FROM reviews WHERE item_id = ? AND comment = ?");
+    $checkStmt->execute([$item_id, $comment]);
+    $count = $checkStmt->fetchColumn();
+
+    if ($count > 0) {
+    echo json_encode(["error" => true, "message" => "You have already submitted a similar comment for this item."]);
+    exit;
+    }
+
+   $stmt = $db->prepare("INSERT INTO reviews (item_id, rating, comment) VALUES (?, ?, ?)");
+   $stmt->execute([$item_id, $rating, $comment]);
 
     // update avg_rating dan review_count dalam menu_items
     $stmt2 = $db->prepare("UPDATE menu_items SET

@@ -18,6 +18,18 @@ body{background:var(--bk);min-height:100vh;display:flex;align-items:center;justi
 .form-control:focus{border-color:var(--y);box-shadow:0 0 0 3px rgba(245,200,0,.2);}
 .form-label{font-weight:600;font-size:.88rem;color:#444;}
 #errMsg{display:none;}
+
+@keyframes shake {
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-6px)}
+  80%{transform:translateX(6px)}
+}
+.shake{animation:shake .4s ease;}
+.error-toast{position:fixed;top:1.5rem;left:50%;transform:translateX(-50%);background:#C62828;color:#fff;padding:.8rem 1.4rem;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:9999;display:flex;align-items:center;gap:10px;font-size:.88rem;font-weight:500;min-width:280px;transition:opacity .4s;}
+
+
 </style>
 </head>
 <body>
@@ -58,6 +70,34 @@ const now = new Date();
 const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 document.getElementById('pageDate').textContent = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
 
+function showErrorToast(message) {
+  const existing = document.getElementById('errorToast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'errorToast';
+  toast.className = 'error-toast';
+  toast.innerHTML = `<i class="bi bi-exclamation-circle-fill" style="font-size:1.1rem"></i><span>${message}</span>`;
+  document.body.appendChild(toast);
+
+  document.getElementById('emailInput').classList.add('shake');
+  document.getElementById('passInput').classList.add('shake');
+  setTimeout(() => {
+    document.getElementById('emailInput').classList.remove('shake');
+    document.getElementById('passInput').classList.remove('shake');
+  }, 400);
+
+  setTimeout(() => {
+    if (document.getElementById('errorToast')) {
+      document.getElementById('errorToast').style.opacity = '0';
+      setTimeout(() => document.getElementById('errorToast')?.remove(), 400);
+    }
+  }, 4000);
+}
+
+
+
+
 async function doLogin() {
   const email = document.getElementById('emailInput').value.trim();
   const pass = document.getElementById('passInput').value;
@@ -65,10 +105,9 @@ async function doLogin() {
   err.style.display = 'none';
 
   if (!email || !pass) {
-    err.textContent = 'Email and password are required.';
-    err.style.display = '';
-    return;
-  }
+  showErrorToast('Email and password are required.');
+  return;
+}
 
   try {
     const res = await fetch(`${API_BASE}/phpdata/login.php`, {
@@ -79,10 +118,9 @@ async function doLogin() {
     const data = await res.json();
 
     if (data.error) {
-      err.textContent = data.message;
-      err.style.display = '';
-      return;
-    }
+  showErrorToast(data.message);
+  return;
+}
 
     DB.setUser(data.user);
 
@@ -96,10 +134,9 @@ else {
   location.href = 'index2.html';
 }
 
-  } catch (e) {
-    err.textContent = 'Server error. Please try again.';
-    err.style.display = '';
-  }
+ } catch (e) {
+  showErrorToast('Server error. Please try again.');
+}
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
