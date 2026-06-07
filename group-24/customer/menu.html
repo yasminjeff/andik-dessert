@@ -50,7 +50,7 @@ footer a:hover{color:var(--y);}
   }
 }
 
-
+.refresh-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:.7rem 1.4rem;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:500;transition:opacity .4s;}
 
 </style>
 </head>
@@ -206,14 +206,32 @@ const res = await fetch(`${API_BASE}/get_menu.php`);
   }
 }
 
-// refresh button
 async function refreshMenu() {
+  const btn = document.querySelector('button[onclick="refreshMenu()"]');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Refreshing...'; }
+  
   try {
-const res = await fetch(`${API_BASE}/get_menu.php`);
-allItems = await res.json();
+    const res = await fetch(`${API_BASE}/get_menu.php`);
+    allItems = await res.json();
     renderMenu();
+
+    // Show toast
+    const existing = document.getElementById('refreshToast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.id = 'refreshToast';
+    toast.className = 'refresh-toast';
+    toast.innerHTML = `<i class="bi bi-check-circle-fill"></i> Menu refreshed!`;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 400);
+    }, 2500);
+
   } catch (err) {
     console.error("refreshMenu error:", err);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Refresh'; }
   }
 }
 
