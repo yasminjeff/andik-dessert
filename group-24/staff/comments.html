@@ -74,6 +74,10 @@
 
 
 
+.review-card.flagged{border:2px solid #FF5722;background:#FFF3E0;}
+.badge-flagged{background:#FF5722;color:#fff;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px;}
+
+
 </style>
 </head>
 <body>
@@ -130,9 +134,10 @@
       <div class="d-flex gap-2 align-items-center">
         <input type="text" id="searchInput" class="form-control" placeholder="Search comments..." style="max-width:300px;border-radius:10px" oninput="renderComments()">
         <select id="filterStatus" class="form-select" style="max-width:160px;border-radius:10px" onchange="renderComments()">
-          <option value="all">All</option>
-          <option value="new">New</option>
-          <option value="replied">Replied</option>
+         <option value="all">All</option>
+         <option value="new">New</option>
+         <option value="replied">Replied</option>
+         <option value="flagged">🚩 Flagged</option>
         </select>
       </div>
     </div>
@@ -206,6 +211,22 @@ const MENU_API = `${API_BASE}/get_menu.php`;
 let allReviews = [];
 let allMenu = [];
 
+async function flagComment(id, flagged) {
+  try {
+    await fetch(`${REVIEWS_API}/flag_review.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, flagged })
+    });
+    loadComments();
+  } catch (err) {
+    alert('Server error. Please try again.');
+  }
+}
+
+
+
+
 async function loadComments() {
   try {
     const [menuRes, revRes] = await Promise.all([
@@ -226,7 +247,10 @@ function renderComments() {
 
   let reviews = allReviews.filter(r => {
     const matchSearch = (r.comment || '').toLowerCase().includes(search);
-    const matchFilter = filter === 'all' ? true : filter === 'replied' ? r.reply : !r.reply;
+    const matchFilter = filter === 'all' ? true 
+  : filter === 'replied' ? r.reply 
+  : filter === 'flagged' ? r.flagged 
+  : !r.reply;
     return matchSearch && matchFilter;
   });
 
@@ -249,7 +273,7 @@ function renderComments() {
     ).join('');
 
     return `
-    <div class="review-card">
+    <div class="review-card ${r.flagged ? 'flagged' : ''}">
       <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
         <div class="d-flex gap-3 align-items-start">
           <div style="width:44px;height:44px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;color:var(--bk);flex-shrink:0">A</div>
@@ -257,6 +281,7 @@ function renderComments() {
             <div class="d-flex align-items-center gap-2 flex-wrap">
               <span style="font-weight:700;font-size:.92rem">Anonymous</span>
               ${r.reply ? `<span class="badge-replied">✓ Replied</span>` : `<span class="badge-new">● New</span>`}
+              ${r.flagged ? `<span class="badge-flagged">🚩 Flagged</span>` : ''}
             </div>
             <div style="font-size:.78rem;color:#888;margin:2px 0">
               <i class="bi bi-tag me-1"></i>${item ? item.name : 'Unknown item'}
@@ -267,13 +292,16 @@ function renderComments() {
           </div>
         </div>
         <div class="d-flex gap-1">
-          <button class="btn btn-sm" style="background:#E3F2FD;color:#1565C0;border:none;border-radius:7px;font-size:.8rem" onclick="openReply(${r.id},'${(r.comment||'').replace(/'/g,"\\'").replace(/\n/g,' ')}','${(r.reply||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">
-            <i class="bi bi-reply me-1"></i>${r.reply ? 'Edit Reply' : 'Reply'}
-          </button>
-          <button class="btn btn-sm" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px" onclick="delComment(${r.id})">
-            <i class="bi bi-trash"></i>
-          </button>
-        </div>
+  <button class="btn btn-sm" style="background:#E3F2FD;color:#1565C0;border:none;border-radius:7px;font-size:.8rem" onclick="openReply(${r.id},'${(r.comment||'').replace(/'/g,"\\'").replace(/\n/g,' ')}','${(r.reply||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">
+    <i class="bi bi-reply me-1"></i>${r.reply ? 'Edit Reply' : 'Reply'}
+  </button>
+  <button class="btn btn-sm" style="background:${r.flagged ? '#FFF3E0' : '#F5F5F5'};color:${r.flagged ? '#E65100' : '#666'};border:none;border-radius:7px" onclick="flagComment(${r.id}, ${r.flagged ? 0 : 1})" title="${r.flagged ? 'Unflag' : 'Flag'}">
+    <i class="bi bi-flag${r.flagged ? '-fill' : ''}"></i>
+  </button>
+  <button class="btn btn-sm" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px" onclick="delComment(${r.id})">
+    <i class="bi bi-trash"></i>
+  </button>
+</div>
       </div>
 
       <p style="font-size:.88rem;color:#444;margin:1rem 0 0;line-height:1.6">${r.comment || ''}</p>

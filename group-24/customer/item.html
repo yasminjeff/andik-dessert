@@ -37,6 +37,10 @@
 .mobile-nav-link{display:flex;align-items:center;gap:.6rem;color:rgba(255,255,255,.8);font-weight:500;font-size:.95rem;padding:.7rem .5rem;border-radius:8px;text-decoration:none;transition:.2s;}
 .mobile-nav-link:hover,.mobile-nav-link.active{color:var(--y);background:rgba(245,200,0,.08);}
 .mobile-menu-divider{border-color:rgba(255,255,255,.1);margin:.6rem 0;}
+
+.badge-flagged-customer{background:#FF5722;color:#fff;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:20px;}
+
+
 </style>
 </head>
 <body>
@@ -151,6 +155,22 @@ function setRating(val) {
   });
 }
 
+
+async function flagReview(id, flagged) {
+  try {
+    await fetch(`${REVIEWS_API}/flag_review.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, flagged })
+    });
+    loadReviews();
+  } catch (err) {
+    alert('Server error. Please try again.');
+  }
+}
+
+
+
 async function loadItem() {
   try {
     const res = await fetch(`${ITEM_API}/get_menu.php`);
@@ -246,11 +266,15 @@ async function loadReviews() {
             </div>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <div>${stars}</div>
-            <button class="btn btn-sm" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px;font-size:.75rem" onclick="deleteMyReview(${r.id})">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
+           <div>${stars}</div>
+          ${r.flagged ? `<span class="badge-flagged-customer">🚩 Flagged</span>` : ''}
+          <button class="btn btn-sm" style="background:${r.flagged ? '#FFF3E0' : '#F5F5F5'};color:${r.flagged ? '#E65100' : '#666'};border:none;border-radius:7px;font-size:.75rem" onclick="flagReview(${r.id}, ${r.flagged ? 0 : 1})" title="${r.flagged ? 'Unflag' : 'Report'}">
+         <i class="bi bi-flag${r.flagged ? '-fill' : ''}"></i>
+        </button>
+         <button class="btn btn-sm" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px;font-size:.75rem" onclick="deleteMyReview(${r.id})">
+        <i class="bi bi-trash"></i>
+         </button>
+       </div>
         </div>
         <p style="font-size:.88rem;color:#555;margin:.6rem 0 0;line-height:1.6">${r.comment || ''}</p>
         ${r.reply ? `
