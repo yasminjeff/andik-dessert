@@ -102,7 +102,20 @@ footer a:hover{color:var(--y);}
 <!-- ANNOUNCEMENTS LIST -->
 <div class="container py-5">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-      <h2 class="section-title mb-0">All Announcements</h2>
+      <div>
+        <h2 class="section-title mb-0">All Announcements</h2>
+        <p class="small text-muted mb-0">Filter announcements by keyword and sort by newest or oldest.</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <div class="input-group" style="max-width:320px;">
+          <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+          <input id="annSearch" class="form-control border-start-0" type="search" placeholder="Search announcements">
+        </div>
+        <select id="annSort" class="form-select" style="max-width:190px;">
+          <option value="latest" selected>Sort: Latest</option>
+          <option value="oldest">Sort: Oldest</option>
+        </select>
+      </div>
     </div>
     <div class="row g-4 ann-list" id="annList">
       <div style="font-size:2.5rem;margin-bottom:8px">📢</div>
@@ -163,44 +176,75 @@ const BASE = window.location.hostname === 'localhost' || window.location.hostnam
   : 'https://andik-dessert-production.up.railway.app';
 
 const ANN_API = `${BASE}/group-24/get_announcements.php`;
+const annSearch = document.getElementById('annSearch');
+const annSort = document.getElementById('annSort');
+let announcements = [];
+
+annSearch.addEventListener('input', renderAnnouncements);
+annSort.addEventListener('change', renderAnnouncements);
 
 async function renderAnnouncements() {
-  try {
-    const res = await fetch(ANN_API);
-    const anns = await res.json();
-    const list = document.getElementById('annList');
+  const list = document.getElementById('annList');
 
-    if (!anns.length) {
-      list.innerHTML = `<div class="col-12 text-center text-muted py-5">
-        <div style="font-size:2.5rem;margin-bottom:8px">📢</div>
-        <h5>No announcements yet</h5>
-        <p class="small">Check back later for updates from Andik's Desserts.</p>
+  if (!announcements.length) {
+    try {
+      announcements = await DB.getAnnouncements();
+    } catch (err) {
+      console.error("renderAnnouncements error:", err);
+      list.innerHTML = `<div class="col-12 text-center text-danger py-5">
+        <div style="font-size:2.5rem;margin-bottom:8px">⚠️</div>
+        <h5>Unable to load announcements.</h5>
+        <p class="small">Please refresh the page or try again later.</p>
       </div>`;
       return;
     }
+  }
 
-    list.innerHTML = anns.map(a => `
-      <div class="col-md-6 col-lg-4">
-        <div class="ann-card h-100">
-          <div class="ann-top">
-            <div class="ann-icon">
-              <i class="bi bi-megaphone-fill" style="color:var(--y)"></i>
-            </div>
-            <div>
-              <div style="font-weight:700;font-size:.95rem;color:var(--bk)">${a.title}</div>
-              <div style="font-size:.72rem;color:rgba(0,0,0,.5)">${a.created_at}</div>
-            </div>
+  const query = annSearch.value.trim().toLowerCase();
+  const sortBy = annSort.value;
+  let filtered = announcements.slice();
+
+  if (query) {
+    filtered = filtered.filter(a =>
+      a.title.toLowerCase().includes(query) ||
+      a.body.toLowerCase().includes(query)
+    );
+  }
+
+  filtered.sort((a, b) => {
+    const aDate = new Date(a.created_at);
+    const bDate = new Date(b.created_at);
+    return sortBy === 'oldest' ? aDate - bDate : bDate - aDate;
+  });
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="col-12 text-center text-muted py-5">
+      <div style="font-size:2.5rem;margin-bottom:8px">📢</div>
+      <h5>No announcements found</h5>
+      <p class="small">Try a different search term or reset the filters.</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(a => `
+    <div class="col-md-6 col-lg-4">
+      <div class="ann-card h-100">
+        <div class="ann-top">
+          <div class="ann-icon">
+            <i class="bi bi-megaphone-fill" style="color:var(--y)"></i>
           </div>
-          <div class="ann-body">
-            <p style="font-size:.88rem;color:#444;line-height:1.7;margin:0">${a.body}</p>
+          <div>
+            <div style="font-weight:700;font-size:.95rem;color:var(--bk)">${a.title}</div>
+            <div style="font-size:.72rem;color:rgba(0,0,0,.5)">${a.created_at}</div>
           </div>
         </div>
-      </div>`).join('');
+        <div class="ann-body">
+          <p style="font-size:.88rem;color:#444;line-height:1.7;margin:0">${a.body}</p>
+        </div>
+      </div>
+    </div>`).join('');
 
-    enableHorizontalScroll(list);
-  } catch (err) {
-    console.error("renderAnnouncements error:", err);
-  }
+  enableHorizontalScroll(list);
 }
 
 function enableHorizontalScroll(container) {
