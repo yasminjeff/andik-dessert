@@ -43,7 +43,7 @@ const DB = {
 
   async getAnnouncements() {
     try {
-      const res = await fetch(`${BASE_URL}/get_announcements.php`);
+      const res = await fetch(`${BASE_URL}/group-24/get_announcements.php`);
       if (!res.ok) throw new Error("Failed to load announcements");
       return await res.json();
     } catch (err) {
