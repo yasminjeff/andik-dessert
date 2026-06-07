@@ -292,19 +292,29 @@ document.getElementById('annStripText').className = 'ticker-wrap';
     if (!anns.length) {
       annList.innerHTML = '<div class="col-12 text-muted text-center py-3">No announcements yet.</div>';
     } else {
-      annList.innerHTML = anns.slice(0, 4).map(a => `
+      anns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+const oneDayAgo = new Date(new Date() - 24 * 60 * 60 * 1000);
+
+annList.innerHTML = anns.slice(0, 4).map((a, idx) => {
+  const isLatest = new Date(a.created_at) >= oneDayAgo || idx === 0;
+  return `
   <div style="width:50%;float:left;padding:8px">
-    <div class="ann-card d-flex gap-3 align-items-start">
+    <div class="ann-card d-flex gap-3 align-items-start" style="${isLatest ? 'border:2px solid var(--y);' : ''}">
       <div style="width:40px;height:40px;background:var(--y);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
         <i class="bi bi-megaphone-fill" style="color:var(--bk)"></i>
       </div>
       <div>
-        <div style="font-weight:600;font-size:.9rem">${a.title}</div>
+        <div class="d-flex align-items-center gap-2">
+          <div style="font-weight:600;font-size:.9rem">${a.title}</div>
+          ${isLatest ? `<span style="background:var(--y);color:var(--bk);font-size:.65rem;font-weight:700;padding:1px 8px;border-radius:20px">New</span>` : ''}
+        </div>
         <div style="font-size:.8rem;color:#666;margin:2px 0">${a.body}</div>
         <div style="font-size:.72rem;color:#999">${a.created_at}</div>
       </div>
     </div>
-  </div>`).join('');
+  </div>`;
+}).join('');
+      
     }
 
     // fetch menu

@@ -297,6 +297,13 @@ async function submitReview() {
   if (!selectedRating) { msg.innerHTML = '<span style="color:#C62828">Please select a rating.</span>'; return; }
   if (!comment) { msg.innerHTML = '<span style="color:#C62828">Please write a comment.</span>'; return; }
 
+// Check duplicate kat client side
+const existingComments = Array.from(document.querySelectorAll('#reviewsList .review-item p'))
+  .map(p => p.textContent.trim().toLowerCase());
+if (existingComments.includes(comment.toLowerCase())) {
+  msg.innerHTML = '<span style="color:#C62828">⚠️ You have already submitted a similar comment. Please write a unique review.</span>';
+  return;
+}
   try {
     const res = await fetch(`${REVIEWS_API}/add_review.php`, {
       method: 'POST',
