@@ -52,6 +52,18 @@ footer a:hover{color:var(--y);}
 
 
 </style>
+<!-- Added navbar responsive overrides to match other pages -->
+<style>
+/* Sync navbar sizing with menu page: hide image on small screens and keep auth right */
+@media (max-width: 767px) {
+  .navbar .container > a.d-flex img {display:none !important;}
+  .navbar .container > a.d-flex .brand-name {font-size:1rem !important}
+}
+@media (min-width: 768px) {
+  #authButtons {margin-left: auto; display:flex !important; gap:.6rem; align-items:center}
+  .nav-date-badge {padding: .45rem 1rem !important;}
+}
+</style>
 </head>
 <body>
 
@@ -71,7 +83,7 @@ footer a:hover{color:var(--y);}
   <button class="btn d-md-none" style="color:var(--y);border:2px solid rgba(245,200,0,.3) !important;border-radius:10px;font-size:1.3rem;padding:.3rem .6rem" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav">
     <i class="bi bi-list"></i>
   </button>
-  <div style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
+      <div class="nav-date-badge" style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
   <div class="d-flex gap-2 d-none d-md-flex" id="authButtons"></div>
 </div>
    </div>
@@ -162,6 +174,7 @@ if (user) {
   authMobile.innerHTML = `<a href="login.html" class="btn btn-sm btn-yo me-2">Login</a><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
 }
 
+// date and day displayed
 const now = new Date();
 const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const dateStr = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;

@@ -226,7 +226,21 @@ async function loadItem() {
         </div>
         <div style="font-size:1.8rem;font-weight:800;margin-bottom:1rem">RM ${parseFloat(item.price).toFixed(2)}</div>
         <p style="color:#555;line-height:1.7;font-size:.95rem">${item.description || ''}</p>
-        ${isAvailable && isAvailableOnDay ? `<div style="font-size:.85rem;color:#555;margin-bottom:1rem"><i class="bi bi-box-seam" style="color:var(--y)"></i> Stock: <strong>${item.stock} units</strong></div>` : (daysText ? `<div style="font-size:.85rem;color:#666;margin-bottom:1rem"><i class="bi bi-calendar" style="color:var(--y)"></i> ${daysText}</div>` : '')}
+        ${isAvailable && isAvailableOnDay ? `
+  <div style="font-size:.85rem;color:#555;margin-bottom:.5rem">
+    <i class="bi bi-box-seam" style="color:var(--y)"></i> Stock: <strong>${item.stock} units</strong>
+  </div>
+  ${parseInt(item.stock) === 0 ? `
+    <div style="background:#FFEBEE;color:#C62828;font-size:.82rem;font-weight:600;padding:.4rem .8rem;border-radius:8px;margin-bottom:1rem;display:inline-block">
+      <i class="bi bi-x-circle me-1"></i>Out of Stock
+    </div>` : parseInt(item.stock) <= 5 ? `
+    <div style="background:#FBE9E7;color:#BF360C;font-size:.82rem;font-weight:600;padding:.4rem .8rem;border-radius:8px;margin-bottom:1rem;display:inline-block">
+      <i class="bi bi-exclamation-triangle me-1"></i>Low Stock — Only ${item.stock} left!
+    </div>` : parseInt(item.stock) <= 10 ? `
+    <div style="background:#FFF8E1;color:#F57F17;font-size:.82rem;font-weight:600;padding:.4rem .8rem;border-radius:8px;margin-bottom:1rem;display:inline-block">
+      <i class="bi bi-exclamation-circle me-1"></i>Limited Stock — ${item.stock} remaining
+    </div>` : ''}
+` : (daysText ? `<div style="font-size:.85rem;color:#666;margin-bottom:1rem"><i class="bi bi-calendar" style="color:var(--y)"></i> ${daysText}</div>` : '')}
         <a href="menu.html" class="btn btn-yo"><i class="bi bi-arrow-left me-1"></i>Back to Menu</a>
       </div>`;
 

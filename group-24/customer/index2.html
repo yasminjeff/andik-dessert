@@ -78,11 +78,20 @@ footer a:hover{color:var(--y);}
 .ann-nav-btn:hover:not(:disabled){border-color:var(--y);}
 .ann-nav-btn:disabled{opacity:.3;cursor:not-allowed;}
 .ann-nav-btn i{font-size:.85rem;color:var(--bk);}
+/* Sync navbar sizing with menu page: hide image on small screens and keep auth right */
+@media (max-width: 767px) {
+  .navbar .container > a.d-flex img {display:none !important;}
+  .navbar .container > a.d-flex .brand-name {font-size:1rem;}
+}
+@media (min-width: 768px) {
+  #authButtons {margin-left: auto; display:flex !important; gap:.6rem; align-items:center}
+  .nav-date-badge {padding: .45rem 1rem !important;}
+}
 </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
+<!-- NAVBAR (copied from announcements.html for consistent header) -->
 <nav class="navbar shadow">
   <div class="container d-flex align-items-center justify-content-between py-2">
     <a href="index2.html" class="d-flex align-items-center gap-2 text-decoration-none">
@@ -98,7 +107,7 @@ footer a:hover{color:var(--y);}
       <button class="btn d-md-none" style="color:var(--y);border:2px solid rgba(245,200,0,.3);border-radius:10px;font-size:1.3rem;padding:.3rem .6rem" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav">
         <i class="bi bi-list"></i>
       </button>
-      <div style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
+      <div class="nav-date-badge" style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
       <div class="d-flex gap-2 d-none d-md-flex" id="authButtons"></div>
     </div>
   </div>
@@ -112,13 +121,6 @@ footer a:hover{color:var(--y);}
     </div>
   </div>
 </nav>
-<div class="mobile-menu d-md-none" id="mobileMenu">
-  <a href="index2.html" class="mobile-nav-link active"><i class="bi bi-house" style="font-size:1.1rem"></i>Home</a>
-  <a href="menu.html" class="mobile-nav-link"><i class="bi bi-grid" style="font-size:1.1rem"></i>Menu</a>
-  <a href="announcements.html" class="mobile-nav-link"><i class="bi bi-megaphone" style="font-size:1.1rem"></i>Announcements</a>
-  <hr class="mobile-menu-divider">
-  <div id="mobileAuthButtons" class="d-flex gap-2 mt-1"></div>
-</div>
 
 <!-- HERO -->
 <section style="background:linear-gradient(135deg,#011041 60%,#091746);padding:5rem 0 4rem;">

@@ -59,14 +59,35 @@ footer a:hover{color:var(--y);}
   .row.g-4 > .col-6 {flex: 0 0 100%; max-width: 100%;}
   .row.g-4 {margin-left: -.5rem; margin-right: -.5rem;}
   .row.g-4 > [class*="col-"] {padding-left: .5rem; padding-right: .5rem;}
+  .desktop-brand {display: none !important;}
+  .mobile-brand-icon {display: flex !important;}
+  .brand-logo-mobile {width: 40px; height: 40px; border-radius: 50%; object-fit: cover;}
+  .mobile-menu-btn {flex-shrink: 0;}
+  .navbar .container {flex-wrap: nowrap !important; gap: .5rem; justify-content: space-between !important;}
+  .navbar .container > .nav {display: none !important;}
+  .navbar .container > div {flex: 1 1 auto; justify-content: flex-end;}
+  .navbar .container > div .btn, .navbar .container > div .brand-logo-mobile {margin: 0;}
+  .nav-date-badge {order: 1;}
+  .mobile-brand-icon {order: 2;}
+  .mobile-menu-btn {order: 3;}
 }
 
+  /* Tablet and larger: keep auth buttons on the far right and add space to date */
+  @media (min-width: 768px) {
+    .navbar .container {flex-wrap: nowrap; align-items: center;}
+    .desktop-brand {white-space: nowrap; display: flex; align-items: center;}
+    #authButtons {margin-left: auto; display: flex !important; gap: .6rem; align-items: center;}
+    .nav {margin-left: 1rem;}
+    .nav-date-badge {padding: .45rem 1rem !important;}
+  }
 
+.refresh-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:.7rem 1.4rem;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:500;transition:opacity .4s;}
 
 </style>
 </head>
 <body>
 
+<!-- NAVBAR (copied from announcements.html for consistent header) -->
 <nav class="navbar shadow">
   <div class="container d-flex align-items-center justify-content-between py-2">
     <a href="index2.html" class="d-flex align-items-center gap-2 text-decoration-none">
@@ -82,11 +103,10 @@ footer a:hover{color:var(--y);}
       <button class="btn d-md-none" style="color:var(--y);border:2px solid rgba(245,200,0,.3);border-radius:10px;font-size:1.3rem;padding:.3rem .6rem" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav">
         <i class="bi bi-list"></i>
       </button>
-      <div style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
+      <div class="nav-date-badge" style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
       <div class="d-flex gap-2 d-none d-md-flex" id="authButtons"></div>
     </div>
   </div>
-  <!-- mobile dropdown menu -->
   <div class="collapse w-100 d-md-none" id="mobileNav">
     <div style="background:var(--bk);padding:.5rem 1rem 1rem;border-top:1px solid rgba(255,255,255,.1)">
       <a href="index2.html" class="nav-link-c nav-link d-block py-2"><i class="bi bi-house me-2"></i>Home</a>
@@ -217,14 +237,32 @@ const res = await fetch(`${API_BASE}/get_menu.php`);
   }
 }
 
-// refresh button
 async function refreshMenu() {
+  const btn = document.querySelector('button[onclick="refreshMenu()"]');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Refreshing...'; }
+  
   try {
-const res = await fetch(`${API_BASE}/get_menu.php`);
-allItems = await res.json();
+    const res = await fetch(`${API_BASE}/get_menu.php`);
+    allItems = await res.json();
     renderMenu();
+
+    // Show toast
+    const existing = document.getElementById('refreshToast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.id = 'refreshToast';
+    toast.className = 'refresh-toast';
+    toast.innerHTML = `<i class="bi bi-check-circle-fill"></i> Menu refreshed!`;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 400);
+    }, 2500);
+
   } catch (err) {
     console.error("refreshMenu error:", err);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Refresh'; }
   }
 }
 
