@@ -45,7 +45,6 @@ footer a:hover{color:var(--y);}
     max-width: 50% !important;
   }
 }
-
 @media (max-width: 768px) {
   .navbar .container {
     flex-wrap: nowrap !important;
@@ -56,22 +55,29 @@ footer a:hover{color:var(--y);}
     padding: .25rem .5rem !important;
   }
 }
-
-
 .ticker-wrap { overflow: hidden; flex: 1; }
 .ticker-text { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; }
 @keyframes ticker {
   0% { transform: translateX(100vw); }
   100% { transform: translateX(-100%); }
 }
-
-
 .stock-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bk);color:#fff;padding:.8rem 1.4rem;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;display:flex;align-items:center;gap:10px;font-size:.88rem;font-weight:500;transition:opacity .4s;min-width:280px;}
 .stock-toast .toast-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:1rem;padding:0;margin-left:auto;cursor:pointer;}
 
-
-
-
+/* ── Announcement Slider ── */
+.ann-slider-outer{overflow:hidden;width:100%;}
+.ann-slider-track{display:flex;transition:transform .35s ease;will-change:transform;}
+.ann-slider-page{flex:0 0 100%;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.ann-card-new{outline:2px solid var(--y);}
+.ann-slider-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:12px;}
+.ann-dots{display:flex;gap:6px;}
+.ann-dot{width:7px;height:7px;border-radius:50%;background:#e0d8b0;transition:.25s;border:none;padding:0;cursor:pointer;}
+.ann-dot.active{background:var(--y);width:18px;border-radius:3px;}
+.ann-nav{display:flex;gap:8px;}
+.ann-nav-btn{width:30px;height:30px;border-radius:50%;border:1.5px solid #e0d8b0;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;padding:0;}
+.ann-nav-btn:hover:not(:disabled){border-color:var(--y);}
+.ann-nav-btn:disabled{opacity:.3;cursor:not-allowed;}
+.ann-nav-btn i{font-size:.85rem;color:var(--bk);}
 </style>
 </head>
 <body>
@@ -96,7 +102,6 @@ footer a:hover{color:var(--y);}
       <div class="d-flex gap-2 d-none d-md-flex" id="authButtons"></div>
     </div>
   </div>
-  <!-- mobile dropdown menu -->
   <div class="collapse w-100 d-md-none" id="mobileNav">
     <div style="background:var(--bk);padding:.5rem 1rem 1rem;border-top:1px solid rgba(255,255,255,.1)">
       <a href="index2.html" class="nav-link-c active nav-link d-block py-2"><i class="bi bi-house me-2"></i>Home</a>
@@ -107,7 +112,6 @@ footer a:hover{color:var(--y);}
     </div>
   </div>
 </nav>
-<!-- MOBILE MENU DRAWER -->
 <div class="mobile-menu d-md-none" id="mobileMenu">
   <a href="index2.html" class="mobile-nav-link active"><i class="bi bi-house" style="font-size:1.1rem"></i>Home</a>
   <a href="menu.html" class="mobile-nav-link"><i class="bi bi-grid" style="font-size:1.1rem"></i>Menu</a>
@@ -151,7 +155,20 @@ footer a:hover{color:var(--y);}
       <h2 class="section-title mb-0">Announcements</h2>
       <a href="announcements.html" class="btn btn-sm btn-yo">View All</a>
     </div>
-    <div class="row g-3" id="annList"></div>
+
+    <div class="ann-slider-outer">
+      <div class="ann-slider-track" id="annSliderTrack">
+      </div>
+    </div>
+
+    <div class="ann-slider-bottom" id="annSliderBottom" style="display:none">
+      <div class="ann-dots" id="annDots"></div>
+      <div class="ann-nav">
+        <button class="ann-nav-btn" id="annPrev" disabled aria-label="Previous announcements"><i class="bi bi-arrow-left"></i></button>
+        <button class="ann-nav-btn" id="annNext" aria-label="Next announcements"><i class="bi bi-arrow-right"></i></button>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -221,7 +238,6 @@ document.getElementById('navDate').textContent = dateStr;
 const BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost/project'
   : 'https://andik-dessert-production.up.railway.app';
-  
 
 let lastMenuSnapshot = localStorage.getItem('menuSnapshot') || null;
 
@@ -230,13 +246,11 @@ async function checkStockUpdate() {
     const res = await fetch(`${BASE}/get_menu.php`);
     const menu = await res.json();
     const snapshot = JSON.stringify(menu.map(i => ({ id: i.id, stock: i.stock, available: i.available })));
-
     if (lastMenuSnapshot === null) {
       lastMenuSnapshot = snapshot;
       localStorage.setItem('menuSnapshot', snapshot);
       return;
     }
-
     if (snapshot !== lastMenuSnapshot) {
       lastMenuSnapshot = snapshot;
       localStorage.setItem('menuSnapshot', snapshot);
@@ -249,7 +263,6 @@ async function checkStockUpdate() {
 function showStockToast() {
   const existing = document.getElementById('stockToast');
   if (existing) existing.remove();
-
   const toast = document.createElement('div');
   toast.id = 'stockToast';
   toast.className = 'stock-toast';
@@ -259,7 +272,6 @@ function showStockToast() {
     <button class="toast-close" onclick="document.getElementById('stockToast').remove()"><i class="bi bi-x"></i></button>
   `;
   document.body.appendChild(toast);
-
   setTimeout(() => {
     if (document.getElementById('stockToast')) {
       document.getElementById('stockToast').style.opacity = '0';
@@ -271,57 +283,118 @@ function showStockToast() {
 setInterval(checkStockUpdate, 10000);
 checkStockUpdate();
 
+/* ── Announcement Slider Logic ── */
+let annPage = 0;
+let annTotalPages = 0;
 
+function buildAnnSlider(anns) {
+  const track = document.getElementById('annSliderTrack');
+  const dotsEl = document.getElementById('annDots');
+  const bottom = document.getElementById('annSliderBottom');
+  const prevBtn = document.getElementById('annPrev');
+  const nextBtn = document.getElementById('annNext');
 
-  async function loadIndex() {
+  track.innerHTML = '';
+  dotsEl.innerHTML = '';
+  annPage = 0;
+
+  if (!anns.length) {
+    track.innerHTML = '<div class="col-12 text-muted text-center py-3">No announcements yet.</div>';
+    return;
+  }
+
+  anns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  const oneDayAgo = new Date(new Date() - 24 * 60 * 60 * 1000);
+
+  const chunks = [];
+  for (let i = 0; i < anns.length; i += 4) chunks.push(anns.slice(i, i + 4));
+  annTotalPages = chunks.length;
+
+  chunks.forEach((group, pageIdx) => {
+    const page = document.createElement('div');
+    page.className = 'ann-slider-page';
+
+    while (group.length < 4) group.push(null);
+
+    group.forEach((a, idx) => {
+      const cell = document.createElement('div');
+      if (!a) {
+        cell.style.visibility = 'hidden';
+        cell.innerHTML = '<div class="ann-card"></div>';
+      } else {
+        const isNew = new Date(a.created_at) >= oneDayAgo || (pageIdx === 0 && idx === 0);
+        cell.innerHTML = `
+          <div class="ann-card${isNew ? ' ann-card-new' : ''} d-flex gap-2 align-items-start">
+            <div style="width:36px;height:36px;background:var(--y);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i class="bi bi-megaphone-fill" style="color:var(--bk);font-size:.85rem"></i>
+            </div>
+            <div style="min-width:0">
+              <div class="d-flex align-items-center gap-1 flex-wrap">
+                <div style="font-weight:600;font-size:.82rem;color:var(--bk)">${a.title}</div>
+                ${isNew ? `<span style="background:var(--y);color:var(--bk);font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:20px;white-space:nowrap">New</span>` : ''}
+              </div>
+              <div style="font-size:.75rem;color:#666;margin:2px 0;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${a.body}</div>
+              <div style="font-size:.68rem;color:#999">${a.created_at}</div>
+            </div>
+          </div>`;
+      }
+      page.appendChild(cell);
+    });
+
+    track.appendChild(page);
+
+    const dot = document.createElement('button');
+    dot.className = 'ann-dot' + (pageIdx === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Page ${pageIdx + 1}`);
+    dot.addEventListener('click', () => goToAnnPage(pageIdx));
+    dotsEl.appendChild(dot);
+  });
+
+  if (annTotalPages > 1) {
+    bottom.style.display = 'flex';
+    prevBtn.disabled = true;
+    nextBtn.disabled = annTotalPages <= 1;
+  } else {
+    bottom.style.display = 'none';
+  }
+
+  prevBtn.onclick = () => goToAnnPage(annPage - 1);
+  nextBtn.onclick = () => goToAnnPage(annPage + 1);
+
+  const outer = document.querySelector('.ann-slider-outer');
+  let touchStartX = 0;
+  outer.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  outer.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) goToAnnPage(diff > 0 ? annPage + 1 : annPage - 1);
+  }, { passive: true });
+}
+
+function goToAnnPage(p) {
+  annPage = Math.max(0, Math.min(p, annTotalPages - 1));
+  document.getElementById('annSliderTrack').style.transform = `translateX(-${annPage * 100}%)`;
+  document.querySelectorAll('.ann-dot').forEach((d, i) => d.classList.toggle('active', i === annPage));
+  document.getElementById('annPrev').disabled = annPage === 0;
+  document.getElementById('annNext').disabled = annPage === annTotalPages - 1;
+}
+
+async function loadIndex() {
   try {
-    // fetch announcements
-const annRes = await fetch(`${BASE}/group-24/get_announcements.php`);
- const anns = await annRes.json();
+    const annRes = await fetch(`${BASE}/group-24/get_announcements.php`);
+    const anns = await annRes.json();
 
-    // announcement strip
     if (anns.length) {
       document.getElementById('annStrip').style.display = '';
       const allText = anns.map(a => `📢 ${a.title} — ${a.body}`).join('   ✦   ');
-document.getElementById('annStripText').innerHTML = `<span class="ticker-text">${allText}</span>`;
-document.getElementById('annStripText').className = 'ticker-wrap';
+      document.getElementById('annStripText').innerHTML = `<span class="ticker-text">${allText}</span>`;
+      document.getElementById('annStripText').className = 'ticker-wrap';
     }
 
-    // announcements list
-    const annList = document.getElementById('annList');
-    if (!anns.length) {
-      annList.innerHTML = '<div class="col-12 text-muted text-center py-3">No announcements yet.</div>';
-    } else {
-      anns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-const oneDayAgo = new Date(new Date() - 24 * 60 * 60 * 1000);
+    buildAnnSlider(anns);
 
-annList.innerHTML = anns.slice(0, 4).map((a, idx) => {
-  const isLatest = new Date(a.created_at) >= oneDayAgo || idx === 0;
-  return `
-  <div style="width:50%;float:left;padding:8px">
-    <div class="ann-card d-flex gap-3 align-items-start" style="${isLatest ? 'border:2px solid var(--y);' : ''}">
-      <div style="width:40px;height:40px;background:var(--y);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <i class="bi bi-megaphone-fill" style="color:var(--bk)"></i>
-      </div>
-      <div>
-        <div class="d-flex align-items-center gap-2">
-          <div style="font-weight:600;font-size:.9rem">${a.title}</div>
-          ${isLatest ? `<span style="background:var(--y);color:var(--bk);font-size:.65rem;font-weight:700;padding:1px 8px;border-radius:20px">New</span>` : ''}
-        </div>
-        <div style="font-size:.8rem;color:#666;margin:2px 0">${a.body}</div>
-        <div style="font-size:.72rem;color:#999">${a.created_at}</div>
-      </div>
-    </div>
-  </div>`;
-}).join('');
-      
-    }
+    const menuRes = await fetch(`${BASE}/get_menu.php`);
+    const menu = await menuRes.json();
 
-    // fetch menu
-const menuRes = await fetch(`${BASE}/get_menu.php`);
-const menu = await menuRes.json();
-
-    // featured items — available == 1
     const featured = menu.filter(i => i.available == 1).slice(0, 4);
     const fl = document.getElementById('featuredList');
 
@@ -354,14 +427,18 @@ const menu = await menuRes.json();
   }
 }
 
+let isRefreshing = false;
+setInterval(() => {
+  if (isRefreshing) return;
+  isRefreshing = true;
+  loadIndex().finally(() => { isRefreshing = false; });
+}, 3000);
+
 loadIndex();
 
-
-// Keep server alive
 setInterval(() => {
   fetch('/keep_alive.php').catch(() => {});
 }, 300000);
-
 </script>
 </body>
 </html>

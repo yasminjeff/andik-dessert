@@ -38,6 +38,11 @@ try {
         exit;
     }
 
+    if ($user['status'] === 'disabled') {
+        echo json_encode(["error" => true, "message" => "Your account has been disabled. Please contact an administrator."]);
+        exit;
+    }
+
     unset($user['password']);
 
     echo json_encode(["success" => true, "user" => $user]);
