@@ -23,13 +23,15 @@ body{background:#F8F8F8;display:flex;flex-direction:column;margin:0;}
 .btn-yo:hover{background:var(--y);color:var(--bk);}
 .section-title{font-size:1.3rem;font-weight:700;color:var(--bk);position:relative;padding-bottom:8px;margin-bottom:1.5rem;}
 .section-title::after{content:'';position:absolute;bottom:0;left:0;width:36px;height:3px;background:var(--y);border-radius:2px;}
-.ann-card{background:#fff;border-radius:14px;border:1px solid #EBEBEB;overflow:hidden;transition:.25s;display:flex;flex-direction:column;min-width:280px;}
+.ann-card{background:#fff;border-radius:14px;border:1px solid #EBEBEB;overflow:hidden;transition:.25s;display:flex;flex-direction:column;height:100%;}
 .ann-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.08);transform:translateY(-2px);}
-.ann-list{flex-wrap:nowrap;overflow-x:auto;padding-bottom:1rem;margin-bottom:1rem;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;cursor:grab;}
-.ann-list:active{cursor:grabbing;}
+.ann-list{display:flex;gap:1rem;overflow-x:auto;padding-bottom:1rem;margin-bottom:1rem;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;}
 .ann-list::-webkit-scrollbar{height:8px;}
 .ann-list::-webkit-scrollbar-thumb{background:rgba(1,16,65,.25);border-radius:999px;}
-.ann-list > .col-12,.ann-list > .col-md-6,.ann-list > .col-lg-4{flex:0 0 auto;scroll-snap-align:start;}
+.ann-page{flex:0 0 100%;scroll-snap-align:start;display:grid;grid-template-columns:1fr;gap:1rem;}
+.ann-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5rem;width:100%;}
+.ann-grid > div{min-height:220px;}
+@media(max-width:768px){.ann-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;}}
 .ann-top{background:var(--y);padding:.8rem 1.2rem;display:flex;align-items:center;gap:10px;}
 .ann-icon{width:38px;height:38px;background:var(--bk);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .ann-body{padding:1.2rem;}
@@ -62,6 +64,98 @@ footer a:hover{color:var(--y);}
 @media (min-width: 768px) {
   #authButtons {margin-left: auto; display:flex !important; gap:.6rem; align-items:center}
   .nav-date-badge {padding: .45rem 1rem !important;}
+}
+
+/* ===== MOBILE FONT ADJUSTMENTS ===== */
+/* Improve readability on phones: scale down fonts appropriately without breaking layout */
+@media (max-width: 768px) {
+  /* Hero title and description */
+  .container h1[style*="font-size:2rem"] {
+    font-size: 1.65rem !important;
+  }
+  .container p[style*="font-size:.88rem"] {
+    font-size: 0.8rem !important;
+  }
+  
+  /* Section title (All Announcements) */
+  .section-title {
+    font-size: 1.15rem !important;
+  }
+  .section-title + p.small {
+    font-size: 0.7rem !important;
+  }
+  
+  /* Sort select label / text inside select */
+  .form-select {
+    font-size: 0.8rem !important;
+    padding-top: 0.35rem !important;
+    padding-bottom: 0.35rem !important;
+  }
+  
+  /* Announcement card title and meta */
+  .ann-top div div:first-child {
+    font-size: 0.85rem !important;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .ann-top div div:last-child {
+    font-size: 0.65rem !important;
+  }
+  
+  /* Announcement body text */
+  .ann-body p {
+    font-size: 0.8rem !important;
+    line-height: 1.5 !important;
+  }
+  
+  /* Adjust icon inside ann-top to match smaller text proportion */
+  .ann-icon {
+    width: 34px;
+    height: 34px;
+  }
+  .ann-icon i {
+    font-size: 1rem;
+  }
+  
+  /* Padding of card body slightly reduced for tighter screens */
+  .ann-body {
+    padding: 0.9rem 1rem !important;
+  }
+  .ann-top {
+    padding: 0.7rem 1rem !important;
+    gap: 8px;
+  }
+  
+  /* Loading / empty states text */
+  .ann-grid h5, .ann-page h5 {
+    font-size: 1rem !important;
+  }
+  .ann-grid p.small {
+    font-size: 0.75rem !important;
+  }
+  
+  /* Optional: breadcrumb or helper text inside container */
+  .d-flex .small.text-muted {
+    font-size: 0.7rem !important;
+  }
+  
+  /* Footer text readability */
+  footer, footer p, footer li, footer a, footer div[style*="color:#fff"] {
+    font-size: 0.75rem !important;
+  }
+  footer .container .row [class*="col-md"] div[style*="font-weight:700"],
+  footer .container .row [class*="col-md"] div[style*="color:#fff"] {
+    font-size: 0.85rem !important;
+  }
+  footer hr + div {
+    font-size: 0.7rem !important;
+  }
+  
+  /* Adjust date badge on navbar mobile */
+  .nav-date-badge {
+    font-size: 0.7rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
 }
 </style>
 </head>
@@ -125,9 +219,13 @@ footer a:hover{color:var(--y);}
         </select>
       </div>
     </div>
-    <div class="row g-4 ann-list" id="annList">
-      <div style="font-size:2.5rem;margin-bottom:8px">📢</div>
-      <h5>Loading announcements...</h5>
+    <div class="ann-list" id="annList">
+      <div class="ann-page">
+        <div class="ann-grid" style="width:100%;">
+          <div style="font-size:2.5rem;margin-bottom:8px;grid-column:1/-1;text-align:center">📢</div>
+          <h5 style="grid-column:1/-1;text-align:center">Loading announcements...</h5>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -198,7 +296,7 @@ async function renderAnnouncements() {
       announcements = await DB.getAnnouncements();
     } catch (err) {
       console.error("renderAnnouncements error:", err);
-      list.innerHTML = `<div class="col-12 text-center text-danger py-5">
+      list.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#dc3545;padding:3rem 1rem">
         <div style="font-size:2.5rem;margin-bottom:8px">⚠️</div>
         <h5>Unable to load announcements.</h5>
         <p class="small">Please refresh the page or try again later.</p>
@@ -217,42 +315,67 @@ async function renderAnnouncements() {
   });
 
   if (!filtered.length) {
-    list.innerHTML = `<div class="col-12 text-center text-muted py-5">
-      <div style="font-size:2.5rem;margin-bottom:8px">📢</div>
-      <h5>No announcements found</h5>
-      <p class="small">Try a different sort order or refresh the page.</p>
+    list.innerHTML = `<div class="ann-page">
+      <div class="ann-grid" style="width:100%;">
+        <div style="grid-column:1/-1;text-align:center;color:#999;padding:3rem 1rem">
+          <div style="font-size:2.5rem;margin-bottom:8px">📢</div>
+          <h5>No announcements found</h5>
+          <p class="small">Try a different sort order or refresh the page.</p>
+        </div>
+      </div>
     </div>`;
     return;
   }
 
-  list.innerHTML = filtered.map(a => `
-    <div class="col-md-6 col-lg-4">
-      <div class="ann-card h-100">
-        <div class="ann-top">
-          <div class="ann-icon">
-            <i class="bi bi-megaphone-fill" style="color:var(--y)"></i>
-          </div>
+  const pageSize = window.innerWidth <= 768 ? 4 : 9;
+  const pages = [];
+  for (let i = 0; i < filtered.length; i += pageSize) {
+    pages.push(filtered.slice(i, i + pageSize));
+  }
+
+  list.innerHTML = pages.map(page => `
+    <div class="ann-page">
+      <div class="ann-grid">
+        ${page.map(a => `
           <div>
-            <div style="font-weight:700;font-size:.95rem;color:var(--bk)">${a.title}</div>
-            <div style="font-size:.72rem;color:rgba(0,0,0,.5)">${a.created_at}</div>
+            <div class="ann-card h-100">
+              <div class="ann-top">
+                <div class="ann-icon">
+                  <i class="bi bi-megaphone-fill" style="color:var(--y)"></i>
+                </div>
+                <div>
+                  <div style="font-weight:700;font-size:.95rem;color:var(--bk)">${escapeHtml(a.title)}</div>
+                  <div style="font-size:.72rem;color:rgba(0,0,0,.5)">${a.created_at}</div>
+                </div>
+              </div>
+              <div class="ann-body">
+                <p style="font-size:.88rem;color:#444;line-height:1.7;margin:0">${escapeHtml(a.body)}</p>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="ann-body">
-          <p style="font-size:.88rem;color:#444;line-height:1.7;margin:0">${a.body}</p>
-        </div>
+        `).join('')}
       </div>
     </div>`).join('');
 
-  enableHorizontalScroll(list);
+  if (window.matchMedia('(max-width:768px)').matches && pages.length > 1) {
+    list.scrollLeft = 0;
+  }
+  if (window.matchMedia('(min-width:769px)').matches && pages.length > 1) {
+    list.scrollLeft = 0;
+  }
 }
 
-function enableHorizontalScroll(container) {
-  container.addEventListener('wheel', event => {
-    if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
-      event.preventDefault();
-      container.scrollLeft += event.deltaY;
-    }
-  }, { passive: false });
+// simple escape to avoid XSS but keep formatting clean
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+    return c;
+  });
 }
 
 renderAnnouncements();
