@@ -181,14 +181,16 @@ function setRating(val) {
 }
 
 
-async function flagReview(id, flagged) {
+async function flagReview(reviewId, flagged) {
   try {
     await fetch(`${REVIEWS_API}/flag_review.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, flagged })
+      body: JSON.stringify({ id: reviewId, flagged })
     });
-    loadReviews();
+    // Update cache terus — tak perlu fetch semula
+    cachedReviews = cachedReviews.map(r => r.id == reviewId ? {...r, flagged} : r);
+    loadReviews(true);
   } catch (err) {
     alert('Server error. Please try again.');
   }
@@ -276,10 +278,13 @@ async function loadItem() {
   }
 }
 
-async function loadReviews() {
+async function loadReviews(useCache = false) {
   try {
-    const res = await fetch(`${REVIEWS_API}/get_reviews.php?item_id=${id}`);
-    const reviews = await res.json();
+    if (!useCache) {
+      const res = await fetch(`${REVIEWS_API}/get_reviews.php?item_id=${id}`);
+      cachedReviews = await res.json();
+    }
+    const reviews = cachedReviews;
 
     document.getElementById('reviewCountLabel').textContent = `(${reviews.length})`;
 
@@ -354,6 +359,7 @@ if (existingComments.includes(comment.toLowerCase())) {
     document.getElementById('reviewComment').value = '';
     setRating(0);
     setTimeout(() => { msg.innerHTML = ''; }, 2000);
+    // Fetch semula untuk dapat id baru dari server
     loadReviews();
   } catch (err) {
     msg.innerHTML = '<span style="color:#C62828">Server error. Please try again.</span>';
