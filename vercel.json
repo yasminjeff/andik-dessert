@@ -1,12 +1,6 @@
 {
-  "rewrites": [
-    { "source": "/", "destination": "/group-24/customer/index2.html" },
-    { "source": "/menu", "destination": "/group-24/customer/menu.html" },
-    { "source": "/announcements", "destination": "/group-24/customer/announcements.html" },
-    { "source": "/login", "destination": "/group-24/customer/login.html" },
-    { "source": "/register", "destination": "/group-24/customer/register.html" },
-    { "source": "/item", "destination": "/group-24/customer/item.html" }
-  ],
   "cleanUrls": true,
-  "trailingSlash": false
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/group-24/customer/$1" }
+  ]
 }
