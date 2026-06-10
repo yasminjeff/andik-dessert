@@ -1,6 +1,5 @@
 {
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/group-24/customer/$1" }
+  "redirects": [
+    { "source": "/", "destination": "/group-24/customer/index2.html", "permanent": false }
   ]
 }
