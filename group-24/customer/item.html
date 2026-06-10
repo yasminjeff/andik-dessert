@@ -366,6 +366,17 @@ if (existingComments.includes(comment.toLowerCase())) {
   }
 }
 
+let lastReviewSync = localStorage.getItem('reviewsUpdated') || null;
+
+function checkReviewUpdates() {
+  const lastUpdate = localStorage.getItem('reviewsUpdated');
+  if (lastUpdate && lastUpdate !== lastReviewSync) {
+    lastReviewSync = lastUpdate;
+    loadReviews();
+  }
+}
+
+setInterval(checkReviewUpdates, 3000);
 loadItem();
 
 function openRoleModal() {

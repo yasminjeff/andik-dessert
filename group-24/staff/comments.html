@@ -350,6 +350,7 @@ async function delComment(id) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })
     });
+    localStorage.setItem('reviewsUpdated', Date.now());
     loadComments();
   } catch (err) {
     alert('Server error. Please try again.');
