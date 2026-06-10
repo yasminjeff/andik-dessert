@@ -206,9 +206,6 @@ function renderComments() {
           <button class="btn btn-sm" style="background:#E3F2FD;color:#1565C0;border:none;border-radius:7px;font-size:.8rem" onclick="openReply(${r.id},'${(r.comment||'').replace(/'/g,"\\'").replace(/\n/g,' ')}','${(r.reply||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">
             <i class="bi bi-reply me-1"></i>${r.reply ? 'Edit Reply' : 'Reply'}
           </button>
-          <button class="btn btn-sm" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px" onclick="delComment(${r.id})">
-            <i class="bi bi-trash"></i>
-          </button>
         </div>
       </div>
 

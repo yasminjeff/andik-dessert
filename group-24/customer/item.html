@@ -285,9 +285,6 @@ async function loadReviews() {
           <button class="btn btn-sm" style="background:${r.flagged ? '#FFF3E0' : '#F5F5F5'};color:${r.flagged ? '#E65100' : '#666'};border:none;border-radius:7px;font-size:.75rem" onclick="flagReview(${r.id}, ${r.flagged ? 0 : 1})" title="${r.flagged ? 'Unflag' : 'Report'}">
          <i class="bi bi-flag${r.flagged ? '-fill' : ''}"></i>
         </button>
-         <button class="btn btn-sm" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px;font-size:.75rem" onclick="deleteMyReview(${r.id})">
-        <i class="bi bi-trash"></i>
-         </button>
        </div>
         </div>
         <p style="font-size:.88rem;color:#555;margin:.6rem 0 0;line-height:1.6">${r.comment || ''}</p>
@@ -335,20 +332,6 @@ if (existingComments.includes(comment.toLowerCase())) {
     loadReviews();
   } catch (err) {
     msg.innerHTML = '<span style="color:#C62828">Server error. Please try again.</span>';
-  }
-}
-
-async function deleteMyReview(reviewId) {
-  if (!confirm('Delete your review?')) return;
-  try {
-    await fetch(`${REVIEWS_API}/delete_review.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: reviewId })
-    });
-    loadReviews();
-  } catch (err) {
-    alert('Server error. Please try again.');
   }
 }
 
