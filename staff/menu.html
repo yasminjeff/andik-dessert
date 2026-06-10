@@ -527,6 +527,7 @@ async function confirmSave() {
   _pendingSave = null;
   bootstrap.Modal.getInstance(document.getElementById('saveConfirmModal')).hide();
   await fetch(`${MENU_API}/update_menu.php`, { method: 'POST', body: formData });
+  localStorage.setItem('menuUpdated', Date.now());
   renderTable();
 }
 

@@ -293,8 +293,8 @@ async function refreshMenu() {
   }
 }
 
-// auto refresh every 30 seconds
-setInterval(refreshMenu, 30000);
+// auto refresh every 10 seconds
+setInterval(refreshMenu, 10000);
 
 function getImageSrc(image) {
   if (!image) return '../assets/andikDessert.png';
@@ -328,8 +328,9 @@ if (sort === 'unavailable') {
   const todayAbbr = DB.getDayName().substring(0, 3);
   items = items.filter(i => {
     const isAvail = i.available == 1;
-    const isToday = !i.available_days || i.available_days.includes(todayAbbr);
-    return !isAvail || !isToday;
+    const isToday = !i.available_days || i.available_days.trim() === '' || i.available_days.includes(todayAbbr);
+    const isOutOfStock = parseInt(i.stock) === 0;
+    return !isAvail || !isToday || isOutOfStock;
   });
 } else if (sort === 'price_asc') items.sort((a,b) => a.price - b.price);
 else if (sort === 'price_desc') items.sort((a,b) => b.price - a.price);
@@ -428,6 +429,17 @@ else if (sort === 'available') items.sort((a,b) => b.available - a.available);
   }).join('');
 }
 
+let lastMenuSync = localStorage.getItem('menuUpdated') || null;
+
+function checkMenuUpdates() {
+  const lastUpdate = localStorage.getItem('menuUpdated');
+  if (lastUpdate && lastUpdate !== lastMenuSync) {
+    lastMenuSync = lastUpdate;
+    loadMenu();
+  }
+}
+
+setInterval(checkMenuUpdates, 3000);
 loadMenu();
 
 const navDateMobile = document.getElementById('navDateMobile');
