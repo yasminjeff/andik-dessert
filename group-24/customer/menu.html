@@ -83,9 +83,35 @@ footer a:hover{color:var(--y);}
 
 .refresh-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:.7rem 1.4rem;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:500;transition:opacity .4s;}
 
+.role-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(1,16,65,.75);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.role-modal{background:#fff;border-radius:20px;padding:2.5rem 2rem;max-width:360px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:popIn .3s ease;}
+@keyframes popIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.role-modal-logo{width:72px;height:72px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;display:block;border:3px solid var(--y);}
+.role-modal h5{font-weight:800;color:var(--bk);font-size:1.1rem;margin-bottom:.4rem;}
+.role-modal p{font-size:.85rem;color:#888;margin-bottom:1.5rem;line-height:1.6;}
+.role-btn-yes{background:var(--bk);color:var(--y);font-weight:700;border:none;border-radius:12px;padding:.75rem 1.5rem;width:100%;font-size:.92rem;transition:.2s;margin-bottom:.6rem;display:block;}
+.role-btn-yes:hover{background:#022070;}
+.role-btn-no{background:#F4F5F7;color:#666;font-weight:600;border:none;border-radius:12px;padding:.75rem 1.5rem;width:100%;font-size:.92rem;transition:.2s;display:block;}
+.role-btn-no:hover{background:#E8E9EB;color:#444;}
+
 </style>
 </head>
 <body>
+
+  <div class="role-modal-overlay" id="roleModalOverlay" style="display:none" onclick="closeRoleModal(event)">
+  <div class="role-modal">
+    <img src="../assets/andikDessert.png" alt="Andik's Desserts" class="role-modal-logo">
+    <h5>Hold on! 👋</h5>
+    <p>Are you a <strong>staff</strong> or <strong>admin</strong> member of Andik's Desserts?</p>
+    <button class="role-btn-yes" onclick="location.href='login.html'">
+      <i class="bi bi-person-badge me-2"></i>Yes, I'm Staff / Admin
+    </button>
+    <button class="role-btn-no" onclick="closeRoleModalDirect()">
+      <i class="bi bi-house me-2"></i>No, just browsing
+    </button>
+    <div style="font-size:.75rem;color:#bbb;margin-top:1rem">Tap outside to close</div>
+  </div>
+</div>
 
 <!-- NAVBAR (copied from announcements.html for consistent header) -->
 <nav class="navbar shadow">
@@ -167,8 +193,8 @@ if (user) {
   authDiv.innerHTML = html;
   authMobile.innerHTML = html;
 } else {
-  authDiv.innerHTML = `<a href="login.html" class="btn btn-sm btn-yo">Login</a><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
-  authMobile.innerHTML = `<a href="login.html" class="btn btn-sm btn-yo me-2">Login</a><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
+  authDiv.innerHTML = `<button class="btn btn-sm btn-yo" onclick="openRoleModal()">Login</button><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
+  authMobile.innerHTML = `<button class="btn btn-sm btn-yo me-2" onclick="openRoleModal()">Login</button><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
 }
 
 // date and day displayed
@@ -398,6 +424,18 @@ loadMenu();
 
 const navDateMobile = document.getElementById('navDateMobile');
 if (navDateMobile) navDateMobile.textContent = dateStr;
+
+function openRoleModal() {
+  document.getElementById('roleModalOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeRoleModal(e) {
+  if (e.target === document.getElementById('roleModalOverlay')) closeRoleModalDirect();
+}
+function closeRoleModalDirect() {
+  document.getElementById('roleModalOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
 
 </script>
 </main>
