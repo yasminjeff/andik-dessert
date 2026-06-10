@@ -171,6 +171,7 @@ footer a:hover{color:var(--y);}
       <option value="name_za">Z → A</option>
       <option value="rating_desc">Rating: Best First</option>
       <option value="available">Available First</option>
+      <option value="unavailable">Unavailable Items</option>
     </select>
     <button onclick="refreshMenu()" class="btn btn-sm btn-yo"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
   </div>
@@ -323,7 +324,14 @@ function renderMenu() {
   if (searchVal) items = items.filter(i => i.name.toLowerCase().includes(searchVal));
 
   const sort = document.getElementById('sortSelect').value;
-if (sort === 'price_asc') items.sort((a,b) => a.price - b.price);
+if (sort === 'unavailable') {
+  const todayAbbr = DB.getDayName().substring(0, 3);
+  items = items.filter(i => {
+    const isAvail = i.available == 1;
+    const isToday = !i.available_days || i.available_days.includes(todayAbbr);
+    return !isAvail || !isToday;
+  });
+} else if (sort === 'price_asc') items.sort((a,b) => a.price - b.price);
 else if (sort === 'price_desc') items.sort((a,b) => b.price - a.price);
 else if (sort === 'name_az') items.sort((a,b) => a.name.localeCompare(b.name));
 else if (sort === 'name_za') items.sort((a,b) => b.name.localeCompare(a.name));
