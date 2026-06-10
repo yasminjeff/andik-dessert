@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/group-24/customer/index2.html" }
+  ]
+}
