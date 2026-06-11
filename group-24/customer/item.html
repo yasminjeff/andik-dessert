@@ -289,18 +289,23 @@ async function loadReviews(useCache = false) {
       return;
     }
 
-    list.innerHTML = reviews.map(r => {
-      const stars = Array.from({length:5}, (_,i) =>
-        `<i class="bi bi-star${i < r.rating ? '-fill' : ''}" style="color:${i < r.rating ? 'var(--y)' : '#E0E0E0'};font-size:.85rem"></i>`
-      ).join('');
+const animals = ['🐻','🐼','🐨','🦁','🐯','🦊','🐺','🐸','🐧','🦋','🐬','🦄','🐙','🦉','🐢','🦀','🐝','🦜','🐳','🦔'];
+const animalNames = ['Bear','Panda','Koala','Lion','Tiger','Fox','Wolf','Frog','Penguin','Butterfly','Dolphin','Unicorn','Octopus','Owl','Turtle','Crab','Bee','Parrot','Whale','Hedgehog'];
 
-      return `
-      <div class="review-item">
-        <div class="d-flex justify-content-between align-items-start">
-          <div class="d-flex gap-2 align-items-center">
-            <div style="width:36px;height:36px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;color:var(--bk)">A</div>
-            <div>
-              <div style="font-weight:600;font-size:.88rem">Anonymous</div>
+list.innerHTML = reviews.map(r => {
+  const animal = animals[r.id % animals.length];
+  const animalName = 'Anon ' + animalNames[r.id % animalNames.length];
+  const stars = Array.from({length:5}, (_,i) =>
+    `<i class="bi bi-star${i < r.rating ? '-fill' : ''}" style="color:${i < r.rating ? 'var(--y)' : '#E0E0E0'};font-size:.85rem"></i>`
+  ).join('');
+
+  return `
+  <div class="review-item">
+    <div class="d-flex justify-content-between align-items-start">
+      <div class="d-flex gap-2 align-items-center">
+        <div style="width:36px;height:36px;background:#F4F5F7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem">${animal}</div>
+        <div>
+          <div style="font-weight:600;font-size:.88rem">${animalName}</div>
               <div style="font-size:.75rem;color:#999">${r.created_at || ''}</div>
             </div>
           </div>
