@@ -55,12 +55,8 @@ footer a:hover{color:var(--y);}
     padding: .25rem .5rem !important;
   }
 }
-.ticker-wrap { overflow: hidden; flex: 1; }
-.ticker-text { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; }
-@keyframes ticker {
-  0% { transform: translateX(100vw); }
-  100% { transform: translateX(-100%); }
-}
+#tickerContainer { overflow: hidden; flex: 1; position: relative; height: 1.4em; }
+#tickerInner { position: absolute; white-space: nowrap; font-size:.85rem; font-weight:500; color:var(--bk); }
 .stock-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bk);color:#fff;padding:.8rem 1.4rem;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;display:flex;align-items:center;gap:10px;font-size:.88rem;font-weight:500;transition:opacity .4s;min-width:280px;}
 .stock-toast .toast-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:1rem;padding:0;margin-left:auto;cursor:pointer;}
 
@@ -97,6 +93,8 @@ footer a:hover{color:var(--y);}
 .role-btn-yes:hover{background:#022070;}
 .role-btn-no{background:#F4F5F7;color:#666;font-weight:600;border:none;border-radius:12px;padding:.75rem 1.5rem;width:100%;font-size:.92rem;transition:.2s;display:block;}
 .role-btn-no:hover{background:#E8E9EB;color:#444;}
+
+
 
 
 </style>
@@ -399,16 +397,43 @@ function goToAnnPage(p) {
   document.getElementById('annNext').disabled = annPage === annTotalPages - 1;
 }
 
+
+
+  let tickerInitialized = false;
+
 async function loadIndex() {
   try {
     const annRes = await fetch(`${BASE}/group-24/get_announcements.php`);
     const anns = await annRes.json();
 
-    if (anns.length) {
-      document.getElementById('annStrip').style.display = '';
+    if (anns.length && !tickerInitialized) {
+      tickerInitialized = true;
       const allText = anns.map(a => `📢 ${a.title} — ${a.body}`).join('   ✦   ');
-      document.getElementById('annStripText').innerHTML = `<span class="ticker-text">${allText}</span>`;
-      document.getElementById('annStripText').className = 'ticker-wrap';
+      document.getElementById('annStrip').style.display = '';
+      document.getElementById('annStrip').innerHTML = `
+        <div class="container d-flex align-items-center gap-3">
+          <span style="background:var(--bk);color:#fff;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0">
+            <i class="bi bi-megaphone-fill me-1"></i>Latest
+          </span>
+          <div id="tickerContainer">
+            <span id="tickerInner">${allText}</span>
+          </div>
+        </div>`;
+
+      setTimeout(() => {
+        const container = document.getElementById('tickerContainer');
+        const inner = document.getElementById('tickerInner');
+        if (!container || !inner) return;
+        const containerWidth = container.offsetWidth;
+        const textWidth = inner.offsetWidth;
+        let pos = containerWidth;
+        inner.style.left = pos + 'px';
+        setInterval(() => {
+          pos -= 2;
+          if (pos < -textWidth) pos = containerWidth;
+          inner.style.left = pos + 'px';
+        }, 16);
+      }, 200);
     }
 
     buildAnnSlider(anns);
