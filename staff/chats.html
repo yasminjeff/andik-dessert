@@ -439,6 +439,7 @@ async function openChat(contactId, contactName, contactRole) {
   if (pollInterval) clearInterval(pollInterval);
   
   activeContact = { id: contactId, name: contactName, role: contactRole };
+  lastMessagesHash = '';
   document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
   event.currentTarget.classList.add('active');
 
@@ -475,6 +476,8 @@ async function openChat(contactId, contactName, contactRole) {
 }
 
 // ── MESSAGES ──────────────────────────────────────
+let lastMessagesHash = '';
+
 async function loadMessages() {
   if (!activeContact) return;
   try {
@@ -482,6 +485,9 @@ async function loadMessages() {
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     });
     const messages = await res.json();
+    const hash = messages.map(m => m.id + m.message).join('');
+    if (hash === lastMessagesHash) return; // tak berubah, skip render
+    lastMessagesHash = hash;
     renderMessages(messages);
     loadContacts();
   } catch (err) {
@@ -513,22 +519,16 @@ function renderMessages(messages) {
     }
 
     return `
-  <div class="msg-wrapper ${isSent ? 'sent' : 'received'}" id="wrap_${m.id}">
+  <div style="display:flex;flex-direction:column;align-items:${isSent ? 'flex-end' : 'flex-start'}">
     ${!isSent ? `<div style="font-size:.68rem;color:#999;margin-bottom:2px;padding-left:4px">${m.sender_name}</div>` : ''}
-    <div style="position:relative;display:flex;align-items:center;gap:6px;${isSent ? 'flex-direction:row-reverse' : ''}">
-      <div class="msg ${isSent ? 'sent' : 'received'}"
-        oncontextmenu="showMsgOptions(${m.id}, ${isSent}, '${safeText}', event)"
-        data-id="${m.id}" data-sent="${isSent}" data-text="${safeText}"
-        ontouchstart="handleTouchStart(event, this)"
-        ontouchend="handleTouchEnd(event, this)"
-        ontouchmove="handleTouchMove(event, this)"
-        style="transform:translateX(0);transition:transform .2s;touch-action:pan-y">
+    <div style="display:flex;align-items:center;gap:6px;${isSent ? 'flex-direction:row-reverse' : ''}">
+      <div class="msg ${isSent ? 'sent' : 'received'}">
         ${displayMsg}
         <div class="msg-time">${formatTime(m.created_at)}</div>
       </div>
-      <div class="swipe-actions" id="actions_${m.id}" style="display:flex;gap:6px;opacity:0;transition:opacity .2s;pointer-events:none">
-        <button class="msg-action-btn msg-action-reply" onclick="replyToMsgById(${m.id}, '${safeText}')"><i class="bi bi-reply"></i></button>
-        ${isSent ? `<button class="msg-action-btn msg-action-delete" onclick="deleteMessage(${m.id})"><i class="bi bi-trash"></i></button>` : ''}
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <button onclick="replyToMsgById(${m.id}, '${safeText}')" style="width:28px;height:28px;background:#E3F2FD;color:#1565C0;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;cursor:pointer"><i class="bi bi-reply"></i></button>
+        ${isSent ? `<button onclick="deleteMessage(${m.id})" style="width:28px;height:28px;background:#FFEBEE;color:#C62828;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;cursor:pointer"><i class="bi bi-trash"></i></button>` : ''}
       </div>
     </div>
   </div>
@@ -546,7 +546,6 @@ async function sendMessage() {
   let message = input.value.trim();
   if (!message || !activeContact) return;
 
-  // Add reply quote if replying
   if (replyingTo) {
     message = `> ${replyingTo.text}\n${message}`;
     cancelReply();
@@ -554,15 +553,60 @@ async function sendMessage() {
 
   input.value = '';
 
-  fetch(`${CHAT_API}/send_message.php`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-    body: JSON.stringify({ sender_id: user.id, receiver_id: activeContact.id, message })
-  }).then(() => loadMessages()).catch(err => console.error('sendMessage error:', err));
+  // Optimistic UI — terus append message tanpa tunggu server
+  const container = document.getElementById('chatMessages');
+  const tempId = 'temp_' + Date.now();
+  const tempDiv = document.createElement('div');
+  tempDiv.id = tempId;
+  tempDiv.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end';
+  tempDiv.innerHTML = `
+    <div class="msg sent" style="opacity:.7">
+      ${message.startsWith('> ') ? (() => {
+        const lines = message.split('\n');
+        return `<div class="reply-quote">${lines[0].replace('> ','')}</div>${lines.slice(1).join('\n')}`;
+      })() : message}
+      <div class="msg-time">Sending...</div>
+    </div>`;
+  container.appendChild(tempDiv);
+  container.scrollTop = container.scrollHeight;
+
+  try {
+    await fetch(`${CHAT_API}/send_message.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      body: JSON.stringify({ sender_id: user.id, receiver_id: activeContact.id, message })
+    });
+    lastMessagesHash = ''; // force refresh
+    loadMessages();
+  } catch (err) {
+    console.error('sendMessage error:', err);
+    document.getElementById(tempId)?.remove();
+  }
 }
 
-async function deleteMessage(msgId) {
+function deleteMessage(msgId) {
   closeContextMenu();
+  
+  const existing = document.getElementById('deleteConfirmToast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'deleteConfirmToast';
+  toast.style.cssText = `position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:.6rem 1rem;border-radius:12px;z-index:9999;display:flex;align-items:center;gap:10px;font-size:.82rem;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.2)`;
+  toast.innerHTML = `
+    <span>Delete this message?</span>
+    <button onclick="confirmDeleteMsg(${msgId})" style="background:#C62828;color:#fff;border:none;border-radius:8px;padding:3px 10px;font-size:.78rem;cursor:pointer;font-weight:600">Delete</button>
+    <button onclick="document.getElementById('deleteConfirmToast').remove()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:3px 10px;font-size:.78rem;cursor:pointer">Cancel</button>
+  `;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    document.getElementById('deleteConfirmToast')?.remove();
+  }, 4000);
+}
+
+async function confirmDeleteMsg(msgId) {
+  document.getElementById('deleteConfirmToast')?.remove();
   try {
     await fetch(`${CHAT_API}/delete_message.php`, {
       method: 'POST',
@@ -674,6 +718,21 @@ function replyToMsgById(id, text) {
   document.getElementById('replyBar').style.display = 'flex';
   document.getElementById('chatInput').focus();
 }
+
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (pollInterval) clearInterval(pollInterval);
+    if (unreadPollInterval) clearInterval(unreadPollInterval);
+  } else {
+    if (activeContact) {
+      lastMessagesHash = '';
+      loadMessages();
+      pollInterval = setInterval(loadMessages, 5000);
+    }
+    unreadPollInterval = setInterval(checkUnread, 5000);
+  }
+});
 
 // Init
 loadContacts();
