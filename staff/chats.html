@@ -626,14 +626,22 @@ function handleTouchStart(e, el) {
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
   swipedMsg = el;
+  isHorizontalSwipe = false;
 }
+
+let isHorizontalSwipe = false;
 
 function handleTouchMove(e, el) {
   const dx = e.touches[0].clientX - touchStartX;
   const dy = e.touches[0].clientY - touchStartY;
-  if (Math.abs(dy) > Math.abs(dx)) return;
-  if (dx < -10) {
-    el.style.transform = `translateX(${Math.max(dx, -70)}px)`;
+  
+  if (!isHorizontalSwipe && Math.abs(dy) > Math.abs(dx)) return;
+  if (Math.abs(dx) > 10) isHorizontalSwipe = true;
+  
+  if (isHorizontalSwipe && dx < 0) {
+    e.preventDefault();
+    el.style.transition = 'none';
+    el.style.transform = `translateX(${Math.max(dx, -80)}px)`;
   }
 }
 
@@ -641,17 +649,23 @@ function handleTouchEnd(e, el) {
   const dx = e.changedTouches[0].clientX - touchStartX;
   const msgId = el.dataset.id;
   const actions = document.getElementById('actions_' + msgId);
-  if (dx < -50) {
-    el.style.transform = 'translateX(-70px)';
-    if (actions) { actions.style.opacity = '1'; actions.style.pointerEvents = 'auto'; }
-    setTimeout(() => {
-      el.style.transform = 'translateX(0)';
-      if (actions) { actions.style.opacity = '0'; actions.style.pointerEvents = 'none'; }
-    }, 3000);
+  
+  el.style.transition = 'transform .2s';
+  
+  if (isHorizontalSwipe && dx < -40) {
+    el.style.transform = 'translateX(-80px)';
+    if (actions) { 
+      actions.style.opacity = '1'; 
+      actions.style.pointerEvents = 'auto'; 
+    }
   } else {
     el.style.transform = 'translateX(0)';
-    if (actions) { actions.style.opacity = '0'; actions.style.pointerEvents = 'none'; }
+    if (actions) { 
+      actions.style.opacity = '0'; 
+      actions.style.pointerEvents = 'none'; 
+    }
   }
+  isHorizontalSwipe = false;
 }
 
 function replyToMsgById(id, text) {
