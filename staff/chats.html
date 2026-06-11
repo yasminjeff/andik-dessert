@@ -101,6 +101,16 @@
   .contacts-panel.mobile-hide{display:none;}
 }
 .hamburger-btn{display:none;}
+
+.msg-wrapper{position:relative;display:flex;flex-direction:column;}
+.msg-wrapper.sent{align-items:flex-end;}
+.msg-wrapper.received{align-items:flex-start;}
+.msg-actions{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;gap:6px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.msg-wrapper.sent .msg-actions{right:calc(100% + 8px);}
+.msg-wrapper.received .msg-actions{left:calc(100% + 8px);}
+.msg-action-btn{width:32px;height:32px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;}
+.msg-action-reply{background:#E3F2FD;color:#1565C0;}
+.msg-action-delete{background:#FFEBEE;color:#C62828;}
 </style>
 </head>
 <body>
@@ -425,10 +435,18 @@ function formatTime(datetime) {
 
 // ── OPEN CHAT ─────────────────────────────────────
 async function openChat(contactId, contactName, contactRole) {
+  if (activeContact?.id == contactId) return; // dah open, skip
+  if (pollInterval) clearInterval(pollInterval);
+  
   activeContact = { id: contactId, name: contactName, role: contactRole };
-
   document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
   event.currentTarget.classList.add('active');
+
+  // Clear messages instantly untuk nampak responsive
+  document.getElementById('chatMessages').innerHTML = `
+    <div class="text-center text-muted py-4" style="font-size:.82rem">
+      <div class="spinner-border spinner-border-sm me-2" style="color:var(--y)"></div>Loading...
+    </div>`;
 
   document.getElementById('chatEmpty').style.display = 'none';
   const chatWindow = document.getElementById('chatWindow');
@@ -495,18 +513,26 @@ function renderMessages(messages) {
     }
 
     return `
-      <div style="display:flex;flex-direction:column;align-items:${isSent ? 'flex-end' : 'flex-start'}">
-        ${!isSent ? `<div style="font-size:.68rem;color:#999;margin-bottom:2px;padding-left:4px">${m.sender_name}</div>` : ''}
-        <div class="msg ${isSent ? 'sent' : 'received'}"
-          oncontextmenu="showMsgOptions(${m.id}, ${isSent}, '${safeText}', event)"
-          ontouchstart="startLongPress(${m.id}, ${isSent}, '${safeText}', event)"
-          ontouchend="cancelLongPress()"
-          ontouchmove="cancelLongPress()">
-          ${displayMsg}
-          <div class="msg-time">${formatTime(m.created_at)}</div>
-        </div>
+  <div class="msg-wrapper ${isSent ? 'sent' : 'received'}" id="wrap_${m.id}">
+    ${!isSent ? `<div style="font-size:.68rem;color:#999;margin-bottom:2px;padding-left:4px">${m.sender_name}</div>` : ''}
+    <div style="position:relative;display:flex;align-items:center;gap:6px;${isSent ? 'flex-direction:row-reverse' : ''}">
+      <div class="msg ${isSent ? 'sent' : 'received'}"
+        oncontextmenu="showMsgOptions(${m.id}, ${isSent}, '${safeText}', event)"
+        data-id="${m.id}" data-sent="${isSent}" data-text="${safeText}"
+        ontouchstart="handleTouchStart(event, this)"
+        ontouchend="handleTouchEnd(event, this)"
+        ontouchmove="handleTouchMove(event, this)"
+        style="transform:translateX(0);transition:transform .2s;touch-action:pan-y">
+        ${displayMsg}
+        <div class="msg-time">${formatTime(m.created_at)}</div>
       </div>
-    `;
+      <div class="swipe-actions" id="actions_${m.id}" style="display:flex;gap:6px;opacity:0;transition:opacity .2s;pointer-events:none">
+        <button class="msg-action-btn msg-action-reply" onclick="replyToMsgById(${m.id}, '${safeText}')"><i class="bi bi-reply"></i></button>
+        ${isSent ? `<button class="msg-action-btn msg-action-delete" onclick="deleteMessage(${m.id})"><i class="bi bi-trash"></i></button>` : ''}
+      </div>
+    </div>
+  </div>
+`;
   }).join('');
 
   if (wasAtBottom || messages.length < 5) {
@@ -589,6 +615,50 @@ function backToContacts() {
   if (pollInterval) clearInterval(pollInterval);
   activeContact = null;
   cancelReply();
+}
+
+
+let touchStartX = 0;
+let touchStartY = 0;
+let swipedMsg = null;
+
+function handleTouchStart(e, el) {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  swipedMsg = el;
+}
+
+function handleTouchMove(e, el) {
+  const dx = e.touches[0].clientX - touchStartX;
+  const dy = e.touches[0].clientY - touchStartY;
+  if (Math.abs(dy) > Math.abs(dx)) return;
+  if (dx < -10) {
+    el.style.transform = `translateX(${Math.max(dx, -70)}px)`;
+  }
+}
+
+function handleTouchEnd(e, el) {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const msgId = el.dataset.id;
+  const actions = document.getElementById('actions_' + msgId);
+  if (dx < -50) {
+    el.style.transform = 'translateX(-70px)';
+    if (actions) { actions.style.opacity = '1'; actions.style.pointerEvents = 'auto'; }
+    setTimeout(() => {
+      el.style.transform = 'translateX(0)';
+      if (actions) { actions.style.opacity = '0'; actions.style.pointerEvents = 'none'; }
+    }, 3000);
+  } else {
+    el.style.transform = 'translateX(0)';
+    if (actions) { actions.style.opacity = '0'; actions.style.pointerEvents = 'none'; }
+  }
+}
+
+function replyToMsgById(id, text) {
+  replyingTo = { id, text };
+  document.getElementById('replyBarText').textContent = text;
+  document.getElementById('replyBar').style.display = 'flex';
+  document.getElementById('chatInput').focus();
 }
 
 // Init
