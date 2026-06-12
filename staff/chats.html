@@ -437,11 +437,12 @@ function filterContacts() {
 
 function formatTime(datetime) {
   if (!datetime) return '';
-  const d = new Date(datetime.replace(' ', 'T') + '+08:00');
+  const d = new Date(datetime.replace(' ', 'T'));
   const now = new Date();
   const diff = now - d;
-  if (diff < 86400000) return d.toLocaleTimeString('en-MY', {hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Asia/Kuala_Lumpur'});
-  return d.toLocaleDateString('en-MY', {day:'numeric', month:'short', timeZone:'Asia/Kuala_Lumpur'});
+  if (isNaN(d.getTime())) return '';
+  if (diff < 86400000) return d.toLocaleTimeString('en-MY', {hour:'2-digit', minute:'2-digit', hour12:false});
+  return d.toLocaleDateString('en-MY', {day:'numeric', month:'short'});
 }
 
 // ── OPEN CHAT ─────────────────────────────────────
@@ -509,6 +510,7 @@ function renderMessages(messages) {
 
   container.innerHTML = messages.map(m => {
     const isSent = m.sender_id == user.id;
+    console.log('datetime raw:', m.created_at);
     const isImage = m.message && (
   m.message.startsWith('/uploads/chat/') || 
   m.message.includes('/uploads/chat/') ||

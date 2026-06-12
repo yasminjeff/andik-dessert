@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Asia/Kuala_Lumpur');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, X-Requested-With");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
@@ -26,14 +27,16 @@ try {
     $stmt->execute([$other_id, $user_id]);
 
     $stmt = $db->prepare("
-        SELECT m.*, u.name as sender_name 
-        FROM messages m
-        JOIN users u ON u.id = m.sender_id
-        WHERE (m.sender_id = ? AND m.receiver_id = ?)
-           OR (m.sender_id = ? AND m.receiver_id = ?)
-        ORDER BY m.created_at ASC
-        LIMIT 100
-    ");
+    SELECT m.id, m.sender_id, m.receiver_id, m.message, m.is_read,
+           m.created_at,
+           u.name as sender_name 
+    FROM messages m
+    JOIN users u ON u.id = m.sender_id
+    WHERE (m.sender_id = ? AND m.receiver_id = ?)
+       OR (m.sender_id = ? AND m.receiver_id = ?)
+    ORDER BY m.created_at ASC
+    LIMIT 100
+");
     $stmt->execute([$user_id, $other_id, $other_id, $user_id]);
     $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
