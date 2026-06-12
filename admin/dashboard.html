@@ -174,14 +174,14 @@ document.getElementById('userName').textContent = user.name;
 const userParam = encodeURIComponent(JSON.stringify(user));
 const CHAT_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? `http://localhost/project/staff/chats.html?u=${userParam}`
-  : `https://andik-dessert-production.up.railway.app/staff/chats.html?u=${userParam}`;
+  : `https://aqua-wren-440584.hostingersite.com/staff/chats.html?u=${userParam}`;
 
 document.getElementById('chatsLink').href = CHAT_URL;
 document.getElementById('adminToday').textContent = DB.getDayName();
 
 const ADMIN_API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost/project/phpdata'
-  : 'https://andik-dessert-production.up.railway.app/phpdata';
+  : 'https://aqua-wren-440584.hostingersite.com/phpdata';
 
 async function renderPending() {
   try {

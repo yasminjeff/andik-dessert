@@ -206,7 +206,7 @@
 <script>
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost/project'
-  : 'https://andik-dessert-production.up.railway.app';
+  : 'https://aqua-wren-440584.hostingersite.com';
 
 const user = DB.currentUser();
 if (!user || (user.role !== 'staff' && user.role !== 'admin')) location.href = '../customer/login.html';
@@ -218,7 +218,7 @@ document.getElementById('roleLabel').textContent = user.role === 'admin' ? 'Admi
 const userParam = encodeURIComponent(JSON.stringify(user));
 const CHAT_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? `http://localhost/project/staff/chats.html?u=${userParam}`
-  : `https://andik-dessert-production.up.railway.app/staff/chats.html?u=${userParam}`;
+  : `https://aqua-wren-440584.hostingersite.com/staff/chats.html?u=${userParam}`;
 
 document.getElementById('chatsLink').href = CHAT_URL;
 

@@ -3,7 +3,7 @@
 // =========================
 const BASE_URL = window.location.hostname === 'localhost'
   ? 'http://localhost/project'
-  : 'https://andik-dessert-production.up.railway.app';
+  : 'https://aqua-wren-440584.hostingersite.com';
 
 const DB = {
 
