@@ -437,7 +437,7 @@ function filterContacts() {
 
 function formatTime(datetime) {
   if (!datetime) return '';
-  const d = new Date(datetime + ' UTC+8');
+  const d = new Date(datetime.replace(' ', 'T') + '+08:00');
   const now = new Date();
   const diff = now - d;
   if (diff < 86400000) return d.toLocaleTimeString('en-MY', {hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Asia/Kuala_Lumpur'});
