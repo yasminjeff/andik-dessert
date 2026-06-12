@@ -242,8 +242,8 @@ const user = DB.currentUser();
 const authDiv = document.getElementById('authButtons');
 const authMobile = document.getElementById('authButtonsMobile');
 
-authDiv.innerHTML = `<button class="btn btn-sm btn-yo" onclick="openRoleModal()">Login</button><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
-authMobile.innerHTML = `<button class="btn btn-sm btn-yo me-2" onclick="openRoleModal()">Login</button><a href="register.html" class="btn btn-sm btn-y">Register</a>`;
+authDiv.innerHTML = `<button class="btn btn-sm btn-yo" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRoleModal()">Register</button>`;
+authMobile.innerHTML = `<button class="btn btn-sm btn-yo me-2" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRoleModal()">Register</button>`;
 
 function toggleMenu() {
   const btn = document.getElementById('hamburgerBtn');
