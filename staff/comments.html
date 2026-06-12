@@ -16,10 +16,25 @@
 .sb-brand{color:var(--y);font-weight:700;font-size:.9rem;line-height:1.2;}
 .sb-role{color:rgba(255,255,255,.4);font-size:.68rem;}
 .sb-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.25);padding:.8rem 1.4rem .3rem;}
-.sb-link{display:flex;align-items:center;gap:10px;padding:.58rem 1.4rem;color:rgba(255,255,255,.65);text-decoration:none;font-size:.86rem;font-weight:500;transition:.2s;border-left:3px solid transparent;}
+.sb-link{display:flex;align-items:center;gap:10px;padding:.58rem 1.4rem;color:rgba(255,255,255,.65);text-decoration:none;font-size:.86rem;font-weight:500;transition:.2s;border-left:3px solid transparent;position:relative;}
 .sb-link i{width:18px;text-align:center;}
 .sb-link:hover{color:#fff;background:rgba(255,255,255,.06);}
 .sb-link.active{color:var(--y);background:rgba(245,200,0,.08);border-left-color:var(--y);}
+/* Badge for new comments on sidebar */
+.sb-badge{
+  position: absolute;
+  right: 1rem;
+  background: #FF5252;
+  color: #011041;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  min-width: 20px;
+  text-align: center;
+  animation: pulse 1s ease infinite;
+}
+
 .sb-footer{padding:1rem 1.4rem;border-top:1px solid rgba(255,255,255,.08);margin-top:auto;}
 .main{margin-left:var(--sw);display:flex;flex-direction:column;min-height:100vh;}
 .topbar{background:#fff;height:64px;display:flex;align-items:center;padding:0 1.5rem;border-bottom:1px solid #EBEBEB;position:sticky;top:0;z-index:100;}
@@ -129,7 +144,10 @@
     <div class="sb-label">Menu</div>
     <a href="menu.html" class="sb-link"><i class="bi bi-grid"></i>Menu Items</a>
     <div class="sb-label">Engagement</div>
-    <a href="comments.html" class="sb-link active"><i class="bi bi-chat-left-text"></i>Comments</a>
+    <a href="comments.html" class="sb-link active" id="commentsLink">
+      <i class="bi bi-chat-left-text"></i>Comments
+      <span class="sb-badge" id="sidebarUnreadBadge" style="display:none">0</span>
+    </a>
     <a href="staff-announcements2.html" class="sb-link"><i class="bi bi-megaphone"></i>Announcements</a>
     <div class="sb-label">Messages</div>
     <a href="chats.html" class="sb-link" id="chatsLink"><i class="bi bi-chat-dots"></i>Chats<span class="sb-badge" id="sbUnreadBadge" style="display:none">0</span></a>
@@ -252,10 +270,21 @@ function getReadIds() {
 }
 function markAllRead(ids) {
   localStorage.setItem('readReviewIds', JSON.stringify(ids));
+  updateSidebarBadge(ids.length); // Update badge when marking read
 }
 function doMarkAllRead() {
   markAllRead(allReviews.map(r => r.id));
   renderComments();
+}
+// Update the red badge on sidebar
+function updateSidebarBadge(unreadCount) {
+  const badge = document.getElementById('sidebarUnreadBadge');
+  if (unreadCount > 0) {
+    badge.textContent = unreadCount;
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
 }
 // ────────────────────────────────────────────────────────────
 
@@ -288,11 +317,24 @@ async function loadComments() {
     }
 
     allReviews = freshReviews;
+    
+    // Count unread comments and update sidebar badge
+    const currentReadIds = getReadIds();
+    const unreadCount = allReviews.filter(r => !currentReadIds.includes(r.id)).length;
+    updateSidebarBadge(unreadCount);
+    
     renderComments();
   } catch (err) {
     console.error("loadComments error:", err);
   }
 }
+
+// Auto-refresh every 30 seconds to check for new comments
+let lastRefreshTime = Date.now();
+setInterval(() => {
+  loadComments();
+  lastRefreshTime = Date.now();
+}, 30000);
 
 function renderComments() {
   const search = document.getElementById('searchInput').value.toLowerCase();
@@ -323,6 +365,9 @@ function renderComments() {
   const unreadList = reviews.filter(r => !readIds.includes(r.id));
   const readList   = reviews.filter(r =>  readIds.includes(r.id));
   const unreadCount = unreadList.length;
+  
+  // Update sidebar badge again in case filter affects display
+  updateSidebarBadge(allReviews.filter(r => !getReadIds().includes(r.id)).length);
 
   function renderCard(r, isUnread) {
     const item = allMenu.find(i => i.id == r.item_id);
