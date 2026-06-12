@@ -444,10 +444,7 @@ async function openChat(contactId, contactName, contactRole) {
   event.currentTarget.classList.add('active');
 
   // Clear messages instantly untuk nampak responsive
-  document.getElementById('chatMessages').innerHTML = `
-    <div class="text-center text-muted py-4" style="font-size:.82rem">
-      <div class="spinner-border spinner-border-sm me-2" style="color:var(--y)"></div>Loading...
-    </div>`;
+    document.getElementById('chatMessages').innerHTML = '';
 
   document.getElementById('chatEmpty').style.display = 'none';
   const chatWindow = document.getElementById('chatWindow');
