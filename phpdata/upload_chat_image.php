@@ -26,7 +26,9 @@ try {
     
     move_uploaded_file($file['tmp_name'], $uploadDir . $filename);
     
-    $url = '/uploads/chat/' . $filename;
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'];
+$url = $protocol . '://' . $host . '/uploads/chat/' . $filename;
     echo json_encode(["success" => true, "url" => $url]);
 } catch (Exception $e) {
     echo json_encode(["error" => true, "message" => $e->getMessage()]);
