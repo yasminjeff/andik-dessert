@@ -40,6 +40,23 @@
 .badge-new{background:#FFEBEE;color:#C62828;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px;}
 .badge-replied{background:#E8F5E9;color:#2E7D32;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px;}
 
+/* Unread banner */
+.unread-banner{
+  display:flex;align-items:center;gap:12px;
+  background:#FFF8E1;border:1.5px solid var(--y);
+  border-radius:12px;padding:.8rem 1.2rem;
+  margin-bottom:1.2rem;animation:fadeIn .3s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.unread-dot{width:10px;height:10px;background:var(--y);border-radius:50%;flex-shrink:0;box-shadow:0 0 0 3px rgba(245,200,0,.2);}
+.unread-banner-text{flex:1;font-size:.85rem;font-weight:600;color:#7A6000;}
+.unread-banner-text span{font-weight:400;color:#999;font-size:.78rem;margin-left:6px;}
+.mark-read-btn{background:var(--y);color:var(--bk);border:none;border-radius:8px;padding:.35rem .9rem;font-size:.78rem;font-weight:700;cursor:pointer;}
+.mark-read-btn:hover{background:var(--yd);}
+.review-card.unread-highlight{border-left:4px solid var(--y);background:#FFFEF5;}
+.section-divider{display:flex;align-items:center;gap:10px;margin:1rem 0 .8rem;}
+.section-divider span{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#bbb;white-space:nowrap;}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:#EBEBEB;}
 
 @media (max-width: 768px) {
   .sidebar {
@@ -72,12 +89,8 @@
 }
 .hamburger-btn { display: none; }
 
-
-
 .review-card.flagged{border:2px solid #FF5722;background:#FFF3E0;}
 .badge-flagged{background:#FF5722;color:#fff;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px;}
-
-
 </style>
 </head>
 <body>
@@ -126,8 +139,8 @@
     <a href="comments.html" class="sb-link active"><i class="bi bi-chat-left-text"></i>Comments</a>
     <a href="../../staff/staff-announcements2.html" class="sb-link"><i class="bi bi-megaphone"></i>Announcements</a>
     <div class="sb-label">Messages</div>
-    <a href="../../staff/chats.html" class="sb-link" id="chatsLink"><i class="bi bi-chat-dots"></i>Chats<span class="sb-badge" id="sbUnreadBadge" style="display:none">0</span></a>  
-   <div id="adminLinks"></div>
+    <a href="../../staff/chats.html" class="sb-link" id="chatsLink"><i class="bi bi-chat-dots"></i>Chats<span class="sb-badge" id="sbUnreadBadge" style="display:none">0</span></a>
+    <div id="adminLinks"></div>
   </nav>
   <div class="sb-footer">
     <button class="btn btn-sm w-100" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:none;border-radius:8px;padding:.5rem" onclick="DB.logout();location.href='../customer/login.html'">
@@ -138,15 +151,15 @@
 
 <div class="main">
   <div class="topbar">
-<button class="hamburger-btn btn" style="background:none;border:none;color:var(--bk);font-size:1.4rem;padding:0;margin-right:.5rem" onclick="toggleSidebar()">
-  <i class="bi bi-list"></i>
-</button>
-
+    <button class="hamburger-btn btn" style="background:none;border:none;color:var(--bk);font-size:1.4rem;padding:0;margin-right:.5rem" onclick="toggleSidebar()">
+      <i class="bi bi-list"></i>
+    </button>
     <div class="topbar-title">Comments</div>
     <div class="d-flex align-items-center gap-2">
       <div class="avatar" id="userAvatar">?</div>
-<div class="d-none d-md-block"><div style="font-weight:600;font-size:.85rem" id="userName"></div>
-<div style="font-size:.72rem;color:#999" id="userRole"></div></div>    </div>
+      <div class="d-none d-md-block"><div style="font-weight:600;font-size:.85rem" id="userName"></div>
+      <div style="font-size:.72rem;color:#999" id="userRole"></div></div>
+    </div>
   </div>
 
   <div class="content">
@@ -162,10 +175,10 @@
       <div class="d-flex gap-2 align-items-center">
         <input type="text" id="searchInput" class="form-control" placeholder="Search comments..." style="max-width:300px;border-radius:10px" oninput="renderComments()">
         <select id="filterStatus" class="form-select" style="max-width:160px;border-radius:10px" onchange="renderComments()">
-         <option value="all">All</option>
-         <option value="new">New</option>
-         <option value="replied">Replied</option>
-         <option value="flagged">🚩 Flagged</option>
+          <option value="all">All</option>
+          <option value="new">New</option>
+          <option value="replied">Replied</option>
+          <option value="flagged">🚩 Flagged</option>
         </select>
       </div>
     </div>
@@ -206,7 +219,7 @@
 <script>
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost/project'
-  : 'https://aqua-wren-440584.hostingersite.com';
+  : 'https://andik-dessert-production.up.railway.app';
 
 const user = DB.currentUser();
 if (!user || (user.role !== 'staff' && user.role !== 'admin')) location.href = '../customer/login.html';
@@ -218,7 +231,7 @@ document.getElementById('roleLabel').textContent = user.role === 'admin' ? 'Admi
 const userParam = encodeURIComponent(JSON.stringify(user));
 const CHAT_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? `http://localhost/project/staff/chats.html?u=${userParam}`
-  : `https://aqua-wren-440584.hostingersite.com/staff/chats.html?u=${userParam}`;
+  : `https://andik-dessert-production.up.railway.app/staff/chats.html?u=${userParam}`;
 
 document.getElementById('chatsLink').href = CHAT_URL;
 
@@ -226,7 +239,7 @@ if (user.role === 'admin') {
   document.querySelector('a[href="menu.html"]').href = '../../staff/menu.html';
   document.querySelector('a[href="dashboard.html"]').href = '../../staff/dashboard.html';
   document.getElementById('chatsLink').href = CHAT_URL;
-  document.getElementById('adminLinks').innerHTML = 
+  document.getElementById('adminLinks').innerHTML =
   `<div class="sb-label">Admin</div>
    <a href="../../admin/dashboard.html" class="sb-link">
      <i class="bi bi-people"></i>Manage Staff
@@ -238,6 +251,19 @@ const MENU_API = `${API_BASE}/get_menu.php`;
 
 let allReviews = [];
 let allMenu = [];
+
+// ── Unread helpers ──────────────────────────────────────────
+function getReadIds() {
+  return JSON.parse(localStorage.getItem('readReviewIds') || '[]');
+}
+function markAllRead(ids) {
+  localStorage.setItem('readReviewIds', JSON.stringify(ids));
+}
+function doMarkAllRead() {
+  markAllRead(allReviews.map(r => r.id));
+  renderComments();
+}
+// ────────────────────────────────────────────────────────────
 
 async function flagComment(id, flagged) {
   try {
@@ -252,9 +278,6 @@ async function flagComment(id, flagged) {
   }
 }
 
-
-
-
 async function loadComments() {
   try {
     const [menuRes, revRes] = await Promise.all([
@@ -262,7 +285,15 @@ async function loadComments() {
       fetch(`${REVIEWS_API}/get_reviews.php`)
     ]);
     allMenu = await menuRes.json();
-    allReviews = await revRes.json();
+    const freshReviews = await revRes.json();
+
+    // First ever visit: treat all existing comments as already read
+    const prevIds = getReadIds();
+    if (prevIds.length === 0) {
+      markAllRead(freshReviews.map(r => r.id));
+    }
+
+    allReviews = freshReviews;
     renderComments();
   } catch (err) {
     console.error("loadComments error:", err);
@@ -272,13 +303,14 @@ async function loadComments() {
 function renderComments() {
   const search = document.getElementById('searchInput').value.toLowerCase();
   const filter = document.getElementById('filterStatus').value;
+  const readIds = getReadIds();
 
   let reviews = allReviews.filter(r => {
     const matchSearch = (r.comment || '').toLowerCase().includes(search);
-    const matchFilter = filter === 'all' ? true 
-  : filter === 'replied' ? r.reply 
-  : filter === 'flagged' ? r.flagged 
-  : !r.reply;
+    const matchFilter = filter === 'all' ? true
+      : filter === 'replied' ? r.reply
+      : filter === 'flagged' ? r.flagged
+      : !r.reply;
     return matchSearch && matchFilter;
   });
 
@@ -294,25 +326,24 @@ function renderComments() {
     return;
   }
 
-  
-    list.innerHTML = reviews.map(r => {
-  const animals = ['🐻','🐼','🐨','🦁','🐯','🦊','🐺','🐸','🐧','🦋','🐬','🦄','🐙','🦉','🐢','🦀','🐝','🦜','🐳','🦔'];
-  const animalNames = ['Bear','Panda','Koala','Lion','Tiger','Fox','Wolf','Frog','Penguin','Butterfly','Dolphin','Unicorn','Octopus','Owl','Turtle','Crab','Bee','Parrot','Whale','Hedgehog'];
-  const animal = animals[r.id % animals.length];
-  const animalName = 'Anon ' + animalNames[r.id % animalNames.length];
-  const item = allMenu.find(i => i.id == r.item_id);
-  const stars = Array.from({length:5}, (_,i) =>
-    `<i class="bi bi-star${i < r.rating ? '-fill star-filled' : ' star-empty'}"></i>`
-  ).join('');
+  const unreadList = reviews.filter(r => !readIds.includes(r.id));
+  const readList   = reviews.filter(r =>  readIds.includes(r.id));
+  const unreadCount = unreadList.length;
 
-  return `
-  <div class="review-card ${r.flagged ? 'flagged' : ''}">
-    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
-      <div class="d-flex gap-3 align-items-start">
-        <div style="width:44px;height:44px;background:#F4F5F7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">${animal}</div>
-        <div>
+  function renderCard(r, isUnread) {
+    const item = allMenu.find(i => i.id == r.item_id);
+    const stars = Array.from({length:5}, (_,i) =>
+      `<i class="bi bi-star${i < r.rating ? '-fill star-filled' : ' star-empty'}"></i>`
+    ).join('');
+
+    return `
+    <div class="review-card ${r.flagged ? 'flagged' : ''} ${isUnread ? 'unread-highlight' : ''}">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div class="d-flex gap-3 align-items-start">
+          <div style="width:44px;height:44px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;color:var(--bk);flex-shrink:0">A</div>
+          <div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
-              <span style="font-weight:700;font-size:.92rem">${animalName}</span>
+              <span style="font-weight:700;font-size:.92rem">Anonymous</span>
               ${r.reply ? `<span class="badge-replied">✓ Replied</span>` : `<span class="badge-new">● New</span>`}
               ${r.flagged ? `<span class="badge-flagged">🚩 Flagged</span>` : ''}
             </div>
@@ -325,16 +356,16 @@ function renderComments() {
           </div>
         </div>
         <div class="d-flex gap-1">
-  <button class="btn btn-sm" style="background:#E3F2FD;color:#1565C0;border:none;border-radius:7px;font-size:.8rem" onclick="openReply(${r.id},'${(r.comment||'').replace(/'/g,"\\'").replace(/\n/g,' ')}','${(r.reply||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">
-    <i class="bi bi-reply me-1"></i>${r.reply ? 'Edit Reply' : 'Reply'}
-  </button>
-  <button class="btn btn-sm" style="background:${r.flagged ? '#FFF3E0' : '#F5F5F5'};color:${r.flagged ? '#E65100' : '#666'};border:none;border-radius:7px" onclick="flagComment(${r.id}, ${r.flagged ? 0 : 1})" title="${r.flagged ? 'Unflag' : 'Flag'}">
-    <i class="bi bi-flag${r.flagged ? '-fill' : ''}"></i>
-  </button>
-  <button class="btn btn-sm" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px" onclick="delComment(${r.id})">
-    <i class="bi bi-trash"></i>
-  </button>
-</div>
+          <button class="btn btn-sm" style="background:#E3F2FD;color:#1565C0;border:none;border-radius:7px;font-size:.8rem" onclick="openReply(${r.id},'${(r.comment||'').replace(/'/g,"\\'").replace(/\n/g,' ')}','${(r.reply||'').replace(/'/g,"\\'").replace(/\n/g,' ')}')">
+            <i class="bi bi-reply me-1"></i>${r.reply ? 'Edit Reply' : 'Reply'}
+          </button>
+          <button class="btn btn-sm" style="background:${r.flagged ? '#FFF3E0' : '#F5F5F5'};color:${r.flagged ? '#E65100' : '#666'};border:none;border-radius:7px" onclick="flagComment(${r.id}, ${r.flagged ? 0 : 1})" title="${r.flagged ? 'Unflag' : 'Flag'}">
+            <i class="bi bi-flag${r.flagged ? '-fill' : ''}"></i>
+          </button>
+          <button class="btn btn-sm" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px" onclick="delComment(${r.id})">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
       </div>
 
       <p style="font-size:.88rem;color:#444;margin:1rem 0 0;line-height:1.6">${r.comment || ''}</p>
@@ -347,7 +378,32 @@ function renderComments() {
         <p style="font-size:.85rem;color:#555;margin:0;line-height:1.6">${r.reply}</p>
       </div>` : ''}
     </div>`;
-  }).join('');
+  }
+
+  let html = '';
+
+  // Unread banner + section
+  if (unreadCount > 0) {
+    html += `
+    <div class="unread-banner">
+      <div class="unread-dot"></div>
+      <div class="unread-banner-text">
+        ${unreadCount} unread comment${unreadCount > 1 ? 's' : ''}
+        <span>since your last visit</span>
+      </div>
+      <button class="mark-read-btn" onclick="doMarkAllRead()">Mark all read</button>
+    </div>
+    <div class="section-divider"><span>✦ New</span></div>`;
+    html += unreadList.map(r => renderCard(r, true)).join('');
+  }
+
+  // Older / already-read section
+  if (readList.length > 0) {
+    if (unreadCount > 0) html += `<div class="section-divider"><span>Earlier</span></div>`;
+    html += readList.map(r => renderCard(r, false)).join('');
+  }
+
+  list.innerHTML = html;
 }
 
 function openReply(id, comment, existingReply) {
@@ -411,7 +467,6 @@ function toggleSidebar() {
   document.querySelector('.sidebar').classList.toggle('open');
   document.getElementById('overlay').classList.toggle('show');
 }
-
 </script>
 </body>
 </html>
