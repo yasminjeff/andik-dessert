@@ -11,6 +11,7 @@ class DB {
             $db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
         }
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $db->exec("SET time_zone = '+08:00'");
         return $db;
     }
 }

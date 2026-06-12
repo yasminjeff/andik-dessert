@@ -23,8 +23,9 @@ try {
     }
 
     $db = DB::connect();
-    $stmt = $db->prepare("INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)");
-    $stmt->execute([$sender_id, $receiver_id, $message]);
+    $now = gmdate('Y-m-d H:i:s', time() + (8 * 3600));
+$stmt = $db->prepare("INSERT INTO messages (sender_id, receiver_id, message, created_at) VALUES (?, ?, ?, ?)");
+$stmt->execute([$sender_id, $receiver_id, $message, $now]);
 
     echo json_encode(["success" => true, "id" => $db->lastInsertId()]);
 } catch (Exception $e) {
