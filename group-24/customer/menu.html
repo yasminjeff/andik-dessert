@@ -1,119 +1,303 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Menu – Andik's Desserts</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="../assets/favicon.png">
-<style>
-:root{--y:#F5C800;--yd:#D4A900;--bk:#011041;}
-*{font-family:'Poppins',sans-serif;}html,body{height:100%;}body{background:#fff;display:flex;flex-direction:column;margin:0;}
-.navbar{background:var(--bk);}
-.brand-logo{width:44px;height:44px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:var(--bk);}
-.brand-name{color:var(--y);font-weight:700;font-size:1rem;line-height:1.2;}
-.brand-sub{color:rgba(255,255,255,.5);font-size:.68rem;}
-.nav-link-c{color:rgba(255,255,255,.75)!important;font-weight:500;font-size:.88rem;padding:.4rem 1rem!important;border-radius:6px;transition:.2s;}
-.nav-link-c:hover,.nav-link-c.active{color:var(--y)!important;background:rgba(245,200,0,.08);}
-.btn-y{background:var(--y);color:var(--bk);font-weight:700;border:none;border-radius:8px;}
-.btn-y:hover{background:var(--yd);color:var(--bk);}
-.btn-yo{background:transparent;color:var(--y);font-weight:600;border:2px solid var(--y);border-radius:8px;transition:.2s;}
-.btn-yo:hover{background:var(--y);color:var(--bk);}
-.andik-card{border:1px solid #EBEBEB;border-radius:14px;overflow:hidden;transition:.25s;background:#fff;}
-.andik-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.1);transform:translateY(-3px);}
-.cat-btn{border:1.5px solid #E0E0E0;border-radius:20px;padding:.35rem 1rem;font-size:.82rem;font-weight:600;color:#666;background:#fff;cursor:pointer;transition:.2s;}
-.cat-btn:hover,.cat-btn.active{background:var(--y);border-color:var(--y);color:var(--bk);}
-.search-box{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;padding:.6rem 1rem .6rem 2.8rem;font-size:.9rem;width:100%;max-width:440px;}
-.search-box::placeholder{color:rgba(255,255,255,.4);}
-.search-box:focus{outline:none;border-color:var(--y);}
-main{flex:1;}
-footer{background:var(--bk);color:rgba(255,255,255,.6);font-size:.82rem;padding:2rem 0 1rem;margin-top:auto;}
-footer a{color:rgba(255,255,255,.5);text-decoration:none;}
-footer a:hover{color:var(--y);}
-
-/* ── MOBILE RESPONSIVE ── */
-@media (max-width: 767px) {
-  body {padding-bottom: 1rem;}
-  .container {padding-left: 1rem; padding-right: 1rem;}
-  .navbar .container {
-    flex-wrap: wrap !important;
-    gap: .5rem;
-  }
-  .navbar .d-flex.gap-2.align-items-center {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .search-box {max-width: 100%;}
-  #navDate {font-size: .72rem !important; padding: .25rem .5rem !important;}
-  .btn-sm {font-size: .75rem; padding: .3rem .6rem;}
-  .cat-btn {font-size: .78rem; padding: .35rem .9rem;}
-  .nav-link-c {font-size: .82rem; padding: .35rem .8rem !important;}
-  h1 {font-size: 1.5rem !important; line-height: 1.2 !important;}
-  .andik-card {border-radius: 12px;}
-  .andik-card .p-3 {padding: 1rem;}
-  .andik-card h6 {font-size: 1rem;}
-  .andik-card .text-muted {font-size: .78rem;}
-  .andik-card div[style*="font-size:.75rem"] {font-size: .72rem;}
-  .andik-card div[style*="font-size:.82rem"] {font-size: .75rem;}
-  .andik-card div[style*="font-size:.72rem"] {font-size: .68rem;}
-  .row.g-4 > .col-6 {flex: 0 0 100%; max-width: 100%;}
-  .row.g-4 {margin-left: -.5rem; margin-right: -.5rem;}
-  .row.g-4 > [class*="col-"] {padding-left: .5rem; padding-right: .5rem;}
-  .desktop-brand {display: none !important;}
-  .mobile-brand-icon {display: flex !important;}
-  .brand-logo-mobile {width: 40px; height: 40px; border-radius: 50%; object-fit: cover;}
-  .mobile-menu-btn {flex-shrink: 0;}
-  .navbar .container {flex-wrap: nowrap !important; gap: .5rem; justify-content: space-between !important;}
-  .navbar .container > .nav {display: none !important;}
-  .navbar .container > div {flex: 1 1 auto; justify-content: flex-end;}
-  .navbar .container > div .btn, .navbar .container > div .brand-logo-mobile {margin: 0;}
-  .nav-date-badge {order: 1;}
-  .mobile-brand-icon {order: 2;}
-  .mobile-menu-btn {order: 3;}
-}
-
-  /* Tablet and larger: keep auth buttons on the far right and add space to date */
-  @media (min-width: 768px) {
-    .navbar .container {flex-wrap: nowrap; align-items: center;}
-    .desktop-brand {white-space: nowrap; display: flex; align-items: center;}
-    #authButtons {margin-left: auto; display: flex !important; gap: .6rem; align-items: center;}
-    .nav {margin-left: 1rem;}
-    .nav-date-badge {padding: .45rem 1rem !important;}
-  }
-
-.refresh-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#2E7D32;color:#fff;padding:.7rem 1.4rem;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:500;transition:opacity .4s;}
-
-.role-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(1,16,65,.75);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-.role-modal{background:#fff;border-radius:20px;padding:2.5rem 2rem;max-width:360px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:popIn .3s ease;}
-@keyframes popIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
-.role-modal-logo{width:72px;height:72px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;display:block;border:3px solid var(--y);}
-.role-modal h5{font-weight:800;color:var(--bk);font-size:1.1rem;margin-bottom:.4rem;}
-.role-modal p{font-size:.85rem;color:#888;margin-bottom:1.5rem;line-height:1.6;}
-.role-btn-yes{background:var(--bk);color:var(--y);font-weight:700;border:none;border-radius:12px;padding:.75rem 1.5rem;width:100%;font-size:.92rem;transition:.2s;margin-bottom:.6rem;display:block;}
-.role-btn-yes:hover{background:#022070;}
-.role-btn-no{background:#F4F5F7;color:#666;font-weight:600;border:none;border-radius:12px;padding:.75rem 1.5rem;width:100%;font-size:.92rem;transition:.2s;display:block;}
-.role-btn-no:hover{background:#E8E9EB;color:#444;}
-
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Menu – Andik's Desserts | Fresh Bites Daily</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <style>
+    :root{--y:#F5C800;--yd:#D4A900;--bk:#011041;--gray-bg:#F9F9FC;}
+    *{font-family:'Poppins',sans-serif;}
+    body{background:var(--gray-bg);margin:0;display:flex;flex-direction:column;min-height:100vh;}
+    
+    /* ========= ORIGINAL NAVBAR STYLES (kept exactly) ========= */
+    .navbar{background:var(--bk);padding:.75rem 0;}
+    .navbar-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .brand-logo{width:44px;height:44px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:var(--bk);}
+    .brand-name{color:var(--y);font-weight:700;font-size:1rem;line-height:1.2;}
+    .brand-sub{color:rgba(255,255,255,.5);font-size:.68rem;}
+    .nav-link-c{color:rgba(255,255,255,.75)!important;font-weight:500;font-size:.88rem;padding:.4rem 1rem!important;border-radius:6px;transition:.2s;}
+    .nav-link-c:hover,.nav-link-c.active{color:var(--y)!important;background:rgba(245,200,0,.08);}
+    
+    /* ========= ORIGINAL BUTTON STYLES ========= */
+    .btn-y{background:var(--y);color:var(--bk);font-weight:700;border:none;border-radius:8px;transition:.2s;}
+    .btn-y:hover{background:var(--yd);color:var(--bk);}
+    .btn-yo{background:transparent;color:var(--y);font-weight:600;border:2px solid var(--y);border-radius:8px;transition:.2s;}
+    .btn-yo:hover{background:var(--y);color:var(--bk);}
+    
+    /* ========= ENHANCED MODERN MENU CARD DESIGN ========= */
+    .menu-card {
+      background: #fff;
+      border-radius: 28px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 4px rgba(0,0,0,0.02);
+      border: 1px solid rgba(0,0,0,0.04);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .menu-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 36px -12px rgba(1,16,65,0.15);
+      border-color: rgba(245,200,0,0.2);
+    }
+    .card-img-wrapper {
+      position: relative;
+      overflow: hidden;
+      background: #f5efe2;
+      aspect-ratio: 4 / 3;
+    }
+    .card-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .menu-card:hover .card-img-wrapper img {
+      transform: scale(1.05);
+    }
+    .overlay-badge {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(1,16,65,0.85);
+      backdrop-filter: blur(6px);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 40px;
+      letter-spacing: 0.3px;
+      z-index: 2;
+    }
+    .status-chip {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      border-radius: 40px;
+      padding: 4px 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      z-index: 2;
+    }
+    .card-content {
+      padding: 1rem 1rem 1.2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .item-title {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--bk);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .item-category {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #a09f9f;
+      letter-spacing: 0.3px;
+      margin-bottom: 6px;
+    }
+    .rating-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 6px 0 4px;
+    }
+    .stars {
+      color: var(--y);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+    }
+    .rating-count {
+      font-size: 0.7rem;
+      color: #8f8f8f;
+      font-weight: 500;
+    }
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+      padding-top: 12px;
+    }
+    .price-tag {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--bk);
+    }
+    .detail-link {
+      background: var(--y);
+      color: var(--bk);
+      border-radius: 40px;
+      padding: 0.4rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .detail-link:hover {
+      background: var(--yd);
+      color: var(--bk);
+      transform: translateX(2px);
+    }
+    .in-stock-text {
+      font-size: 0.7rem;
+      color: #2E7D32;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .unavailable-text {
+      font-size: 0.7rem;
+      color: #B85C00;
+      font-weight: 500;
+    }
+    /* category tabs refined */
+    .cat-btn {
+      background: #fff;
+      border: 1px solid #E2E2EA;
+      border-radius: 60px;
+      padding: .5rem 1.2rem;
+      font-size: .85rem;
+      font-weight: 600;
+      color: #4a4a5a;
+      transition: all 0.2s;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.02);
+    }
+    .cat-btn:hover, .cat-btn.active {
+      background: var(--y);
+      border-color: var(--y);
+      color: var(--bk);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(245,200,0,0.2);
+    }
+    .search-box {
+      background: #fff;
+      border: 1.5px solid #E6E6F0;
+      border-radius: 60px;
+      color: #1E1E2A;
+      padding: .7rem 1rem .7rem 2.8rem;
+      font-size: .9rem;
+      width: 100%;
+      transition: 0.2s;
+    }
+    .search-box:focus {
+      outline: none;
+      border-color: var(--y);
+      box-shadow: 0 0 0 3px rgba(245,200,0,0.2);
+    }
+    .hero-menu {
+      background: linear-gradient(110deg, var(--bk) 0%, #061c4e 100%);
+      padding: 2.5rem 0 2.2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-menu::after {
+      font-size: 180px;
+      opacity: 0.04;
+      position: absolute;
+      bottom: -30px;
+      right: -20px;
+      pointer-events: none;
+    }
+    .sort-select {
+      border-radius: 40px;
+      border: 1px solid #E0E0EA;
+      font-size: 0.8rem;
+      padding: 0.4rem 1.8rem 0.4rem 1rem;
+      font-weight: 500;
+    }
+    .refresh-toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2E7D32;
+      color: #fff;
+      padding: .7rem 1.4rem;
+      border-radius: 60px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .85rem;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+    }
+    /* ========= ORIGINAL FOOTER STYLES (kept exactly) ========= */
+    footer{background:var(--bk);color:rgba(255,255,255,.6);font-size:.82rem;padding:2rem 0 1rem;margin-top:auto;}
+    footer a{color:rgba(255,255,255,.5);text-decoration:none;}
+    footer a:hover{color:var(--y);}
+    
+    /* ========= MODAL & RESPONSIVE ========= */
+    .role-modal-overlay {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background: rgba(1,16,65,.8); z-index:9999;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(6px);
+    }
+    .role-modal {
+      background: #fff; border-radius: 32px; padding: 2rem; max-width: 340px; width: 90%;
+      text-align: center; box-shadow: 0 40px 60px rgba(0,0,0,.3);
+      animation: popIn .3s ease;
+    }
+    @keyframes popIn{from{transform:scale(.9); opacity:0}to{transform:scale(1); opacity:1}}
+    .role-modal-logo{width:70px;height:70px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;border:3px solid var(--y);}
+    .role-btn-yes{background:var(--bk);color:var(--y);font-weight:700;border:none;border-radius:12px;padding:.75rem;width:100%;margin-bottom:.6rem;transition:.2s;}
+    .role-btn-yes:hover{background:#022070;}
+    .role-btn-no{background:#F4F5F7;color:#666;font-weight:600;border:none;border-radius:12px;padding:.75rem;width:100%;transition:.2s;}
+    .role-btn-no:hover{background:#E8E9EB;color:#444;}
+    
+    @media (max-width: 767px) {
+      .navbar .container > a.d-flex img {display:none !important;}
+      .navbar .container > a.d-flex .brand-name {font-size:1rem;}
+    }
+    @media (min-width: 768px) {
+      #authButtons {margin-left: auto; display:flex !important; gap:.6rem; align-items:center}
+      .nav-date-badge {padding: .45rem 1rem !important;}
+    }
+    @media (max-width: 768px) {
+      .container {padding-left: 1rem; padding-right: 1rem;}
+      .cat-btn {padding: 0.35rem 1rem; font-size: 0.75rem;}
+      .item-title {font-size: 0.9rem;}
+      .price-tag {font-size: 1rem;}
+    }
+    .grid-gap-custom { row-gap: 1.5rem; }
+    .nav-date-badge{background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap}
+  </style>
 </head>
 <body>
 
-  <div class="role-modal-overlay" id="roleModalOverlay" style="display:none" onclick="closeRoleModal(event)">
+<div class="role-modal-overlay" id="roleModalOverlay" style="display:none" onclick="closeRoleModal(event)">
   <div class="role-modal">
     <img src="../assets/andikDessert.png" alt="Andik's Desserts" class="role-modal-logo">
-    <h5>Hold on! 👋</h5>
-    <p>Are you a <strong>staff</strong> or <strong>admin</strong> member of Andik's Desserts?</p>
+    <h5 style="font-weight:800;">Hold on! 👋</h5>
+    <p style="font-size:.85rem;">Are you a <strong>staff</strong> or <strong>admin</strong> member of Andik's Desserts?</p>
     <button class="role-btn-yes" onclick="location.href='login.html'">
-      <i class="bi bi-person-badge me-2"></i>Yes, I'm Staff / Admin
+      <i class="bi bi-person-badge me-2"></i>Yes, Staff / Admin
     </button>
     <button class="role-btn-no" onclick="closeRoleModalDirect()">
       <i class="bi bi-house me-2"></i>No, just browsing
     </button>
-    <div style="font-size:.75rem;color:#bbb;margin-top:1rem">Tap outside to close</div>
   </div>
 </div>
 
-<!-- NAVBAR (copied from announcements.html for consistent header) -->
+<!-- ORIGINAL NAVBAR (exactly as from announcements.html) -->
 <nav class="navbar shadow">
   <div class="container d-flex align-items-center justify-content-between py-2">
     <a href="index2.html" class="d-flex align-items-center gap-2 text-decoration-none">
@@ -130,7 +314,7 @@ footer a:hover{color:var(--y);}
       <button class="btn d-md-none" style="color:var(--y);border:2px solid rgba(245,200,0,.3);border-radius:10px;font-size:1.3rem;padding:.3rem .6rem" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav">
         <i class="bi bi-list"></i>
       </button>
-      <div class="nav-date-badge" style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
+      <div class="nav-date-badge"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
       <div class="d-flex gap-2 d-none d-md-flex" id="authButtons"></div>
     </div>
   </div>
@@ -147,316 +331,246 @@ footer a:hover{color:var(--y);}
 </nav>
 
 <main>
-<!-- HERO HEADER -->
-<div style="background:var(--bk);padding:2.5rem 0 2rem">
-  <div class="container">
-    <h1 style="color:#fff;font-size:2rem;font-weight:800;margin-bottom:.3rem"><span style="color:var(--y)">Our</span> Menu</h1>
-    <p style="color:rgba(255,255,255,.5);font-size:.88rem;margin-bottom:1.2rem">Browse all desserts — filter by category and check live stock</p>
-    <div style="position:relative;max-width:440px">
-      <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.4)"></i>
-      <input type="text" id="searchInput" class="search-box" placeholder="Search desserts...">
+  <!-- HERO with modern style -->
+  <div class="hero-menu">
+    <div class="container">
+      <h1 style="color:#fff;font-size:2.2rem;font-weight:800;margin-bottom:.2rem">Explore <span style="color:var(--y)">Our Menu</span></h1>
+      <p style="color:rgba(255,255,255,.6);font-size:.9rem;margin-bottom:1.5rem;max-width:500px;">Freshly made desserts, daily specials & live availability.</p>
+      <div style="position:relative;max-width:480px">
+        <i class="bi bi-search" style="position:absolute;left:18px;top:50%;transform:translateY(-50%);color:#aaa;z-index:2;"></i>
+        <input type="text" id="searchInput" class="search-box" placeholder="Search for desserts, cakes, drinks...">
+      </div>
     </div>
   </div>
-</div>
 
-<!-- CATEGORY + GRID -->
-<div class="container py-4">
-  <div class="d-flex flex-wrap gap-2 mb-4" id="catTabs"></div>
-  <div class="d-flex align-items-center justify-content-between mb-3">
-  <p class="text-muted mb-0" style="font-size:.85rem" id="resultInfo"></p>
-  <div class="d-flex gap-2 align-items-center">
-    <select id="sortSelect" class="form-select form-select-sm" style="border-radius:8px;font-size:.82rem;max-width:200px;border:1.5px solid #E0E0E0" onchange="renderMenu()">
-      <option value="default">Sort By</option>
-      <option value="price_asc">Price: Low → High</option>
-      <option value="price_desc">Price: High → Low</option>
-      <option value="name_az">A → Z</option>
-      <option value="name_za">Z → A</option>
-      <option value="rating_desc">Rating: Best First</option>
-      <option value="available">Available First</option>
-      <option value="unavailable">Unavailable Items</option>
-    </select>
-    <button onclick="refreshMenu()" class="btn btn-sm btn-yo"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+  <div class="container py-4">
+    <!-- Categories refined -->
+    <div class="d-flex flex-wrap gap-2 mb-4" id="catTabs" style="row-gap: 10px;"></div>
+    
+    <!-- Toolbar row -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+      <p class="text-muted mb-0" style="font-size:.85rem;font-weight:500;" id="resultInfo"></p>
+      <div class="d-flex gap-2 align-items-center">
+        <select id="sortSelect" class="sort-select form-select-sm" onchange="renderMenu()">
+          <option value="default">Sort by</option>
+          <option value="price_asc">Price: Low → High</option>
+          <option value="price_desc">Price: High → Low</option>
+          <option value="name_az">A → Z</option>
+          <option value="name_za">Z → A</option>
+          <option value="rating_desc">Rating: Best First</option>
+          <option value="available">Available First</option>
+        </select>
+        <button onclick="refreshMenu()" class="btn btn-sm btn-yo" style="border-radius:40px;padding:.4rem 1rem;"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+      </div>
+    </div>
+
+    <div class="row g-4 grid-gap-custom" id="menuGrid"></div>
   </div>
-</div>
-
-<div class="row g-4" id="menuGrid"></div>
-</div>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../../phpdata/data.js"></script>
 <script>
-// auth
-const user = DB.currentUser();
-const authDiv = document.getElementById('authButtons');
-const authMobile = document.getElementById('authButtonsMobile');
+  const user = DB.currentUser();
+  const authDiv = document.getElementById('authButtons');
+  const authMobile = document.getElementById('authButtonsMobile');
+  authDiv.innerHTML = `<button class="btn btn-sm btn-yo" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRoleModal()">Register</button>`;
+  authMobile.innerHTML = `<button class="btn btn-sm btn-yo me-2" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRoleModal()">Register</button>`;
 
-authDiv.innerHTML = `<button class="btn btn-sm btn-yo" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRoleModal()">Register</button>`;
-authMobile.innerHTML = `<button class="btn btn-sm btn-yo me-2" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRoleModal()">Register</button>`;
+  const now = new Date();
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('navDate').textContent = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
 
-// date and day displayed
-const now = new Date();
-const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const dateStr = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
-document.getElementById('navDate').textContent = dateStr;
+  let activeCat = 'Today';
+  let searchVal = '';
+  let allItems = [];
 
-let activeCat = 'Today';
-let searchVal = '';
-let allItems = [];
-
-// categories
-const categories = ['Rice', 'Noodles', 'Dessert', 'Drinks', 'Side Dishes', 'All'];
-const catTabs = document.getElementById('catTabs');
-
-const todayBtn = document.createElement('button');
-todayBtn.className = 'cat-btn active';
-todayBtn.textContent = "Today's item";
-todayBtn.onclick = () => {
-  activeCat = 'Today';
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-  todayBtn.classList.add('active');
-  renderMenu();
-};
-catTabs.appendChild(todayBtn);
-
-categories.forEach(c => {
-  const btn = document.createElement('button');
-  btn.className = 'cat-btn' + (c === activeCat ? ' active' : '');
-  btn.textContent = c;
-  btn.onclick = () => {
-    activeCat = c;
+  const categories = ['Rice', 'Noodles', 'Dessert', 'Drinks', 'Side Dishes', 'All'];
+  const catContainer = document.getElementById('catTabs');
+  
+  // Today's special button
+  const todayBtn = document.createElement('button');
+  todayBtn.className = 'cat-btn active';
+  todayBtn.innerHTML = `<i class="bi bi-stars me-1"></i> Today's Specials`;
+  todayBtn.onclick = () => {
+    activeCat = 'Today';
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    todayBtn.classList.add('active');
     document.getElementById('searchInput').value = '';
-    searchVal  = '';
+    searchVal = '';
     renderMenu();
   };
-  catTabs.appendChild(btn);
-});
+  catContainer.appendChild(todayBtn);
 
-// search
-document.getElementById('searchInput').addEventListener('input', e => {
-  searchVal = e.target.value.toLowerCase();
-  renderMenu();
-});
-
-
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost/project'
-  : 'https://aqua-wren-440584.hostingersite.com';
-
-
-// fetch dari PHP
-async function loadMenu() {
-  try {
-const res = await fetch(`${API_BASE}/get_menu.php`);
-    if (!res.ok) throw new Error("Failed to load menu");
-    allItems = await res.json();
-    renderMenu();
-  } catch (err) {
-    console.error("loadMenu error:", err);
-    document.getElementById('menuGrid').innerHTML =
-      '<div class="col-12 text-center py-5 text-muted"><h5>Failed to load menu</h5><p class="small">Please check your connection.</p></div>';
-  }
-}
-
-async function refreshMenu() {
-  const btn = document.querySelector('button[onclick="refreshMenu()"]');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Refreshing...'; }
-  
-  try {
-    const res = await fetch(`${API_BASE}/get_menu.php`);
-    allItems = await res.json();
-    renderMenu();
-
-    // Show toast
-    const existing = document.getElementById('refreshToast');
-    if (existing) existing.remove();
-    const toast = document.createElement('div');
-    toast.id = 'refreshToast';
-    toast.className = 'refresh-toast';
-    toast.innerHTML = `<i class="bi bi-check-circle-fill"></i> Menu refreshed!`;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      setTimeout(() => toast.remove(), 400);
-    }, 2500);
-
-  } catch (err) {
-    console.error("refreshMenu error:", err);
-  } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Refresh'; }
-  }
-}
-
-// auto refresh every 10 seconds
-setInterval(refreshMenu, 10000);
-
-function getImageSrc(image) {
-  if (!image) return '../assets/andikDessert.png';
-  const trimmed = String(image).trim();
-  if (/^(https?:)?\/\//.test(trimmed) || trimmed.startsWith('/')) return trimmed;
-  if (trimmed.startsWith('../assets/') || trimmed.startsWith('./assets/') || trimmed.includes('/assets/')) return trimmed.replace(/^\.\//, '');
-  if (trimmed.startsWith('assets/')) return `../${trimmed}`;
-  return `../assets/${trimmed}`;
-}
-
-function renderMenu() {
-  let items = allItems;
-
-  if (activeCat === 'Today') {
-    const todayAbbr = DB.getDayName().substring(0, 3);
-    items = items.filter(i => {
-      // Show if manually set as Today's Items
-      if (i.category === "⭐ Today's Items") return true;
-      // OR automatically show if today is one of its available days
-      if (i.available_days && i.available_days.includes(todayAbbr)) return true;
-      return false;
-    });
-  } else if (activeCat !== 'All') {
-    items = items.filter(i => i.category === activeCat);
-  }
-
-  if (searchVal) items = items.filter(i => i.name.toLowerCase().includes(searchVal));
-
-  const sort = document.getElementById('sortSelect').value;
-if (sort === 'unavailable') {
-  const todayAbbr = DB.getDayName().substring(0, 3);
-  items = items.filter(i => {
-    const isAvail = i.available == 1;
-    const isToday = !i.available_days || i.available_days.trim() === '' || i.available_days.includes(todayAbbr);
-    const isOutOfStock = parseInt(i.stock) === 0;
-    return !isAvail || !isToday || isOutOfStock;
+  categories.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn';
+    btn.textContent = c;
+    btn.onclick = () => {
+      activeCat = c;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('searchInput').value = '';
+      searchVal = '';
+      renderMenu();
+    };
+    catContainer.appendChild(btn);
   });
-} else if (sort === 'price_asc') items.sort((a,b) => a.price - b.price);
-else if (sort === 'price_desc') items.sort((a,b) => b.price - a.price);
-else if (sort === 'name_az') items.sort((a,b) => a.name.localeCompare(b.name));
-else if (sort === 'name_za') items.sort((a,b) => b.name.localeCompare(a.name));
-else if (sort === 'rating_desc') items.sort((a,b) => (b.avg_rating||0) - (a.avg_rating||0));
-else if (sort === 'available') items.sort((a,b) => b.available - a.available);
 
-  document.getElementById('resultInfo').innerHTML = searchVal
-    ? `Result for "<strong>${searchVal}</strong>" — ${items.length} item${items.length !== 1 ? 's' : ''} found`
-    : `Showing ${items.length} item${items.length !== 1 ? 's' : ''}`;
+  document.getElementById('searchInput').addEventListener('input', e => {
+    searchVal = e.target.value.toLowerCase();
+    renderMenu();
+  });
 
-  const grid = document.getElementById('menuGrid');
+  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost/project'
+    : 'https://aqua-wren-440584.hostingersite.com';
 
-  if (!items.length) {
-    grid.innerHTML = '<div class="col-12 text-center py-5 text-muted"><div style="font-size:3rem">🍰</div><h5>No items found</h5><p class="small">Try a different category or search term.</p></div>';
-    return;
+  async function loadMenu() {
+    try {
+      const res = await fetch(`${API_BASE}/get_menu.php`);
+      if (!res.ok) throw new Error();
+      allItems = await res.json();
+      renderMenu();
+    } catch (err) {
+      document.getElementById('menuGrid').innerHTML = '<div class="col-12 text-center py-5"><i class="bi bi-wifi-off" style="font-size:2rem;color:#ccc;"></i><h5 class="mt-2">Unable to load menu</h5><p>Please try again later.</p></div>';
+    }
   }
 
-  function getAvailableDaysText(availableDaysStr) {
-    if (!availableDaysStr) return null;
-    const days = availableDaysStr.split(',').map(d => d.trim());
-    return `Available on ${days.join('/')}`;
+  async function refreshMenu() {
+    const btn = document.querySelector('button[onclick="refreshMenu()"]');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Updating...'; }
+    try {
+      const res = await fetch(`${API_BASE}/get_menu.php`);
+      allItems = await res.json();
+      renderMenu();
+      const toast = document.createElement('div');
+      toast.className = 'refresh-toast';
+      toast.innerHTML = `<i class="bi bi-check2-circle fs-6"></i> Menu refreshed!`;
+      document.body.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2000);
+    } catch(e) {}
+    finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Refresh'; } }
   }
 
-  function isAvailableToday(availableDaysStr) {
-    if (!availableDaysStr) return true;
-    const today = DB.getDayName().substring(0, 3);
-    return availableDaysStr.includes(today);
+  setInterval(refreshMenu, 12000);
+  
+  function getImageSrc(img) {
+    if(!img) return '../assets/andikDessert.png';
+    let src = img.trim();
+    if(src.startsWith('http') || src.startsWith('/')) return src;
+    return `../assets/${src.replace(/^\.\.\/assets\//, '')}`;
   }
 
-  grid.innerHTML = items.map(item => {
-    const isAvailable = item.available == 1;
-    const isAvailableOnDay = isAvailableToday(item.available_days);
-    const daysText = getAvailableDaysText(item.available_days);
+  function isAvailableToday(daysStr) {
+    if(!daysStr) return true;
+    const today = DB.getDayName().substring(0,3);
+    return daysStr.includes(today);
+  }
 
-    let statusBadge;
-      if (isAvailable && isAvailableOnDay) {
-        // Fully available today
-        statusBadge = `<span class="badge" style="background:#E8F5E9;color:#2E7D32;font-size:.72rem">✓ Available</span>`;
-      } else if (!isAvailable && item.available_days) {
-        // Has specific days set — show them
-        statusBadge = `<span class="badge" style="background:#FFF3CD;color:#856404;font-size:.72rem">
-          <i class="bi bi-calendar-week me-1"></i>${daysText}
-        </span>`;
-      } else if (!isAvailable && !item.available_days) {
-        // No days set, just unavailable
-        statusBadge = `<span class="badge" style="background:#FFEBEE;color:#C62828;font-size:.72rem">Unavailable</span>`;
-      } else {
-        // Available but not today
-        statusBadge = `<span class="badge" style="background:#FFF3CD;color:#856404;font-size:.72rem">
-          <i class="bi bi-calendar-week me-1"></i>${daysText}
-        </span>`;
-      }
+  function renderMenu() {
+    let items = [...allItems];
+    // Category filter
+    if(activeCat === 'Today') {
+      const todayAbbr = DB.getDayName().substring(0,3);
+      items = items.filter(i => (i.category === "⭐ Today's Items") || (i.available_days && i.available_days.includes(todayAbbr)));
+    } else if(activeCat !== 'All') {
+      items = items.filter(i => i.category === activeCat);
+    }
+    if(searchVal) items = items.filter(i => i.name.toLowerCase().includes(searchVal));
+
+    const sortVal = document.getElementById('sortSelect').value;
+    if(sortVal === 'price_asc') items.sort((a,b)=>a.price-b.price);
+    else if(sortVal === 'price_desc') items.sort((a,b)=>b.price-a.price);
+    else if(sortVal === 'name_az') items.sort((a,b)=>a.name.localeCompare(b.name));
+    else if(sortVal === 'name_za') items.sort((a,b)=>b.name.localeCompare(a.name));
+    else if(sortVal === 'rating_desc') items.sort((a,b)=>(b.avg_rating||0)-(a.avg_rating||0));
+    else if(sortVal === 'available') items.sort((a,b)=>b.available - a.available);
+
+    document.getElementById('resultInfo').innerHTML = searchVal 
+      ? `🔍 Found <strong>${items.length}</strong> result${items.length !== 1 ? 's' : ''} for “${escapeHtml(searchVal)}”`
+      : `🍽️ Showing <strong>${items.length}</strong> delicious item${items.length !== 1 ? 's' : ''}`;
+
+    const grid = document.getElementById('menuGrid');
+    if(!items.length) {
+      grid.innerHTML = '<div class="col-12 text-center py-5"><div style="font-size:3rem">🍩</div><h5>No items match</h5><p class="text-muted">Try another category or search term</p></div>';
+      return;
+    }
+
+    grid.innerHTML = items.map(item => {
+      const availableFlag = item.available == 1;
+      const availableToday = isAvailableToday(item.available_days);
+      const finalAvailable = availableFlag && availableToday;
+      const stockCount = parseInt(item.stock) || 0;
+      const daysHint = item.available_days ? item.available_days.split(',').map(d=>d.trim()).join('/') : null;
+      let statusBadgeHtml = '';
+      let overlayStatusText = '';
       
-    return `
-    <div class="col-6 col-lg-3">
-      <div class="andik-card h-100">
-        <div style="height:190px;overflow:hidden;background:#F0F0F0;position:relative">
-          <img src="${item.image}" alt="${item.name}"
-               style="width:100%;height:100%;object-fit:cover;transition:.3s"
-               onmouseover="this.style.transform='scale(1.05)'"
-               onmouseout="this.style.transform='scale(1)'"
-               onerror="this.onerror=null;this.src='https://placehold.co/400x300/F5C800/011041?text=No+Image'">
-          ${(!isAvailable || !isAvailableOnDay) ? `
-          <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center">
-          <span style="background:rgba(0,0,0,.8);color:#fff;padding:.5rem 1rem;border-radius:8px;font-weight:600;font-size:.85rem">
-            ${!isAvailable && item.available_days ? daysText : !isAvailable ? 'Out of Stock' : daysText || 'Unavailable'}
-          </span>
-          </div>` : ''}
-        </div>
-        <div class="p-3 d-flex flex-column">
-          <div class="d-flex justify-content-between align-items-start mb-1">
-            <h6 style="font-weight:700;margin:0">${item.name}</h6>
-            ${statusBadge}
-          </div>
-          <div class="text-muted mb-1" style="font-size:.78rem">${item.category}</div>
-          <div style="font-size:.82rem;margin-bottom:2px">
-            ${DB.stars(parseFloat(item.avg_rating) || 0)}
-            <span style="font-size:.72rem;color:#999;margin-left:3px">${parseFloat(item.avg_rating || 0).toFixed(1)} (${item.review_count || 0})</span>
-          </div>
-          <div style="font-size:.75rem;color:#888;margin-bottom:4px">${item.description || ''}</div>
-          ${isAvailable && isAvailableOnDay
-            ? `<div style="font-size:.75rem;color:#888">Stock: ${item.stock}</div>`
-            : `<div style="font-size:.75rem;color:#856404;font-weight:500">
-                ${item.available_days ? `<i class="bi bi-calendar-week me-1"></i>${daysText}` : 'Currently unavailable'}
-              </div>`
-          }
-          <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
-            <span style="font-weight:700;font-size:1.05rem">RM ${parseFloat(item.price).toFixed(2)}</span>
-            <a href="item.html?id=${item.id}" class="btn btn-sm btn-y">Details</a>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
+      if(finalAvailable && stockCount > 0) {
+        statusBadgeHtml = `<span class="in-stock-text"><i class="bi bi-check-circle-fill"></i> In Stock</span>`;
+        overlayStatusText = '';
+      } else if(!availableFlag && daysHint) {
+        statusBadgeHtml = `<span class="unavailable-text"><i class="bi bi-calendar-week"></i> ${daysHint}</span>`;
+        overlayStatusText = daysHint;
+      } else if(!availableFlag || stockCount === 0) {
+        statusBadgeHtml = `<span class="unavailable-text"><i class="bi bi-x-circle"></i> Unavailable</span>`;
+        overlayStatusText = 'Currently unavailable';
+      } else if(!availableToday && daysHint) {
+        statusBadgeHtml = `<span class="unavailable-text"><i class="bi bi-calendar-event"></i> ${daysHint}</span>`;
+        overlayStatusText = `Available on ${daysHint}`;
+      } else {
+        statusBadgeHtml = `<span class="unavailable-text">Limited</span>`;
+        overlayStatusText = 'Check later';
+      }
 
-let lastMenuSync = localStorage.getItem('menuUpdated') || null;
-
-function checkMenuUpdates() {
-  const lastUpdate = localStorage.getItem('menuUpdated');
-  if (lastUpdate && lastUpdate !== lastMenuSync) {
-    lastMenuSync = lastUpdate;
-    loadMenu();
+      const showOverlay = (!finalAvailable || stockCount === 0);
+      const ratingVal = parseFloat(item.avg_rating) || 0;
+      const reviewCount = item.review_count || 0;
+      
+      return `
+        <div class="col-md-6 col-lg-3 col-sm-6">
+          <div class="menu-card">
+            <div class="card-img-wrapper">
+              <img src="${getImageSrc(item.image)}" alt="${escapeHtml(item.name)}" loading="lazy">
+              <div class="overlay-badge">${item.category || 'Dessert'}</div>
+              <div class="status-chip" style="background:${finalAvailable && stockCount>0 ? 'rgba(46,125,50,0.85)' : 'rgba(0,0,0,0.7)'};">
+                ${finalAvailable && stockCount>0 ? `<i class="bi bi-dot"></i> Ready` : `<i class="bi bi-clock"></i> Check`}
+              </div>
+              ${showOverlay ? `<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:3;"><span style="background:#011041cc;color:#fff;padding:6px 14px;border-radius:60px;font-size:.7rem;font-weight:600;">${overlayStatusText || 'Out of stock'}</span></div>` : ''}
+            </div>
+            <div class="card-content">
+              <div class="item-title">${escapeHtml(item.name)}</div>
+              <div class="item-category"><i class="bi bi-tag me-1"></i>${item.category || 'Special'}</div>
+              <div class="rating-wrap">
+                <div class="stars">${DB.stars(ratingVal)}</div>
+                <div class="rating-count">${ratingVal.toFixed(1)} (${reviewCount})</div>
+              </div>
+              <div class="price-row">
+                <div class="price-tag">RM ${parseFloat(item.price).toFixed(2)}</div>
+                <a href="item.html?id=${item.id}" class="detail-link"><i class="bi bi-arrow-right-short"></i> Details</a>
+              </div>
+              <div class="mt-2">
+                ${statusBadgeHtml}
+                ${finalAvailable && stockCount>0 ? `<span class="ms-2 text-muted" style="font-size:.65rem;"><i class="bi bi-box-seam"></i> ${stockCount} left</span>` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
-}
 
-setInterval(checkMenuUpdates, 3000);
-loadMenu();
+  function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+  loadMenu();
+  setInterval(() => { if(document.querySelector('.menu-card')) loadMenu(); }, 15000);
 
-const navDateMobile = document.getElementById('navDateMobile');
-if (navDateMobile) navDateMobile.textContent = dateStr;
-
-function openRoleModal() {
-  document.getElementById('roleModalOverlay').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-function closeRoleModal(e) {
-  if (e.target === document.getElementById('roleModalOverlay')) closeRoleModalDirect();
-}
-function closeRoleModalDirect() {
-  document.getElementById('roleModalOverlay').style.display = 'none';
-  document.body.style.overflow = '';
-}
-
+  function openRoleModal() { document.getElementById('roleModalOverlay').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+  function closeRoleModal(e) { if(e.target === document.getElementById('roleModalOverlay')) closeRoleModalDirect(); }
+  function closeRoleModalDirect() { document.getElementById('roleModalOverlay').style.display = 'none'; document.body.style.overflow = ''; }
 </script>
-</main>
 
-<!-- FOOTER -->
-<footer class="mt-5" style="margin-top:4rem">
+<!-- ORIGINAL FOOTER (exactly as from announcements.html) -->
+<footer>
   <div class="container">
     <div class="row g-4 mb-3">
       <div class="col-md-4"><div style="color:var(--y);font-weight:700;margin-bottom:.4rem">Andik's Desserts</div><p class="mb-0">Your favourite dessert spot. Fresh, tasty, always available.</p></div>
@@ -478,6 +592,5 @@ function closeRoleModalDirect() {
     <div class="text-center" style="font-size:.75rem">&copy; 2026 Andik's Desserts. All rights reserved.</div>
   </div>
 </footer>
-
 </body>
 </html>
