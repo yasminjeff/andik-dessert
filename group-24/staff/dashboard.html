@@ -89,9 +89,56 @@
 }
 
 
+@media print {
+  body * { visibility: hidden !important; }
+  #reportContent, #reportContent * { visibility: visible !important; }
+  #reportContent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 2rem;
+  background: #fff;
+  overflow: visible !important;
+}
+.modal-backdrop { display: none !important; }
+  .modal, .modal-dialog, .modal-content { 
+    position: static !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+  .modal-header, .modal-footer, .modal-backdrop { display: none !important; }
+  table { page-break-inside: auto; width: 100%; }
+  tr { page-break-inside: avoid; page-break-after: auto; }
+  thead { display: table-header-group; }
+}
+
 </style>
 </head>
 <body>
+
+<!-- REPORT MODAL -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content" style="border-radius:16px;border:none">
+      <div class="modal-header" style="background:var(--bk);border-radius:16px 16px 0 0">
+        <h5 class="modal-title" style="color:var(--y);font-weight:700">
+          <i class="bi bi-file-earmark-bar-graph me-2"></i>Andik's Desserts — Staff Report
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4" id="reportContent"></div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <button class="btn" style="background:var(--bk);color:var(--y);font-weight:700" onclick="window.print()">
+          <i class="bi bi-printer me-1"></i>Print / Save PDF
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
   <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
@@ -168,6 +215,7 @@
             <a href="../../staff/staff-announcements2.html" class="btn d-flex align-items-center gap-2" style="background:#F4F5F7;color:var(--bk);font-weight:600;border:none;border-radius:8px"><i class="bi bi-megaphone"></i>Post Announcement</a>
             <a href="comments.html" class="btn d-flex align-items-center gap-2" style="background:#F4F5F7;color:var(--bk);font-weight:600;border:none;border-radius:8px"><i class="bi bi-chat-left-text"></i>Manage Comments</a>
            <a href="../../staff/chats.html" class="btn d-flex align-items-center gap-2" style="background:#F4F5F7;color:var(--bk);font-weight:600;border:none;border-radius:8px" id="chatsLink"><i class="bi bi-chat-dots"></i>Chats</a>
+           <button onclick="generateReport()" class="btn d-flex align-items-center gap-2" style="background:#011041;color:#F5C800;font-weight:600;border:none;border-radius:8px"><i class="bi bi-file-earmark-bar-graph"></i>Generate Report</button>
             <div id="adminQuickAction"></div>
           </div>
         </div>
@@ -282,7 +330,151 @@ function toggleSidebar() {
 }
 
 
+async function generateReport() {
+  try {
+    const menuRes = await fetch(API_MENU);
+    const menu = await menuRes.json();
+    const revRes = await fetch(API_REVIEWS);
+    const reviews = await revRes.json();
 
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+    const timeStr = now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+
+    // Stock summary
+    const totalItems = menu.length;
+    const available = menu.filter(i => i.available == 1).length;
+    const outOfStock = menu.filter(i => i.stock == 0).length;
+    const critical = menu.filter(i => i.stock > 0 && i.stock <= 5).length;
+    const low = menu.filter(i => i.stock >= 6 && i.stock <= 10).length;
+    const good = menu.filter(i => i.stock > 10).length;
+
+    // Reviews summary
+    const totalReviews = reviews.length;
+    const replied = reviews.filter(r => r.reply).length;
+    const unreplied = reviews.filter(r => !r.reply).length;
+    const flagged = reviews.filter(r => r.flagged).length;
+    const avgRating = reviews.length ? (reviews.reduce((s,r) => s + parseInt(r.rating), 0) / reviews.length).toFixed(1) : '0.0';
+
+    // Stock table
+    const stockRows = menu.map(i => {
+      const status = i.stock == 0 ? `<span style="color:#C62828;font-weight:600">Out of Stock</span>` 
+        : i.stock <= 5 ? `<span style="color:#BF360C;font-weight:600">Critical</span>`
+        : i.stock <= 10 ? `<span style="color:#F57F17;font-weight:600">Low</span>`
+        : `<span style="color:#2E7D32;font-weight:600">Good</span>`;
+      return `<tr>
+        <td>${i.name}</td>
+        <td>${i.category}</td>
+        <td style="text-align:center">${i.stock}</td>
+        <td>${status}</td>
+        <td style="text-align:center">${i.available == 1 ? '✅' : '❌'}</td>
+      </tr>`;
+    }).join('');
+
+    // Reviews table
+    const reviewRows = reviews.slice(-10).reverse().map(r => {
+      const item = menu.find(i => i.id == r.item_id);
+      return `<tr>
+        <td>${item ? item.name : 'Unknown'}</td>
+        <td style="text-align:center">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</td>
+        <td>${r.comment || '-'}</td>
+        <td style="text-align:center">${r.reply ? `<span style="color:#2E7D32;font-weight:600">✓ Replied</span>` : `<span style="color:#C62828;font-weight:600">● New</span>`}</td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('reportContent').innerHTML = `
+      <div style="font-family:'Poppins',sans-serif">
+        <!-- Header -->
+        <div style="text-align:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:2px solid var(--y)">
+          <h3 style="color:var(--bk);font-weight:800;margin:0">Andik's Desserts Mini Cafe</h3>
+          <p style="color:#888;margin:4px 0">Staff Report — Generated by ${user.name}</p>
+          <p style="color:#888;font-size:.85rem;margin:0">${dateStr} at ${timeStr}</p>
+        </div>
+
+        <!-- Stock Summary -->
+        <h5 style="color:var(--bk);font-weight:700;margin-bottom:1rem"><i class="bi bi-box-seam me-2" style="color:var(--y)"></i>Stock Summary</h5>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem">
+          <div style="background:#F8F8F8;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:1.8rem;font-weight:800;color:var(--bk)">${totalItems}</div>
+            <div style="font-size:.8rem;color:#888">Total Items</div>
+          </div>
+          <div style="background:#E8F5E9;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:1.8rem;font-weight:800;color:#2E7D32">${available}</div>
+            <div style="font-size:.8rem;color:#888">Available</div>
+          </div>
+          <div style="background:#FFEBEE;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:1.8rem;font-weight:800;color:#C62828">${outOfStock}</div>
+            <div style="font-size:.8rem;color:#888">Out of Stock</div>
+          </div>
+          <div style="background:#FBE9E7;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:1.8rem;font-weight:800;color:#BF360C">${critical}</div>
+            <div style="font-size:.8rem;color:#888">Critical (1-5)</div>
+          </div>
+          <div style="background:#FFF8E1;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:1.8rem;font-weight:800;color:#F57F17">${low}</div>
+            <div style="font-size:.8rem;color:#888">Low (6-10)</div>
+          </div>
+          <div style="background:#E8F5E9;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:1.8rem;font-weight:800;color:#2E7D32">${good}</div>
+            <div style="font-size:.8rem;color:#888">Good (11+)</div>
+          </div>
+        </div>
+
+        <!-- Stock Table -->
+        <table style="width:100%;border-collapse:collapse;margin-bottom:2rem;font-size:.85rem">
+          <thead>
+            <tr style="background:var(--bk);color:#fff">
+              <th style="padding:.6rem 1rem;text-align:left">Item Name</th>
+              <th style="padding:.6rem 1rem;text-align:left">Category</th>
+              <th style="padding:.6rem 1rem;text-align:center">Stock</th>
+              <th style="padding:.6rem 1rem;text-align:left">Status</th>
+              <th style="padding:.6rem 1rem;text-align:center">Available</th>
+            </tr>
+          </thead>
+          <tbody>${stockRows}</tbody>
+        </table>
+
+        <!-- Reviews Summary -->
+        <h5 style="color:var(--bk);font-weight:700;margin-bottom:1rem"><i class="bi bi-star me-2" style="color:var(--y)"></i>Reviews Summary</h5>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem">
+          <div style="background:#F8F8F8;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:1.8rem;font-weight:800;color:var(--bk)">${totalReviews}</div>
+            <div style="font-size:.8rem;color:#888">Total Reviews</div>
+          </div>
+          <div style="background:#E8F5E9;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:1.8rem;font-weight:800;color:#2E7D32">${replied}</div>
+            <div style="font-size:.8rem;color:#888">Replied</div>
+          </div>
+          <div style="background:#FFEBEE;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:1.8rem;font-weight:800;color:#C62828">${unreplied}</div>
+            <div style="font-size:.8rem;color:#888">Unreplied</div>
+          </div>
+          <div style="background:#FFF9E0;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:1.8rem;font-weight:800;color:var(--bk)">${avgRating} ★</div>
+            <div style="font-size:.8rem;color:#888">Avg Rating</div>
+          </div>
+        </div>
+
+        <!-- Reviews Table -->
+        <table style="width:100%;border-collapse:collapse;font-size:.85rem">
+          <thead>
+            <tr style="background:var(--bk);color:#fff">
+              <th style="padding:.6rem 1rem;text-align:left">Item</th>
+              <th style="padding:.6rem 1rem;text-align:center">Rating</th>
+              <th style="padding:.6rem 1rem;text-align:left">Comment</th>
+              <th style="padding:.6rem 1rem;text-align:center">Status</th>
+            </tr>
+          </thead>
+          <tbody>${reviewRows}</tbody>
+        </table>
+      </div>`;
+
+    new bootstrap.Modal(document.getElementById('reportModal')).show();
+  } catch(err) {
+    console.error('generateReport error:', err);
+    alert('Failed to generate report. Please try again.');
+  }
+}
 </script>
 </body>
 </html>
