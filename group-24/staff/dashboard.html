@@ -16,10 +16,28 @@
 .sb-brand{color:var(--y);font-weight:700;font-size:.9rem;line-height:1.2;}
 .sb-role{color:rgba(255,255,255,.4);font-size:.68rem;}
 .sb-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.25);padding:.8rem 1.4rem .3rem;}
-.sb-link{display:flex;align-items:center;gap:10px;padding:.58rem 1.4rem;color:rgba(255,255,255,.65);text-decoration:none;font-size:.86rem;font-weight:500;transition:.2s;border-left:3px solid transparent;}
+.sb-link{display:flex;align-items:center;gap:10px;padding:.58rem 1.4rem;color:rgba(255,255,255,.65);text-decoration:none;font-size:.86rem;font-weight:500;transition:.2s;border-left:3px solid transparent;position:relative;}
 .sb-link i{width:18px;text-align:center;}
 .sb-link:hover{color:#fff;background:rgba(255,255,255,.06);}
 .sb-link.active{color:var(--y);background:rgba(245,200,0,.08);border-left-color:var(--y);}
+/* Badge for new comments on sidebar */
+.sb-badge-comment{
+  position: absolute;
+  right: 1rem;
+  background: #FF5252;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  min-width: 20px;
+  text-align: center;
+  animation: pulse 1s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); background: #FF1744; }
+}
 .sb-footer{padding:1rem 1.4rem;border-top:1px solid rgba(255,255,255,.08);margin-top:auto;}
 .main{margin-left:var(--sw);display:flex;flex-direction:column;min-height:100vh;}
 .topbar{background:#fff;height:64px;display:flex;align-items:center;padding:0 1.5rem;border-bottom:1px solid #EBEBEB;position:sticky;top:0;z-index:100;gap:1rem;}
@@ -153,7 +171,10 @@
     <div class="sb-label">Menu</div>
 <a href="menu.html" class="sb-link"><i class="bi bi-grid"></i>Menu Items</a>
     <div class="sb-label">Engagement</div>
-    <a href="comments.html" class="sb-link"><i class="bi bi-chat-left-text"></i>Comments</a>
+    <a href="comments.html" class="sb-link" id="commentsLink">
+      <i class="bi bi-chat-left-text"></i>Comments
+      <span class="sb-badge-comment" id="sidebarCommentBadge" style="display:none">0</span>
+    </a>
     <a href="../../staff/staff-announcements2.html" class="sb-link"><i class="bi bi-megaphone"></i>Announcements</a>
     <div class="sb-label">Messages</div>
     <a href="#" class="sb-link" id="chatsLinkSidebar"><i class="bi bi-chat-dots"></i>Chats <span class="sb-badge" id="sbUnreadBadge" style="display:none">0</span></a>
@@ -275,6 +296,38 @@ if (user.role === 'admin') {
 
 const API_MENU = `${API_BASE}/get_menu.php`;
 const API_REVIEWS = `${API_BASE}/group-24/reviews/get_reviews.php`;
+const REVIEWS_API = `${API_BASE}/group-24/reviews`;
+
+// ── Comment unread badge functions ──────────────────────────
+function getReadCommentIds() {
+  return JSON.parse(localStorage.getItem('readReviewIds') || '[]');
+}
+
+function updateCommentBadge() {
+  const readIds = getReadCommentIds();
+  fetch(`${REVIEWS_API}/get_reviews.php`)
+    .then(res => res.json())
+    .then(reviews => {
+      const unreadCount = reviews.filter(r => !readIds.includes(r.id)).length;
+      const badge = document.getElementById('sidebarCommentBadge');
+      if (unreadCount > 0) {
+        badge.textContent = unreadCount;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    })
+    .catch(err => console.error("Error fetching comments for badge:", err));
+}
+
+// Auto-refresh comment badge every 30 seconds
+setInterval(() => {
+  updateCommentBadge();
+}, 30000);
+
+// Update badge on page load
+updateCommentBadge();
+// ────────────────────────────────────────────────────────────
 
 async function loadDashboard() {
   try {
@@ -293,17 +346,21 @@ async function loadDashboard() {
     const rr = document.getElementById('recentReviews');
     const recent = reviews.slice(-5).reverse();
 
+    // Get read IDs to show "New" badge appropriately
+    const readIds = getReadCommentIds();
+
     if (!recent.length) {
       rr.innerHTML = '<div class="text-muted text-center py-3" style="font-size:.88rem">No reviews yet.</div>';
     } else {
       rr.innerHTML = recent.map(r => {
         const item = menu.find(i => i.id == r.item_id);
+        const isUnread = !readIds.includes(r.id);
         return `<div class="d-flex align-items-start gap-3 py-3" style="border-bottom:1px solid #F0F0F0">
           <div style="width:36px;height:36px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;color:var(--bk);flex-shrink:0">A</div>
           <div style="flex:1;min-width:0">
             <div class="d-flex justify-content-between">
               <span style="font-weight:600;font-size:.88rem">Anonymous</span>
-              <span style="background:#FFEBEE;color:#C62828;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:20px">New</span>
+              ${isUnread ? `<span style="background:#FFEBEE;color:#C62828;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:20px">New</span>` : '<span style="font-size:.68rem;color:#999">Read</span>'}
             </div>
             <div style="font-size:.8rem;color:#888;margin:1px 0">${item ? item.name : 'Unknown item'}</div>
             <p style="font-size:.83rem;color:#555;margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.comment || ''}</p>
@@ -429,10 +486,10 @@ async function generateReport() {
               <th style="padding:.6rem 1rem;text-align:center">Stock</th>
               <th style="padding:.6rem 1rem;text-align:left">Status</th>
               <th style="padding:.6rem 1rem;text-align:center">Available</th>
-            </tr>
+             </tr>
           </thead>
           <tbody>${stockRows}</tbody>
-        </table>
+         </table>
 
         <!-- Reviews Summary -->
         <h5 style="color:var(--bk);font-weight:700;margin-bottom:1rem"><i class="bi bi-star me-2" style="color:var(--y)"></i>Reviews Summary</h5>
@@ -463,10 +520,10 @@ async function generateReport() {
               <th style="padding:.6rem 1rem;text-align:center">Rating</th>
               <th style="padding:.6rem 1rem;text-align:left">Comment</th>
               <th style="padding:.6rem 1rem;text-align:center">Status</th>
-            </tr>
+             </tr>
           </thead>
           <tbody>${reviewRows}</tbody>
-        </table>
+         </table>
       </div>`;
 
     new bootstrap.Modal(document.getElementById('reportModal')).show();
