@@ -7,7 +7,7 @@ class DB {
             $host = 'localhost';
             $dbname = 'u141697790_db_ls8mfL7Y';
             $username = 'u141697790_usr_ls8mfL7Y';
-            $password = 'Syakirah_20';
+            $password = 'Andik_2026';
             $db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
         }
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
