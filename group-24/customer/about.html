@@ -75,6 +75,18 @@ footer a:hover{color:var(--y);}
 @media (min-width: 768px) {
   #authButtons {margin-left: auto; display:flex !important; gap:.6rem; align-items:center}
 }
+
+
+@media (max-width: 768px) {
+  .nav-date-badge {
+    font-size: .72rem !important;
+    padding: .25rem .5rem !important;
+  }
+  .navbar .container {
+    flex-wrap: nowrap !important;
+    gap: .5rem;
+  }
+}
 </style>
 </head>
 <body>
@@ -123,12 +135,12 @@ footer a:hover{color:var(--y);}
       <li><a href="about.html" class="nav-link-c nav-link active"><i class="bi bi-info-circle me-1"></i>About</a></li>
     </ul>
     <div class="d-flex gap-2 align-items-center">
-      <button class="btn d-md-none" style="color:var(--y);border:2px solid rgba(245,200,0,.3);border-radius:10px;font-size:1.3rem;padding:.3rem .6rem" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav">
-        <i class="bi bi-list"></i>
-      </button>
-      <div style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
-      <div class="d-flex gap-2 d-none d-md-flex" id="authButtons"></div>
-    </div>
+  <button class="btn d-md-none" style="color:var(--y);border:2px solid rgba(245,200,0,.3);border-radius:10px;font-size:1.3rem;padding:.3rem .6rem" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav">
+    <i class="bi bi-list"></i>
+  </button>
+  <div class="nav-date-badge" style="background:rgba(245,200,0,.15);color:var(--y);padding:.4rem .8rem;border-radius:8px;font-weight:600;font-size:.85rem;white-space:nowrap"><i class="bi bi-calendar-event me-1"></i><span id="navDate"></span></div>
+  <div class="d-flex gap-2 d-none d-md-flex" id="authButtons"></div>
+</div>
   </div>
   <div class="collapse w-100 d-md-none" id="mobileNav">
     <div style="background:var(--bk);padding:.5rem 1rem 1rem;border-top:1px solid rgba(255,255,255,.1)">
