@@ -191,7 +191,7 @@ document.getElementById('userName').textContent = user.name;
 const userParam = encodeURIComponent(JSON.stringify(user));
 const CHAT_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? `http://localhost/project/staff/chats.html?u=${userParam}`
-  : 'https://aqua-wren-440584.hostingersite.com/staff/chats.html?u=${userParam}';
+  : `https://aqua-wren-440584.hostingersite.com/staff/chats.html?u=${userParam}`;
 
 document.getElementById('chatsLink').href = CHAT_URL;
 document.getElementById('adminToday').textContent = DB.getDayName();
