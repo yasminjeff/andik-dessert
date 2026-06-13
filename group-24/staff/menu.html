@@ -10,7 +10,7 @@
 <style>
 :root{--y:#F5C800;--yd:#D4A900;--bk:#011041;--sw:260px;}
 *{font-family:'Poppins',sans-serif;}body{background:#F4F5F7;margin:0;}
-.sidebar{width:var(--sw);height:100vh;background:var(--bk);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:200;overflow:hidden;}
+.sidebar{width:var(--sw);min-height:100vh;background:var(--bk);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:200;}
 .sb-header{padding:1.2rem;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;}
 .sb-logo{width:42px;height:42px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:var(--bk);flex-shrink:0;}
 .sb-brand{color:var(--y);font-weight:700;font-size:.9rem;line-height:1.2;}
@@ -38,7 +38,7 @@
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); background: #FF1744; }
 }
-.sb-footer{padding:1rem 1.4rem;border-top:1px solid rgba(255,255,255,.08);margin-top:auto;flex-shrink:0;}
+.sb-footer{padding:1rem 1.4rem;border-top:1px solid rgba(255,255,255,.08);margin-top:auto;}
 .main{margin-left:var(--sw);display:flex;flex-direction:column;min-height:100vh;}
 .topbar{background:#fff;height:64px;display:flex;align-items:center;padding:0 1.5rem;border-bottom:1px solid #EBEBEB;position:sticky;top:0;z-index:100;}
 .topbar-title{font-weight:700;font-size:1.1rem;flex:1;}
