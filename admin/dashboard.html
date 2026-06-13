@@ -423,6 +423,7 @@ async function delStaff(id) {
     body: JSON.stringify({ id })
   });
   renderStaff();
+  renderDisabled();
 }
 
 renderPending();
