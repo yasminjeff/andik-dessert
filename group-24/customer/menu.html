@@ -251,17 +251,15 @@
       display: flex; align-items: center; justify-content: center;
       backdrop-filter: blur(6px);
     }
-    .role-modal {
-      background: #fff; border-radius: 32px; padding: 2rem; max-width: 340px; width: 90%;
-      text-align: center; box-shadow: 0 40px 60px rgba(0,0,0,.3);
-      animation: popIn .3s ease;
-    }
-    @keyframes popIn{from{transform:scale(.9); opacity:0}to{transform:scale(1); opacity:1}}
-    .role-modal-logo{width:70px;height:70px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;border:3px solid var(--y);}
-    .role-btn-yes{background:var(--bk);color:var(--y);font-weight:700;border:none;border-radius:12px;padding:.75rem;width:100%;margin-bottom:.6rem;transition:.2s;}
-    .role-btn-yes:hover{background:#022070;}
-    .role-btn-no{background:#F4F5F7;color:#666;font-weight:600;border:none;border-radius:12px;padding:.75rem;width:100%;transition:.2s;}
-    .role-btn-no:hover{background:#E8E9EB;color:#444;}
+    .role-modal{background:#fff;border-radius:20px;padding:2.5rem 2rem;max-width:360px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:popIn .3s ease;}
+    @keyframes popIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+   .role-modal-logo{width:72px;height:72px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;display:block;border:3px solid var(--y);}
+   .role-modal h5{font-weight:800;color:var(--bk);font-size:1.1rem;margin-bottom:.4rem;}
+   .role-modal p{font-size:.85rem;color:#888;margin-bottom:1.5rem;line-height:1.6;}
+   .role-btn-yes{background:var(--bk);color:var(--y);font-weight:700;border:none;border-radius:12px;padding:.75rem 1.5rem;width:100%;font-size:.92rem;transition:.2s;margin-bottom:.6rem;display:block;}
+   .role-btn-yes:hover{background:#022070;}
+   .role-btn-no{background:#F4F5F7;color:#666;font-weight:600;border:none;border-radius:12px;padding:.75rem 1.5rem;width:100%;font-size:.92rem;transition:.2s;display:block;}
+   .role-btn-no:hover{background:#E8E9EB;color:#444;}
     
     @media (max-width: 767px) {
       .navbar .container > a.d-flex img {display:none !important;}
@@ -283,6 +281,20 @@
 </head>
 <body>
 
+<div class="role-modal-overlay" id="registerModalOverlay" style="display:none" onclick="closeRegisterModal(event)">
+  <div class="role-modal">
+    <img src="../assets/andikDessert.png" alt="Andik's Desserts" class="role-modal-logo">
+    <h5>Join Us! 🎉</h5>
+    <p>Do you want to be one of our <strong>staff members</strong>? Let's register and be part of the Andik's Desserts team!</p>
+    <button class="role-btn-yes" onclick="location.href='register.html'">
+      <i class="bi bi-person-plus me-2"></i>Yes, Let's Register!
+    </button>
+    <button class="role-btn-no" onclick="closeRegisterModalDirect()">
+      <i class="bi bi-house me-2"></i>No, just browsing
+    </button>
+    <div style="font-size:.75rem;color:#bbb;margin-top:1rem">Tap outside to close</div>
+  </div>
+</div>
 <div class="role-modal-overlay" id="roleModalOverlay" style="display:none" onclick="closeRoleModal(event)">
   <div class="role-modal">
     <img src="../assets/andikDessert.png" alt="Andik's Desserts" class="role-modal-logo">
@@ -374,8 +386,8 @@
   const user = DB.currentUser();
   const authDiv = document.getElementById('authButtons');
   const authMobile = document.getElementById('authButtonsMobile');
-  authDiv.innerHTML = `<button class="btn btn-sm btn-yo" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRoleModal()">Register</button>`;
-  authMobile.innerHTML = `<button class="btn btn-sm btn-yo me-2" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRoleModal()">Register</button>`;
+authDiv.innerHTML = `<button class="btn btn-sm btn-yo" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRegisterModal()">Register</button>`;
+authMobile.innerHTML = `<button class="btn btn-sm btn-yo me-2" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRegisterModal()">Register</button>`;
 
   const now = new Date();
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -567,6 +579,18 @@
   function openRoleModal() { document.getElementById('roleModalOverlay').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
   function closeRoleModal(e) { if(e.target === document.getElementById('roleModalOverlay')) closeRoleModalDirect(); }
   function closeRoleModalDirect() { document.getElementById('roleModalOverlay').style.display = 'none'; document.body.style.overflow = ''; }
+
+  function openRegisterModal() {
+  document.getElementById('registerModalOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeRegisterModal(e) {
+  if (e.target === document.getElementById('registerModalOverlay')) closeRegisterModalDirect();
+}
+function closeRegisterModalDirect() {
+  document.getElementById('registerModalOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
 </script>
 
 <!-- ORIGINAL FOOTER (exactly as from announcements.html) -->

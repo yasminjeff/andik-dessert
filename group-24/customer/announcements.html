@@ -184,6 +184,21 @@ footer a:hover{color:var(--y);}
 </head>
 <body>
 
+<div class="role-modal-overlay" id="registerModalOverlay" style="display:none" onclick="closeRegisterModal(event)">
+  <div class="role-modal">
+    <img src="../assets/andikDessert.png" alt="Andik's Desserts" class="role-modal-logo">
+    <h5>Join Us! 🎉</h5>
+    <p>Do you want to be one of our <strong>staff members</strong>? Let's register and be part of the Andik's Desserts team!</p>
+    <button class="role-btn-yes" onclick="location.href='register.html'">
+      <i class="bi bi-person-plus me-2"></i>Yes, Let's Register!
+    </button>
+    <button class="role-btn-no" onclick="closeRegisterModalDirect()">
+      <i class="bi bi-house me-2"></i>No, just browsing
+    </button>
+    <div style="font-size:.75rem;color:#bbb;margin-top:1rem">Tap outside to close</div>
+  </div>
+</div>
+
 <div class="role-modal-overlay" id="roleModalOverlay" style="display:none" onclick="closeRoleModal(event)">
   <div class="role-modal">
     <img src="../assets/andikDessert.png" alt="Andik's Desserts" class="role-modal-logo">
@@ -303,8 +318,8 @@ const user = DB.currentUser();
 const authDiv = document.getElementById('authButtons');
 const authMobile = document.getElementById('authButtonsMobile');
 
-authDiv.innerHTML = `<button class="btn btn-sm btn-yo" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRoleModal()">Register</button>`;
-authMobile.innerHTML = `<button class="btn btn-sm btn-yo me-2" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRoleModal()">Register</button>`;
+authDiv.innerHTML = `<button class="btn btn-sm btn-yo" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRegisterModal()">Register</button>`;
+authMobile.innerHTML = `<button class="btn btn-sm btn-yo me-2" onclick="openRoleModal()">Login</button><button class="btn btn-sm btn-y" onclick="openRegisterModal()">Register</button>`;
 
 // date and day displayed
 const now = new Date();
@@ -426,6 +441,17 @@ function closeRoleModalDirect() {
   document.body.style.overflow = '';
 }
 
+function openRegisterModal() {
+  document.getElementById('registerModalOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeRegisterModal(e) {
+  if (e.target === document.getElementById('registerModalOverlay')) closeRegisterModalDirect();
+}
+function closeRegisterModalDirect() {
+  document.getElementById('registerModalOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
 </script>
 </body>
 </html>
