@@ -229,6 +229,13 @@
 <script src="../phpdata/data.js"></script>
 <script>
 
+window.addEventListener('pageshow', function(event) {
+  if (event.persisted) {
+    location.reload();
+  }
+});
+
+
 const user = DB.currentUser();
 if (!user || (user.role !== 'staff' && user.role !== 'admin'))
   location.href = '../group-24/customer/login.html';

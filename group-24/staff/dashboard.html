@@ -202,6 +202,12 @@
 <script src="../../phpdata/data.js"></script>
 <script>
 
+window.addEventListener('pageshow', function(event) {
+  if (event.persisted) {
+    location.reload();
+  }
+});
+
 
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost/project'
@@ -297,7 +303,8 @@ async function loadDashboard() {
     document.getElementById('statComments').textContent = reviews.length;
 
     const rr = document.getElementById('recentReviews');
-    const recent = reviews.slice(-5).reverse();
+    const sortedReviews = [...reviews].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    const recent = sortedReviews.slice(0, 5);
 
     // Get read IDs to show "New" badge appropriately
     const readIds = getReadCommentIds();
