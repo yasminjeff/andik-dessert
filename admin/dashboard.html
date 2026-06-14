@@ -237,7 +237,9 @@ updateCommentBadge();
 
 async function renderPending() {
   try {
-    const res = await fetch(`${ADMIN_API}/get_staff.php?status=pending`);
+    const res = await fetch(`${ADMIN_API}/get_staff.php?status=pending`, {
+  headers: { 'X-Requested-With': 'XMLHttpRequest' }
+});
     const pending = await res.json();
     const section = document.getElementById('pendingSection');
     const list = document.getElementById('pendingList');
@@ -265,7 +267,9 @@ async function renderPending() {
 
 async function renderDisabled() {
   try {
-    const res = await fetch(`${ADMIN_API}/get_staff.php?status=disabled`);
+    const res = await fetch(`${ADMIN_API}/get_staff.php?status=disabled`, {
+  headers: { 'X-Requested-With': 'XMLHttpRequest' }
+});
     const disabled = await res.json();
     const section = document.getElementById('disabledSection');
     const list = document.getElementById('disabledList');
@@ -294,7 +298,9 @@ async function renderDisabled() {
 async function renderStaff() {
   try {
     const search = document.getElementById('searchInput').value.toLowerCase();
-    const res = await fetch(`${ADMIN_API}/get_staff.php?status=active`);
+    const res = await fetch(`${ADMIN_API}/get_staff.php?status=active`, {
+  headers: { 'X-Requested-With': 'XMLHttpRequest' }
+});
     const staff = await res.json();
     const filtered = staff.filter(s =>
       s.name.toLowerCase().includes(search) ||

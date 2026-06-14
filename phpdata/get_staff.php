@@ -11,6 +11,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require __DIR__ . "/../db.php";
 
+if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+    http_response_code(403);
+    echo json_encode(["error" => true, "message" => "Forbidden"]);
+    exit;
+}
+
 try {
     $db = DB::connect();
     $status = $_GET['status'] ?? null;
