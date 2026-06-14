@@ -64,6 +64,9 @@
 .contact-item{display:flex;align-items:center;gap:12px;padding:.9rem 1.2rem;cursor:pointer;border-bottom:1px solid #F5F5F5;transition:.2s;}
 .contact-item:hover{background:#F8F8F8;}
 .contact-item.active{background:#FFF9E0;border-left:3px solid var(--y);}
+.contact-item.disabled-contact{opacity:.5;cursor:default;}
+.contact-item.disabled-contact:hover{background:transparent;}
+.chat-disabled-notice{background:#FFEBEE;color:#C62828;padding:.6rem 1.2rem;font-size:.82rem;font-weight:600;text-align:center;}
 .contact-av{width:44px;height:44px;border-radius:50%;background:var(--bk);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;color:var(--y);flex-shrink:0;}
 .contact-av.admin{background:var(--y);color:var(--bk);}
 .contact-info{flex:1;min-width:0;}
@@ -477,12 +480,13 @@ function renderContacts(contacts) {
     return;
   }
   list.innerHTML = contacts.map(c => `
-    <div class="contact-item ${activeContact?.id == c.id ? 'active' : ''}" onclick="openChat(${c.id}, '${c.name}', '${c.role}')">
+    <div class="contact-item ${activeContact?.id == c.id ? 'active' : ''} ${c.status === 'disabled' ? 'disabled-contact' : ''}" onclick="openChat(${c.id}, '${c.name}', '${c.role}', '${c.status || 'active'}')">
       <div class="contact-av ${c.role === 'admin' ? 'admin' : ''}">${c.name.charAt(0).toUpperCase()}</div>
       <div class="contact-info">
         <div class="d-flex align-items-center gap-1">
           <span class="contact-name">${c.name}</span>
           <span class="role-tag ${c.role}">${c.role}</span>
+          ${c.status === 'disabled' ? '<span class="role-tag" style="background:#FFEBEE;color:#C62828">Disabled</span>' : ''}
         </div>
         <div class="contact-preview">${c.last_message && c.last_message.includes('/uploads/chat/') ? '📷 Image' : (c.last_message || 'No messages yet')}</div>
       </div>
@@ -510,11 +514,11 @@ function formatTime(datetime) {
 }
 
 // ── OPEN CHAT ─────────────────────────────────────
-async function openChat(contactId, contactName, contactRole) {
+async function openChat(contactId, contactName, contactRole, contactStatus) {
   if (activeContact?.id == contactId) return; // dah open, skip
   if (pollInterval) clearInterval(pollInterval);
   
-  activeContact = { id: contactId, name: contactName, role: contactRole };
+  activeContact = { id: contactId, name: contactName, role: contactRole, status: contactStatus };
   lastMessagesHash = '';
   document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
   event.currentTarget.classList.add('active');
@@ -541,6 +545,23 @@ async function openChat(contactId, contactName, contactRole) {
 
   document.getElementById('contactsPanel').classList.add('mobile-hide');
   document.getElementById('chatPanel').classList.add('mobile-show');
+
+  // Toggle input area based on disabled status
+  const inputArea = document.querySelector('.chat-input-area');
+  let notice = document.getElementById('chatDisabledNotice');
+  if (contactStatus === 'disabled') {
+    inputArea.style.display = 'none';
+    if (!notice) {
+      notice = document.createElement('div');
+      notice.id = 'chatDisabledNotice';
+      notice.className = 'chat-disabled-notice';
+      notice.innerHTML = '<i class="bi bi-pause-circle me-1"></i>This staff account is disabled. You can view history but cannot send new messages.';
+      document.getElementById('chatWindow').appendChild(notice);
+    }
+  } else {
+    inputArea.style.display = 'flex';
+    if (notice) notice.remove();
+  }
 
   await loadMessages();
 

@@ -23,10 +23,10 @@ try {
     $db = DB::connect();
 
     if ($role === 'admin') {
-        $stmt = $db->prepare("SELECT id, name, email, role FROM users WHERE status = 'active' AND id != ?");
+        $stmt = $db->prepare("SELECT id, name, email, role, status FROM users WHERE status IN ('active','disabled') AND id != ?");
         $stmt->execute([$user_id]);
     } else {
-        $stmt = $db->prepare("SELECT id, name, email, role FROM users WHERE role = 'admin' AND id != ?");
+        $stmt = $db->prepare("SELECT id, name, email, role, status FROM users WHERE role = 'admin' AND id != ?");
         $stmt->execute([$user_id]);
     }
 
