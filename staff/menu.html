@@ -71,6 +71,13 @@
   .hamburger-btn { display: flex !important; }
   .content { padding: 1rem; }
   .panel { padding: .8rem; }
+  .table th, .table td { font-size: .75rem; padding: .4rem; }
+
+  /* Filter bar — stack full width on mobile */
+  .panel .form-select, .panel #searchInput {
+    max-width: 100% !important;
+    flex: 1 1 100%;
+  }
 }
 .hamburger-btn { display: none; }
 
@@ -176,18 +183,31 @@
           <option>Noodles</option>
         </select>
         <select id="stockFilter" class="form-select" style="max-width:220px;border-radius:10px" onchange="renderTable()">
-        <option value="">All Stocks</option>
-        <option value="out">Out of Stock</option>
-        <option value="critical">Critical (1–5)</option>
-        <option value="low">Low (6–10)</option>
-        <option value="good">Good (11+)</option>
+          <option value="">All Stocks</option>
+          <option value="out">Out of Stock</option>
+          <option value="critical">Critical (1–5)</option>
+          <option value="low">Low (6–10)</option>
+          <option value="good">Good (11+)</option>
+        </select>
+        <select id="dayFilter" class="form-select" style="max-width:220px;border-radius:10px" onchange="renderTable()">
+          <option value="">All Days</option>
+          <option value="Mon">Available Monday</option>
+          <option value="Tue">Available Tuesday</option>
+          <option value="Wed">Available Wednesday</option>
+          <option value="Thu">Available Thursday</option>
+          <option value="Fri">Available Friday</option>
+          <option value="Sat">Available Saturday</option>
+          <option value="Sun">Available Sunday</option>
         </select>
       </div>
     </div>
     <div class="panel p-0">
       <div class="table-responsive">
         <table class="table mb-0">
-          <thead><tr><th>#</th><th>Image</th><th>Item Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Action</th></tr></thead>
+          <thead><tr>
+              <th>#</th><th>Image</th><th>Item Name</th><th>Category</th>
+              <th>Price</th><th>Stock</th><th>Days</th><th>Status</th><th>Action</th>
+            </tr></thead>
           <tbody id="menuTable"></tbody>
         </table>
       </div>
@@ -437,10 +457,12 @@ async function renderTable() {
   const search = document.getElementById('searchInput').value.toLowerCase();
   const category = document.getElementById('categoryFilter').value;
   const stockFilter = document.getElementById('stockFilter').value;
+  const dayFilter = document.getElementById('dayFilter').value;
   const res = await fetch(`${MENU_API}/get_menu.php`);
   const allItems = await res.json();
 
-
+  // Check low stock on ALL items (not just filtered)
+  checkLowStock(allItems);
 
   const items = allItems
     .filter(i => i.name.toLowerCase().includes(search))
@@ -453,10 +475,16 @@ async function renderTable() {
       if (stockFilter === 'low') return stock >= 6 && stock <= 10;
       if (stockFilter === 'good') return stock > 10;
       return true;
+    })
+    .filter(i => {
+      if (!dayFilter) return true;
+      // Empty available_days = available every day
+      if (!i.available_days || i.available_days.toString().trim() === '') return true;
+      return i.available_days.toString().split(',').map(d => d.trim()).includes(dayFilter);
     });
     
   const tb = document.getElementById('menuTable');
-  if (!items.length) { tb.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No items found.</td></tr>'; return; }
+  if (!items.length) { tb.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">No items found.</td></tr>'; return; }
   checkLowStock(allItems);
 tb.innerHTML = items.map((item, idx) => {
     const rowClass = parseInt(item.stock) === 0 ? 'row-out' : parseInt(item.stock) <= 5 ? 'row-critical' : '';
@@ -468,7 +496,12 @@ tb.innerHTML = items.map((item, idx) => {
       <td><span style="background:#F4F5F7;padding:3px 10px;border-radius:20px;font-size:.78rem">${item.category}</span></td>
       <td style="font-weight:600">RM ${parseFloat(item.price).toFixed(2)}</td>
       <td>${getStockBadge(item.stock)}</td>
-      <td>${item.available == 1 ? '<span class="badge" style="background:#E8F5E9;color:#2E7D32;font-size:.72rem">Available</span>' : '<span class="badge" style="background:#FFEBEE;color:#C62828;font-size:.72rem">Out of Stock</span>'}</td>
+      <td>${item.available_days && item.available_days.toString().trim() !== ''
+        ? `<span style="background:#E3F2FD;color:#1565C0;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:600">${item.available_days}</span>`
+        : `<span style="background:#F4F5F7;color:#888;padding:2px 8px;border-radius:12px;font-size:.72rem">Every day</span>`}</td>
+      <td>${item.available == 1
+        ? '<span class="badge" style="background:#E8F5E9;color:#2E7D32;font-size:.72rem">Available</span>'
+        : '<span class="badge" style="background:#FFEBEE;color:#C62828;font-size:.72rem">Out of Stock</span>'}</td>
       <td>
         <div class="d-flex gap-1">
           <button class="btn btn-sm" style="background:#EDE7F6;color:#6A1B9A;border:none;border-radius:7px" onclick="openEdit(${item.id}, this)"><i class="bi bi-pencil"></i></button>
