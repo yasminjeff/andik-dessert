@@ -22,10 +22,10 @@ try {
     $status = $_GET['status'] ?? null;
 
     if ($status) {
-        $stmt = $db->prepare("SELECT id, name, email, role, status, created_at FROM users WHERE role = 'staff' AND status = ?");
+        $stmt = $db->prepare("SELECT id, name, email, role, status, created_at, reset_requested FROM users WHERE role = 'staff' AND status = ?");
         $stmt->execute([$status]);
     } else {
-        $stmt = $db->query("SELECT id, name, email, role, status, created_at FROM users WHERE role = 'staff'");
+        $stmt = $db->query("SELECT id, name, email, role, status, created_at, reset_requested FROM users WHERE role = 'staff'");
     }
 
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);

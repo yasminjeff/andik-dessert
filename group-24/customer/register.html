@@ -78,7 +78,14 @@ body{background:var(--bk);min-height:100vh;display:flex;align-items:center;justi
   </div>
   <div class="mb-3">
     <label class="form-label">Password</label>
-    <input type="password" id="passInput" class="form-control" placeholder="Min. 6 characters" style="border-radius:10px">
+    <input type="password" id="passInput" class="form-control" placeholder="Min. 8 characters" style="border-radius:10px" oninput="checkStrength()">
+<div class="mt-1" style="background:#eee;border-radius:3px;overflow:hidden">
+  <div class="strength-bar" id="strengthBar" style="height:5px;border-radius:3px;transition:width .3s,background .3s;width:0;background:#ccc"></div>
+</div>
+<small id="strengthLabel" class="text-muted" style="font-size:.75rem"></small>
+<div style="font-size:.75rem;color:#888;margin-top:4px">
+  Must contain uppercase, lowercase, number & symbol.
+</div>
   </div>
   <div class="mb-4">
     <label class="form-label">Confirm Password</label>
@@ -99,6 +106,31 @@ const now = new Date();
 const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 document.getElementById('pageDate').textContent = `${DB.getDayName()}, ${now.getDate()} ${months[now.getMonth()]}`;
 
+function checkStrength(){
+  const val = document.getElementById('passInput').value;
+  const bar = document.getElementById('strengthBar');
+  const lbl = document.getElementById('strengthLabel');
+  let score = 0;
+  if (val.length >= 8)  score++;
+  if (val.length >= 12) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[a-z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const levels = [
+    {w:'0%',   c:'#ccc',    t:''},
+    {w:'20%',  c:'#e74c3c', t:'Weak'},
+    {w:'40%',  c:'#e67e22', t:'Fair'},
+    {w:'60%',  c:'#f1c40f', t:'Good'},
+    {w:'80%',  c:'#2ecc71', t:'Strong'},
+    {w:'100%', c:'#27ae60', t:'Very Strong'},
+    {w:'100%', c:'#27ae60', t:'Very Strong'}
+  ];
+  const l = levels[score] || levels[0];
+  bar.style.width = l.w; bar.style.background = l.c;
+  lbl.textContent = l.t; lbl.style.color = l.c;
+}
+
 async function doRegister() {
   const name = document.getElementById('nameInput').value.trim();
   const email = document.getElementById('emailInput').value.trim();
@@ -110,7 +142,12 @@ async function doRegister() {
 
   if (!name || !email || !pass) { err.textContent = 'All fields are required.'; err.style.display = ''; return; }
   if (!email.endsWith('@andiks.my') || email.split('@')[0].length === 0) { err.textContent = 'Staff must register with an @andiks.my email (e.g. syasya@andiks.my).'; err.style.display = ''; return; }
-  if (pass.length < 6) { err.textContent = 'Password must be at least 6 characters.'; err.style.display = ''; return; }
+  if (pass.length < 8) { err.textContent = 'Password must be at least 8 characters.'; err.style.display = ''; return; }
+  if (!/[A-Z]/.test(pass) || !/[a-z]/.test(pass) || !/[0-9]/.test(pass) || !/[^A-Za-z0-9]/.test(pass)) {
+    err.textContent = 'Password must include uppercase, lowercase, number, and symbol.';
+    err.style.display = '';
+    return;
+  }
   if (pass !== pass2) { err.textContent = 'Passwords do not match.'; err.style.display = ''; return; }
 
   try {

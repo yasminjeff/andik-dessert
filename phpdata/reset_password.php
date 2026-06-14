@@ -36,12 +36,18 @@ try {
     $db = DB::connect();
 
     // Check email wujud dalam database
-    $stmt = $db->prepare("SELECT id, status FROM users WHERE email = ?");
+    $stmt = $db->prepare("SELECT id, role, status FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
         echo json_encode(["success" => false, "message" => "Email not found."]);
+        exit;
+    }
+
+    // Admin tak boleh request reset
+    if ($user['role'] === 'admin') {
+        echo json_encode(["success" => false, "message" => "Admin accounts cannot request password reset here. Please contact the developer."]);
         exit;
     }
 
@@ -51,11 +57,16 @@ try {
         exit;
     }
 
-$hashed = password_hash($new_password, PASSWORD_BCRYPT, ['cost' => 4]);
-    $stmt = $db->prepare("UPDATE users SET password = ? WHERE id = ?");
+    if ($user['status'] === 'disabled') {
+        echo json_encode(["success" => false, "message" => "Your account is disabled. Please contact admin."]);
+        exit;
+    }
+
+    $hashed = password_hash($new_password, PASSWORD_BCRYPT, ['cost' => 10]);
+    $stmt = $db->prepare("UPDATE users SET reset_requested = 1, reset_new_password = ? WHERE id = ?");
     $stmt->execute([$hashed, $user['id']]);
 
-    echo json_encode(["success" => true, "message" => "Password updated successfully."]);
+    echo json_encode(["success" => true, "message" => "Request sent! An admin will review and approve your password reset shortly."]);
 
 } catch (Exception $e) {
     echo json_encode(["success" => false, "message" => $e->getMessage()]);

@@ -21,6 +21,16 @@ try {
         exit;
     }
 
+    if (strlen($password) < 8) {
+        echo json_encode(["error" => true, "message" => "Password must be at least 8 characters."]);
+        exit;
+    }
+
+    if (!preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[^A-Za-z0-9]/', $password)) {
+        echo json_encode(["error" => true, "message" => "Password must include uppercase, lowercase, number, and symbol."]);
+        exit;
+    }
+
     $db = DB::connect();
 
     $check = $db->prepare("SELECT id FROM users WHERE email = ?");

@@ -31,6 +31,14 @@ try {
         $stmt = $db->prepare("UPDATE users SET status = ? WHERE id = ?");
         $stmt->execute([$status, $id]);
     } elseif ($password) {
+        if (strlen($password) < 8) {
+            echo json_encode(["error" => true, "message" => "Password must be at least 8 characters."]);
+            exit;
+        }
+        if (!preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[^A-Za-z0-9]/', $password)) {
+            echo json_encode(["error" => true, "message" => "Password must include uppercase, lowercase, number, and symbol."]);
+            exit;
+        }
         $hashed = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $db->prepare("UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?");
         $stmt->execute([$name, $email, $hashed, $id]);
