@@ -356,6 +356,11 @@ setInterval(() => {
   loadComments();
 }, 30000);
 
+const animals = ['🐻','🐼','🐨','🦁','🐯','🦊','🐺','🐸','🐧','🦋','🐬','🦄','🐙','🦉','🐢','🦀','🐝','🦜','🐳','🦔'];
+const animalNames = ['Bear','Panda','Koala','Lion','Tiger','Fox','Wolf','Frog','Penguin','Butterfly','Dolphin','Unicorn','Octopus','Owl','Turtle','Crab','Bee','Parrot','Whale','Hedgehog'];
+
+
+
 function renderComments() {
   const search = document.getElementById('searchInput').value.toLowerCase();
   const filter = document.getElementById('filterStatus').value;
@@ -392,14 +397,17 @@ function renderComments() {
       `<i class="bi bi-star${i < r.rating ? '-fill star-filled' : ' star-empty'}"></i>`
     ).join('');
 
+    const animal = animals[r.id % animals.length];
+    const animalName = 'Anon ' + animalNames[r.id % animalNames.length];
+
     return `
     <div class="review-card ${r.flagged ? 'flagged' : ''} ${isUnread ? 'unread-highlight' : ''}">
       <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
         <div class="d-flex gap-3 align-items-start">
-          <div style="width:44px;height:44px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;color:var(--bk);flex-shrink:0">A</div>
+          <div style="width:44px;height:44px;background:#F4F5F7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">${animal}</div>
           <div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
-              <span style="font-weight:700;font-size:.92rem">Anonymous</span>
+              <span style="font-weight:700;font-size:.92rem">${animalName}</span>
               ${r.reply ? `<span class="badge-replied">✓ Replied</span>` : `<span class="badge-new">● New</span>`}
               ${r.flagged ? `<span class="badge-flagged">🚩 Flagged</span>` : ''}
             </div>
