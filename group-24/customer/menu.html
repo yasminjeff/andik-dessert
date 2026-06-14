@@ -480,6 +480,13 @@ authMobile.innerHTML = `<button class="btn btn-sm btn-yo me-2" onclick="openRole
     return daysStr.includes(today);
   }
 
+  function isItemAvailable(item) {
+    const availableFlag = item.available == 1;
+    const stockCount = parseInt(item.stock) || 0;
+    const availableToday = isAvailableToday(item.available_days);
+    return availableFlag && stockCount > 0 && availableToday;
+  }
+
   function renderMenu() {
     let items = [...allItems];
     // Category filter
@@ -497,7 +504,9 @@ authMobile.innerHTML = `<button class="btn btn-sm btn-yo me-2" onclick="openRole
     else if(sortVal === 'name_az') items.sort((a,b)=>a.name.localeCompare(b.name));
     else if(sortVal === 'name_za') items.sort((a,b)=>b.name.localeCompare(a.name));
     else if(sortVal === 'rating_desc') items.sort((a,b)=>(b.avg_rating||0)-(a.avg_rating||0));
-    else if(sortVal === 'available') items.sort((a,b)=>b.available - a.available);
+    else if(sortVal === 'available') {
+      items.sort((a,b) => (isItemAvailable(b) ? 1 : 0) - (isItemAvailable(a) ? 1 : 0));
+    }
 
     document.getElementById('resultInfo').innerHTML = searchVal 
       ? `🔍 Found <strong>${items.length}</strong> result${items.length !== 1 ? 's' : ''} for “${escapeHtml(searchVal)}”`
@@ -512,8 +521,8 @@ authMobile.innerHTML = `<button class="btn btn-sm btn-yo me-2" onclick="openRole
     grid.innerHTML = items.map(item => {
       const availableFlag = item.available == 1;
       const availableToday = isAvailableToday(item.available_days);
-      const finalAvailable = availableFlag && availableToday;
       const stockCount = parseInt(item.stock) || 0;
+      const finalAvailable = isItemAvailable(item);
       const daysHint = item.available_days ? item.available_days.split(',').map(d=>d.trim()).join('/') : null;
       let statusBadgeHtml = '';
       let overlayStatusText = '';
